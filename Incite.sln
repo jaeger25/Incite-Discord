@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.138
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incite.Discord", "Incite.Discord\Incite.Discord.csproj", "{C2DA9D94-DADF-4196-977B-808331EDF0DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2DA9D94-DADF-4196-977B-808331EDF0DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2DA9D94-DADF-4196-977B-808331EDF0DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2DA9D94-DADF-4196-977B-808331EDF0DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2DA9D94-DADF-4196-977B-808331EDF0DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C937F0C-EB28-474E-A8EB-5FD2E8C5D493}
+	EndGlobalSection
+EndGlobal
