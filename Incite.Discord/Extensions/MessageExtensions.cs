@@ -14,5 +14,10 @@ namespace Incite.Discord.Extensions
                 message :
                 await message.Channel.GetMessageAsync(message.Id);
         }
+
+        public static async Task<DiscordMessage> RefreshAsync(this DiscordMessage message)
+        {
+            return await message.Channel.GetMessageAsync(message.Id);
+        }
     }
 }
