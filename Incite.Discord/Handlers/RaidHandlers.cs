@@ -38,7 +38,15 @@ namespace Incite.Discord.Handlers
 
         private Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            return Task.CompletedTask;
+            using (var messageLock = await LockOnMessageAsync(e.Message.Id))
+            {
+                var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
+                if (message != null && e.User != e.Client.CurrentUser)
+                {
+                    await message.RemovePreviousReactionsAsync(e.User, e.Emoji);
+                    await message.AddUserAsync(e.User, e.Emoji);
+                }
+            }
         }
 
         private async Task<IDisposable> LockOnMessageAsync(ulong messageId)

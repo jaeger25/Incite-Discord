@@ -74,6 +74,11 @@ namespace Incite.Discord.Messages
             await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji));
         }
 
+        public async Task RemoveUserAsync(DiscordUser user, DiscordEmoji emoji)
+        {
+
+        }
+
         DiscordEmbed ModifyEventMessageEmbed(DiscordUser user, DiscordEmoji emoji)
         {
             var embed = m_message.Embeds[0];
