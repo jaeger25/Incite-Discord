@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord.Handlers
 {
-    public class RaidHandlers : BaseHandler
+    public class EventHandlers : BaseHandler
     {
         Dictionary<ulong, AsyncLock> m_eventMessageLocks = new Dictionary<ulong, AsyncLock>();
 
-        public RaidHandlers(DiscordClient client)
+        public EventHandlers(DiscordClient client)
         {
             client.MessageReactionAdded += Client_MessageReactionAdded;
             client.MessageReactionRemoved += Client_MessageReactionRemoved;
@@ -36,15 +36,14 @@ namespace Incite.Discord.Handlers
             }
         }
 
-        private Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
+        private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
             using (var messageLock = await LockOnMessageAsync(e.Message.Id))
             {
                 var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-                if (message != null && e.User != e.Client.CurrentUser)
+                if (message != null)
                 {
-                    await message.RemovePreviousReactionsAsync(e.User, e.Emoji);
-                    await message.AddUserAsync(e.User, e.Emoji);
+                    await message.RemoveUserAsync(e.User, e.Emoji);
                 }
             }
         }

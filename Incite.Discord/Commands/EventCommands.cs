@@ -10,15 +10,14 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord.Commands
 {
-    [Group("raid")]
+    [Group("event")]
     [Description("Commands for setting and retrieving info about the guild's schedule")]
-    public class RaidCommands : BaseCommandModule
+    public class EventCommands : BaseCommandModule
     {
         [Command("times")]
         [Description("Lists the official guild raid days and times")]
-        public async Task Ping(CommandContext context)
+        public async Task Times(CommandContext context)
         {
-            await context.TriggerTypingAsync();
             await context.RespondAsync("Raid days: Monday/Wednesday\nRaid times: 9pm - 12am EST (Server time)");
         }
 
@@ -27,12 +26,7 @@ namespace Incite.Discord.Commands
         [Description("Creates a raid event")]
         public async Task Create(CommandContext context, string name, DateTimeOffset date)
         {
-            await context.TriggerTypingAsync();
-
-            var embed = EventMessage.CreateEventMessageEmbed(name, date);
-            var message = await context.RespondAsync(embed: embed);
-
-            await EventMessage.AddReactionsToEventMessageAsync(context.Client, message);
+            var message = await EventMessage.CreateEventMessageAsync(context, name, date);
         }
     }
 }

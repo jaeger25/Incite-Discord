@@ -1,4 +1,5 @@
 ﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Incite.Discord.Extensions;
 using System;
@@ -14,33 +15,76 @@ namespace Incite.Discord.Messages
         DiscordClient m_client;
         DiscordMessage m_message;
 
-        public int TankCount => m_message.Reactions
+        public int TankCount => m_message?.Reactions
             .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
             .Where(x => x.Item1 == InciteEmoji.Prot || x.Item1 == InciteEmoji.Bear)
-            .Sum(x => x.Item2);
+            .Sum(x => x.Item2) ?? 0;
 
-        public int MeleeCount => m_message.Reactions
+        public int MeleeCount => m_message?.Reactions
             .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
             .Where(x => x.Item1 == InciteEmoji.Cat || x.Item1 == InciteEmoji.Enhance || x.Item1 == InciteEmoji.Rouge || x.Item1 == InciteEmoji.Warrior)
-            .Sum(x => x.Item2);
+            .Sum(x => x.Item2) ?? 0;
 
-        public int RangedCount => m_message.Reactions
+        public int RangedCount => m_message?.Reactions
             .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
             .Where(x => x.Item1 == InciteEmoji.Boomkin || x.Item1 == InciteEmoji.EleShaman || x.Item1 == InciteEmoji.Hunter || x.Item1 == InciteEmoji.Mage || x.Item1 == InciteEmoji.Shadow || x.Item1 == InciteEmoji.Warlock)
-            .Sum(x => x.Item2);
+            .Sum(x => x.Item2) ?? 0;
 
-        public int HealerCount => m_message.Reactions
+        public int HealerCount => m_message?.Reactions
             .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
             .Where(x => x.Item1 == InciteEmoji.Priest || x.Item1 == InciteEmoji.RestoDruid || x.Item1 == InciteEmoji.RestoShaman)
-            .Sum(x => x.Item2);
+            .Sum(x => x.Item2) ?? 0;
 
         public int AttendingCount => TankCount + MeleeCount + RangedCount + HealerCount;
 
+        public int WarriorCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Warrior || x.Item1 == InciteEmoji.Prot)
+            .Sum(x => x.Item2) ?? 0;
 
-        private EventMessage(DiscordClient client, DiscordMessage message)
+        public int RogueCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Rouge)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int HunterCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Hunter)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int MageCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Mage)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int WarlockCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Warlock)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int DruidCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Bear || x.Item1 == InciteEmoji.Cat || x.Item1 == InciteEmoji.RestoDruid || x.Item1 == InciteEmoji.Boomkin)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int ShamanCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.RestoShaman || x.Item1 == InciteEmoji.EleShaman || x.Item1 == InciteEmoji.Enhance)
+            .Sum(x => x.Item2) ?? 0;
+
+        public int PriestCount => m_message?.Reactions
+            .Select(x => Tuple.Create(x.Emoji.GetDiscordName(), x.Count - 1))
+            .Where(x => x.Item1 == InciteEmoji.Priest || x.Item1 == InciteEmoji.Shadow)
+            .Sum(x => x.Item2) ?? 0;
+
+        EventMessage(DiscordClient client, DiscordMessage message) : this(client)
+        {
+            m_message = message;
+        }
+
+        EventMessage(DiscordClient client)
         {
             m_client = client;
-            m_message = message;
         }
 
         public static async Task<EventMessage> TryCreateFromMessageAsync(DiscordClient client, DiscordMessage message)
@@ -51,9 +95,7 @@ namespace Incite.Discord.Messages
                 return null;
             }
 
-            var eventMessage = new EventMessage(client, message);
-
-            return eventMessage;
+            return new EventMessage(client, message);
         }
 
         public async Task RemovePreviousReactionsAsync(DiscordUser user, DiscordEmoji currentReaction)
@@ -71,117 +113,144 @@ namespace Incite.Discord.Messages
 
         public async Task AddUserAsync(DiscordUser user, DiscordEmoji emoji)
         {
-            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji));
+            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji, true));
         }
 
         public async Task RemoveUserAsync(DiscordUser user, DiscordEmoji emoji)
         {
-
+            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji, false));
         }
 
-        DiscordEmbed ModifyEventMessageEmbed(DiscordUser user, DiscordEmoji emoji)
+        public static async Task<EventMessage> CreateEventMessageAsync(CommandContext context, string title, DateTimeOffset date)
         {
-            var embed = m_message.Embeds[0];
-            embed.Fields[0].Name = $"Count - {AttendingCount}";
+            var message = new EventMessage(context.Client);
+            message.m_message = await context.RespondAsync(embed: CreateEventMessageEmbed(title, date));
 
-            embed.Fields[3].Name = $"Tanks - {TankCount}";
-            embed.Fields[4].Name = $"{MeleeCount} - DPS - {RangedCount}";
-            embed.Fields[5].Name = $"Healers - {HealerCount}";
+            await message.AddReactionsToEventMessageAsync();
+            return message;
+        }
 
-            embed.Fields[GetFieldIndexForEmoji(emoji)].Value += $"{user.Username}\n";
+        DiscordEmbed ModifyEventMessageEmbed(DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        {
+            var previousEmbed = m_message.Embeds[0];
+            var embed = new DiscordEmbedBuilder()
+            {
+                Title = previousEmbed.Title,
+            };
+
+            embed.WithFooter(previousEmbed.Footer.Text);
+            for (int i = 0; i < 2; i++)
+            {
+                var field = previousEmbed.Fields[i];
+                embed.AddField(field.Name, field.Value, field.Inline);
+            }
+
+            return AddCountFieldsToEmbed(embed, user, emoji, isAdd);
+        }
+
+        async Task AddReactionsToEventMessageAsync()
+        {
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Prot));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Bear));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Warrior));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Rouge));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Cat));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Enhance));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Hunter));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Mage));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Warlock));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Shadow));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.EleShaman));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Boomkin));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.RestoDruid));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.RestoShaman));
+            await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Priest));
+        }
+
+        DiscordEmbedBuilder AddCountFieldsToEmbed(DiscordEmbedBuilder embed, DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        {
+            // Attending count
+            AddEventField(embed, "Count", $"{AttendingCount}");
+
+            // Melee, Ranged, Healer counts
+            AddEventField(embed, "Tanks", $"{TankCount}");
+            AddEventField(embed, "DPS", $"{MeleeCount}", $"{RangedCount}");
+            AddEventField(embed, "Healers", $"{HealerCount}");
+
+            // Class counts
+            AddClassField(embed, "Warrior", WarriorCount, user, emoji, isAdd);
+            AddClassField(embed, "Rogue", RogueCount, user, emoji, isAdd);
+            AddClassField(embed, "Hunter", HunterCount, user, emoji, isAdd);
+
+            AddClassField(embed, "Mage", MageCount, user, emoji, isAdd);
+            AddClassField(embed, "Warlock", WarlockCount, user, emoji, isAdd);
+            AddClassField(embed, "Druid", DruidCount, user, emoji, isAdd);
+
+            AddClassField(embed, "Shaman", ShamanCount, user, emoji, isAdd);
+            AddClassField(embed, "Priest", PriestCount, user, emoji, isAdd);
+
+            embed.AddBlankField();
 
             return embed;
         }
 
-        public static DiscordEmbed CreateEventMessageEmbed(string name, DateTimeOffset date)
+        DiscordEmbedBuilder AddClassField(DiscordEmbedBuilder embed, string className, int count, DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        {
+            if (count == 0)
+            {
+                return embed;
+            }
+
+            string userText = $"\n{emoji} {user.Username}";
+            string classText = $"__**{className}**__";
+
+            if (count == 1 && isAdd)
+            {
+                return embed.AddField("\u200b", $"{classText} - {count}{userText}", true);
+            }
+            else
+            {
+                var field = m_message.Embeds[0].Fields.
+                    Where(x => x.Value.Contains(classText))
+                    .First();
+
+                return isAdd ?
+                    embed.AddField("\u200b", $"{field.Value}{userText}", true) :
+                    embed.AddField("\u200b", $"{field.Value.Replace(userText, "")}", true);
+            }
+        }
+
+        static DiscordEmbedBuilder CreateEventMessageEmbed(string title, DateTimeOffset date)
         {
             var embed = new DiscordEmbedBuilder()
             {
-                Title = $"{name}",
+                Title = $"{title}",
             };
 
             embed.WithFooter("Event");
 
             // Player count and date
-            embed.AddField($"Count - {0}", "\u200b", true);
-            embed.AddField($"{date.ToString("MM-dd")}", "\u200b", true);
-            embed.AddField($"Time - {date.ToString("t")}", "\u200b", true);
-
-            // Melee, Ranged, Healer counts
-            embed.AddField($"Tanks - {0}", "\u200b", true);
-            embed.AddField($"{0} - DPS - {0}", "\u200b", true);
-            embed.AddField($"Healers - {0}", "\u200b", true);
-
-            // Class counts
-            embed.AddField($"Warrior - {0}", "\u200b", true);
-            embed.AddField($"Rogue - {0}", "\u200b", true);
-            embed.AddField($"Hunter - {0}", "\u200b", true);
-            embed.AddField($"Mage - {0}", "\u200b", true);
-            embed.AddField($"Warlock - {0}", "\u200b", true);
-            embed.AddField($"Druid - {0}", "\u200b", true);
-            embed.AddField($"Shaman - {0}", "\u200b", true);
-            embed.AddField($"Priest - {0}", "\u200b", true);
-            embed.AddField("\u200b", "\u200b", true);
+            AddEventField(embed, "Date", $"{date.ToString("MM-dd")}");
+            AddEventField(embed, "Time", $"{date.ToString("t")}");
 
             return embed;
         }
 
-        public static async Task AddReactionsToEventMessageAsync(DiscordClient client, DiscordMessage message)
+        static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format)
         {
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Prot));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Bear));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Warrior));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Rouge));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Cat));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Enhance));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Hunter));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Mage));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Warlock));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Shadow));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.EleShaman));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Boomkin));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.RestoDruid));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.RestoShaman));
-            await message.CreateReactionAsync(DiscordEmoji.FromName(client, InciteEmoji.Priest));
+            return embed.AddField("\u200b", $"__**{label}**__ - {format}", true);
+        }
+
+        static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format1, string format2)
+        {
+            return embed.AddField("\u200b", $"{format1} - __**{label}**__ - {format2}", true);
         }
 
         static bool IsEventMessage(DiscordMessage message)
         {
             return message.Author.IsCurrent &&
                 message.Embeds.Count > 0 &&
-                message.Embeds[0].Footer.Text == "Event";
-        }
-
-        static int GetFieldIndexForEmoji(DiscordEmoji emoji)
-        {
-            switch(emoji.GetDiscordName())
-            {
-                case InciteEmoji.Warrior:
-                case InciteEmoji.Prot:
-                    return 6;
-                case InciteEmoji.Rouge:
-                    return 7;
-                case InciteEmoji.Hunter:
-                    return 8;
-                case InciteEmoji.Mage:
-                    return 9;
-                case InciteEmoji.Warlock:
-                    return 10;
-                case InciteEmoji.Bear:
-                case InciteEmoji.Cat:
-                case InciteEmoji.Boomkin:
-                case InciteEmoji.RestoDruid:
-                    return 11;
-                case InciteEmoji.Enhance:
-                case InciteEmoji.EleShaman:
-                case InciteEmoji.RestoShaman:
-                    return 12;
-                case InciteEmoji.Priest:
-                case InciteEmoji.Shadow:
-                    return 13;
-                default:
-                    throw new ArgumentException($"Unexpected DiscordEmoji: {emoji.GetDiscordName()}");
-            }
+                message.Embeds[0].Footer.Text.Trim() == "Event";
         }
     }
 }
