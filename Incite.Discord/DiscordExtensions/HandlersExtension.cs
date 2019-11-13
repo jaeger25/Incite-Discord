@@ -1,10 +1,11 @@
 ﻿using DSharpPlus;
+using Incite.Discord.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Incite.Discord.Handlers
+namespace Incite.Discord.DiscordExtensions
 {
     public class HandlersExtension : BaseExtension
     {

@@ -1,7 +1,10 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Handlers;
+using Incite.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
@@ -16,26 +19,33 @@ namespace Incite.Discord
 
         static async Task MainAsync(string[] args)
         {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile("appsettings.development.json", true)
+                .AddUserSecrets("97f50552-3f23-43f2-af0f-ab150fb1bcdb")
+                .AddEnvironmentVariables()
+                .Build();
+
             var client = new DiscordClient(new DiscordConfiguration
             {
                 AutoReconnect = true,
                 LogLevel = LogLevel.Debug,
-                Token = "NjM3MDc3MDY2MDgwMTkwNDk4.XbJuwQ.C1GyxIxOqbKQZ1QW0Dsknhzjl2o",
+                Token = config["Discord:BotToken"],
                 TokenType = TokenType.Bot,
                 UseInternalLogHandler = true,
             });
 
             var commands = client.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefixes = new []{ "!" },
+                StringPrefixes = new[] { "!" },
             });
 
             commands.RegisterCommands(typeof(Program).Assembly);
 
-            var handlers = new HandlersExtension();
-            client.AddExtension(handlers);
+            client.AddExtension(new HandlersExtension());
+            client.AddExtension(new DatabaseExtension(config));
 
-            handlers.RegisterHandlers(typeof(Program).Assembly);
+            client.GetExtension<HandlersExtension>().RegisterHandlers(typeof(Program).Assembly);
 
             await client.ConnectAsync();
             await Task.Delay(-1);
