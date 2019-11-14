@@ -7,7 +7,7 @@ namespace Incite.Models
 {
     public class Member : BaseModel
     {
-        public UInt64 DiscordUserId { get; set; }
+        public UInt64 DiscordId { get; set; }
 
         public string PrimaryCharacterName { get; set; }
 

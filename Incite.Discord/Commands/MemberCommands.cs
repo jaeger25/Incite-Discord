@@ -27,15 +27,15 @@ namespace Incite.Discord.Commands
             using var dbContext = new InciteDbContext();
 
             var members = dbContext.Members
-                .Where(x => x.Guild.DiscordGuildId == context.Guild.Id);
+                .Where(x => x.Guild.DiscordId == context.Guild.Id);
 
             StringBuilder memberList = new StringBuilder("Discord Name : Character Name");
             memberList.AppendLine();
 
             foreach(var member in members)
             {
-                string discordName = context.Guild.Members.ContainsKey(member.DiscordUserId) ?
-                    (context.Guild.Members[member.DiscordUserId].Nickname ?? context.Guild.Members[member.DiscordUserId].DisplayName) :
+                string discordName = context.Guild.Members.ContainsKey(member.DiscordId) ?
+                    (context.Guild.Members[member.DiscordId].Nickname ?? context.Guild.Members[member.DiscordId].DisplayName) :
                     "(Unknown)";
 
                 memberList.AppendLine($"{discordName} : {member.PrimaryCharacterName} ");
@@ -55,7 +55,7 @@ namespace Incite.Discord.Commands
             using var dbContext = new InciteDbContext();
 
             var guild = dbContext.Guilds
-                .First(x => x.DiscordGuildId == context.Guild.Id);
+                .First(x => x.DiscordId == context.Guild.Id);
 
             var member = await dbContext.Members
                 .TryGetCurrentMemberAsync(context);
@@ -64,7 +64,7 @@ namespace Incite.Discord.Commands
             {
                 dbContext.Add(new Member()
                 {
-                    DiscordUserId = context.Member.Id,
+                    DiscordId = context.Member.Id,
                     GuildId = guild.Id,
                     PrimaryCharacterName = primaryCharacterName
                 });

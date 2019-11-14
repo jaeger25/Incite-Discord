@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using Incite.Discord.Converters;
 using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Handlers;
 using Incite.Models;
@@ -39,7 +40,11 @@ namespace Incite.Discord
             var commands = client.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = new[] { "!" },
+                EnableDms = false,
             });
+
+            commands.RegisterConverter(new InciteRoleArgumentConverter());
+            commands.RegisterUserFriendlyTypeName<InciteRole>(UserFriendlyEnumTypeConverter.GetUserFriendlyType<InciteRole>());
 
             commands.RegisterCommands(typeof(Program).Assembly);
 

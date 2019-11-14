@@ -18,16 +18,20 @@ namespace Incite.Models
 
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Guild>()
-                .HasAlternateKey(x => x.DiscordGuildId);
+                .HasAlternateKey(x => x.DiscordId);
 
             modelBuilder.Entity<Member>()
-                .HasAlternateKey(x => x.DiscordUserId);
+                .HasAlternateKey(x => x.DiscordId);
+
+            modelBuilder.Entity<Role>()
+                .HasAlternateKey(x => x.DiscordId);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);

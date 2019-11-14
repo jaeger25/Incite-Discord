@@ -32,11 +32,11 @@ namespace Incite.Discord.Handlers
         {
             using var dbContext = new InciteDbContext();
 
-            if (!dbContext.Guilds.Any(x => x.DiscordGuildId == e.Guild.Id))
+            if (!dbContext.Guilds.Any(x => x.DiscordId == e.Guild.Id))
             {
                 dbContext.Guilds.Add(new Guild()
                 {
-                    DiscordGuildId = e.Guild.Id
+                    DiscordId = e.Guild.Id
                 });
 
                 await dbContext.SaveChangesAsync();
