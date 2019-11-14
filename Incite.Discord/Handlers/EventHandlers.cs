@@ -1,7 +1,9 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Incite.Discord.Extensions;
 using Incite.Discord.Messages;
+using Incite.Models;
 using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
@@ -25,26 +27,43 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionAdded(MessageReactionAddEventArgs e)
         {
-            using (var messageLock = await LockOnMessageAsync(e.Message.Id))
+            if (e.User.IsCurrent)
             {
-                var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-                if (message != null && e.User != e.Client.CurrentUser)
-                {
-                    await message.RemovePreviousReactionsAsync(e.User, e.Emoji);
-                    await message.AddUserAsync(e.User, e.Emoji);
-                }
+                return;
+            }
+
+            using var dbContext = new InciteDbContext();
+
+            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            if (e.User != e.Client.CurrentUser && member == null)
+            {
+                await e.Message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
+
+                var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
+                var dmChannel = await discordMember.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("You must first register with the '!member register' command");
+                return;
+            }
+
+            using var messageLock = await LockOnMessageAsync(e.Message.Id);
+            var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
+            if (message != null)
+            {
+                await message.RemovePreviousReactionsAsync(e.User, e.Emoji);
+                await message.AddUserAsync(member, e.Emoji);
             }
         }
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            using (var messageLock = await LockOnMessageAsync(e.Message.Id))
+            using var dbContext = new InciteDbContext();
+
+            var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
+            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            if (message != null && member != null)
             {
-                var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-                if (message != null)
-                {
-                    await message.RemoveUserAsync(e.User, e.Emoji);
-                }
+                await message.RemoveUserAsync(member, e.Emoji);
             }
         }
 

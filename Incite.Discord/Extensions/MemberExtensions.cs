@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,18 +12,18 @@ namespace Incite.Discord.Extensions
 {
     public static class MemberExtensions
     {
-        public static Task<bool> IsMemberRegistered(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
+        public static Task<bool> IsMemberRegisteredAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
         {
             return members
                 .AnyAsync(x => x.Guild.DiscordGuildId == discordGuildId && x.DiscordUserId == discordMemberId);
         }
 
-        public static Task<bool> IsMemberRegistered(this DbSet<Member> members, CommandContext context)
+        public static Task<bool> IsCurrentMemberRegisteredAsync(this DbSet<Member> members, CommandContext context)
         {
-            return members.IsMemberRegistered(context.Guild.Id, context.Member.Id);
+            return members.IsMemberRegisteredAsync(context.Guild.Id, context.User.Id);
         }
 
-        public static Task<Member> GetCurrentMemberAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
+        public static Task<Member> GetMemberAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
         {
             return members
                 .FirstAsync(x => x.Guild.DiscordGuildId == discordGuildId && x.DiscordUserId == discordMemberId);
@@ -30,10 +31,10 @@ namespace Incite.Discord.Extensions
 
         public static Task<Member> GetCurrentMemberAsync(this DbSet<Member> members, CommandContext context)
         {
-            return members.GetCurrentMemberAsync(context.Guild.Id, context.Member.Id);
+            return members.GetMemberAsync(context.Guild.Id, context.User.Id);
         }
 
-        public static Task<Member?> TryGetCurrentMemberAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
+        public static Task<Member?> TryGetMemberAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
         {
             return members
                 .FirstOrDefaultAsync(x => x.Guild.DiscordGuildId == discordGuildId && x.DiscordUserId == discordMemberId);
@@ -41,7 +42,7 @@ namespace Incite.Discord.Extensions
 
         public static Task<Member?> TryGetCurrentMemberAsync(this DbSet<Member> members, CommandContext context)
         {
-            return members.GetCurrentMemberAsync(context.Guild.Id, context.Member.Id);
+            return members.TryGetMemberAsync(context.Guild.Id, context.User.Id);
         }
     }
 }

@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Incite.Discord.Extensions;
+using Incite.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,14 +112,14 @@ namespace Incite.Discord.Messages
             m_message = await m_message.RefreshAsync();
         }
 
-        public async Task AddUserAsync(DiscordUser user, DiscordEmoji emoji)
+        public async Task AddUserAsync(Member member, DiscordEmoji emoji)
         {
-            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji, true));
+            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(member, emoji, true));
         }
 
-        public async Task RemoveUserAsync(DiscordUser user, DiscordEmoji emoji)
+        public async Task RemoveUserAsync(Member member, DiscordEmoji emoji)
         {
-            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(user, emoji, false));
+            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(member, emoji, false));
         }
 
         public static async Task<EventMessage> CreateEventMessageAsync(CommandContext context, string title, DateTimeOffset date)
@@ -130,7 +131,7 @@ namespace Incite.Discord.Messages
             return message;
         }
 
-        DiscordEmbed ModifyEventMessageEmbed(DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        DiscordEmbed ModifyEventMessageEmbed(Member member, DiscordEmoji emoji, bool isAdd)
         {
             var previousEmbed = m_message.Embeds[0];
             var embed = new DiscordEmbedBuilder()
@@ -145,7 +146,7 @@ namespace Incite.Discord.Messages
                 embed.AddField(field.Name, field.Value, field.Inline);
             }
 
-            return AddCountFieldsToEmbed(embed, user, emoji, isAdd);
+            return AddCountFieldsToEmbed(embed, member, emoji, isAdd);
         }
 
         async Task AddReactionsToEventMessageAsync()
@@ -167,7 +168,7 @@ namespace Incite.Discord.Messages
             await m_message.CreateReactionAsync(DiscordEmoji.FromName(m_client, InciteEmoji.Priest));
         }
 
-        DiscordEmbedBuilder AddCountFieldsToEmbed(DiscordEmbedBuilder embed, DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        DiscordEmbedBuilder AddCountFieldsToEmbed(DiscordEmbedBuilder embed, Member member, DiscordEmoji emoji, bool isAdd)
         {
             // Attending count
             AddEventField(embed, "Count", $"{AttendingCount}");
@@ -178,30 +179,30 @@ namespace Incite.Discord.Messages
             AddEventField(embed, "Healers", $"{HealerCount}");
 
             // Class counts
-            AddClassField(embed, "Warrior", WarriorCount, user, emoji, isAdd);
-            AddClassField(embed, "Rogue", RogueCount, user, emoji, isAdd);
-            AddClassField(embed, "Hunter", HunterCount, user, emoji, isAdd);
+            AddClassField(embed, "Warrior", WarriorCount, member, emoji, isAdd);
+            AddClassField(embed, "Rogue", RogueCount, member, emoji, isAdd);
+            AddClassField(embed, "Hunter", HunterCount, member, emoji, isAdd);
 
-            AddClassField(embed, "Mage", MageCount, user, emoji, isAdd);
-            AddClassField(embed, "Warlock", WarlockCount, user, emoji, isAdd);
-            AddClassField(embed, "Druid", DruidCount, user, emoji, isAdd);
+            AddClassField(embed, "Mage", MageCount, member, emoji, isAdd);
+            AddClassField(embed, "Warlock", WarlockCount, member, emoji, isAdd);
+            AddClassField(embed, "Druid", DruidCount, member, emoji, isAdd);
 
-            AddClassField(embed, "Shaman", ShamanCount, user, emoji, isAdd);
-            AddClassField(embed, "Priest", PriestCount, user, emoji, isAdd);
+            AddClassField(embed, "Shaman", ShamanCount, member, emoji, isAdd);
+            AddClassField(embed, "Priest", PriestCount, member, emoji, isAdd);
 
             embed.AddBlankField();
 
             return embed;
         }
 
-        DiscordEmbedBuilder AddClassField(DiscordEmbedBuilder embed, string className, int count, DiscordUser user, DiscordEmoji emoji, bool isAdd)
+        DiscordEmbedBuilder AddClassField(DiscordEmbedBuilder embed, string className, int count, Member member, DiscordEmoji emoji, bool isAdd)
         {
             if (count == 0)
             {
                 return embed;
             }
 
-            string userText = $"\n{emoji} {user.Username}";
+            string userText = $"\n{emoji} {member.PrimaryCharacterName}";
             string classText = $"__**{className}**__";
 
             if (count == 1 && isAdd)

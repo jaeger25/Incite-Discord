@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Incite.Discord.DiscordExtensions;
+using Incite.Discord.Extensions;
 using Incite.Models;
 using System;
 using System.Collections.Generic;
@@ -56,8 +57,8 @@ namespace Incite.Discord.Commands
             var guild = dbContext.Guilds
                 .First(x => x.DiscordGuildId == context.Guild.Id);
 
-            var member = dbContext.Members
-                .FirstOrDefault(x => x.Guild.DiscordGuildId == context.Guild.Id && x.DiscordUserId == context.Member.Id);
+            var member = await dbContext.Members
+                .TryGetCurrentMemberAsync(context);
 
             if (member == null)
             {
