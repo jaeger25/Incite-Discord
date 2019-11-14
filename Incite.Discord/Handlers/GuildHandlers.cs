@@ -32,7 +32,7 @@ namespace Incite.Discord.Handlers
         {
             using var dbContext = new InciteDbContext();
 
-            if (dbContext.Guilds.Any(x => x.DiscordGuildId == e.Guild.Id))
+            if (!dbContext.Guilds.Any(x => x.DiscordGuildId == e.Guild.Id))
             {
                 dbContext.Guilds.Add(new Guild()
                 {

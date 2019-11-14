@@ -210,8 +210,8 @@ namespace Incite.Discord.Messages
             }
             else
             {
-                var field = m_message.Embeds[0].Fields.
-                    Where(x => x.Value.Contains(classText))
+                var field = m_message.Embeds[0].Fields
+                    .Where(x => x.Value.Contains(classText))
                     .First();
 
                 return isAdd ?

@@ -22,22 +22,22 @@ namespace Incite.Discord.Commands
             await context.Message.DeleteAsync();
 
             var channel = await context.Member.CreateDmChannelAsync();
-            await channel.TriggerTypingAsync();
 
             using var dbContext = new InciteDbContext();
 
             var members = dbContext.Members
                 .Where(x => x.Guild.DiscordGuildId == context.Guild.Id);
 
-            StringBuilder memberList = new StringBuilder("Character Name : Discord Name");
+            StringBuilder memberList = new StringBuilder("Discord Name : Character Name");
+            memberList.AppendLine();
 
             foreach(var member in members)
             {
                 string discordName = context.Guild.Members.ContainsKey(member.DiscordUserId) ?
-                    context.Guild.Members[member.DiscordUserId].Nickname :
+                    (context.Guild.Members[member.DiscordUserId].Nickname ?? context.Guild.Members[member.DiscordUserId].DisplayName) :
                     "(Unknown)";
 
-                memberList.AppendLine($"{member.PrimaryCharacterName} : {discordName}");
+                memberList.AppendLine($"{discordName} : {member.PrimaryCharacterName} ");
             }
 
             await channel.SendMessageAsync(memberList.ToString());
@@ -50,7 +50,6 @@ namespace Incite.Discord.Commands
             await context.Message.DeleteAsync();
 
             var channel = await context.Member.CreateDmChannelAsync();
-            await channel.TriggerTypingAsync();
 
             using var dbContext = new InciteDbContext();
 
@@ -64,6 +63,7 @@ namespace Incite.Discord.Commands
             {
                 dbContext.Add(new Member()
                 {
+                    DiscordUserId = context.Member.Id,
                     GuildId = guild.Id,
                     PrimaryCharacterName = primaryCharacterName
                 });
@@ -75,7 +75,7 @@ namespace Incite.Discord.Commands
             }
 
             await dbContext.SaveChangesAsync();
-            await channel.SendMessageAsync("Success!");
+            await channel.SendMessageAsync("Successfully registered!");
         }
     }
 }
