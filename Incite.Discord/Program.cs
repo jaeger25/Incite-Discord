@@ -5,6 +5,7 @@ using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Handlers;
 using Incite.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 

@@ -30,12 +30,9 @@ namespace Incite.Discord.Handlers
 
         async Task CreateGuildAsyc(GuildCreateEventArgs e)
         {
-            using var dbContext = e.Client.GetExtension<DatabaseExtension>().GetDbContext();
+            using var dbContext = new InciteDbContext();
 
-            var guild = dbContext.Guilds
-                .FirstOrDefault(x => x.DiscordGuildId == e.Guild.Id);
-
-            if (guild == null)
+            if (dbContext.Guilds.Any(x => x.DiscordGuildId == e.Guild.Id))
             {
                 dbContext.Guilds.Add(new Guild()
                 {

@@ -23,8 +23,19 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Guild>()
+                .HasAlternateKey(x => x.DiscordGuildId);
+
+            modelBuilder.Entity<Member>()
+                .HasAlternateKey(x => x.DiscordUserId);
+
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            builder.UseInMemoryDatabase("Incite");
         }
     }
 }
