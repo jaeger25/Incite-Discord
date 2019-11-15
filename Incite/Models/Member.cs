@@ -13,5 +13,8 @@ namespace Incite.Models
 
         public int GuildId { get; set; }
         public Guild Guild { get; set; }
+
+        public int RoleId { get; set; }
+        public Role Role { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace Incite.Discord.Attributes
 
             int roleCount = await dbContext.Roles
                 .Where(x => x.GuildId == guild.Id &&
-                    (x.Kind == RoleKind.Member || x.Kind == RoleKind.Officer || x.Kind == RoleKind.Admin))
+                    (x.Kind == RoleKind.Everyone || x.Kind == RoleKind.Member || x.Kind == RoleKind.Officer || x.Kind == RoleKind.Admin))
                 .CountAsync();
 
             int channelCount = await dbContext.Channels
@@ -43,7 +43,7 @@ namespace Incite.Discord.Attributes
                     (x.Kind == ChannelKind.Admin))
                 .CountAsync();
 
-            bool configured = roleCount == 3 &&
+            bool configured = roleCount == 4 &&
                 channelCount == 1;
 
             if (configured)

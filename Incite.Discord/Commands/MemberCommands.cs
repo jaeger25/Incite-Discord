@@ -70,7 +70,8 @@ namespace Incite.Discord.Commands
                 {
                     DiscordId = context.Member.Id,
                     GuildId = guild.Id,
-                    PrimaryCharacterName = primaryCharacterName
+                    PrimaryCharacterName = primaryCharacterName,
+                    RoleId = (await dbContext.Roles.GetRoleAsync(context, RoleKind.Everyone)).Id
                 });
             }
             else
@@ -80,7 +81,11 @@ namespace Incite.Discord.Commands
             }
 
             await dbContext.SaveChangesAsync();
-            await channel.SendMessageAsync("Successfully registered!");
+
+            var adminChannel = await dbContext.Channels.GetChannelAsync(context, ChannelKind.Admin);
+            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"TODO has registered. Please assign them a role using the \"!member setrole\" command");
+
+            await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
     }
 }
