@@ -38,7 +38,13 @@ namespace Incite.Discord.Attributes
                     (x.Kind == RoleKind.Member || x.Kind == RoleKind.Officer))
                 .CountAsync();
 
-            return roleCount == 2;
+            int channelCount = await dbContext.Channels
+                .Where(x => x.Guild.Id == guild.Id &&
+                    (x.Kind == ChannelKind.Admin))
+                .CountAsync();
+
+            return roleCount == 2 &&
+                channelCount == 1;
         }
     }
 }

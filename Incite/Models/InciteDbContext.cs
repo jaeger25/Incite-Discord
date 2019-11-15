@@ -16,6 +16,7 @@ namespace Incite.Models
         {
         }
 
+        public DbSet<Channel> Channels { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -24,6 +25,9 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Channel>()
+                .HasAlternateKey(x => x.DiscordId);
+
             modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
 

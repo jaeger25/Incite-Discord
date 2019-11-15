@@ -8,6 +8,7 @@ using Incite.Discord.Messages;
 using Incite.Models;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,13 +20,14 @@ namespace Incite.Discord.Commands
     public class EventCommands : BaseCommandModule
     {
         [Command("create")]
-        [RequirePermissions(Permissions.SendMessages)]
+        [RequireUserPermissions(Permissions.SendMessages)]
         [Description("Creates an event")]
         public async Task Create(CommandContext context,
             string name,
-            [Description("Format: \"10-31-2019 9:00 PM\"")] DateTimeOffset date)
+            string description,
+            [Description("Format: \"10-31-2019 9:00 PM -04:00\"")] DateTimeOffset date)
         {
-            await EventMessage.CreateEventMessageAsync(context, name, date);
+            await EventMessage.CreateEventMessageAsync(context, name, description, date);
         }
     }
 }

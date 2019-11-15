@@ -122,10 +122,10 @@ namespace Incite.Discord.Messages
             await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(member, emoji, false));
         }
 
-        public static async Task<EventMessage> CreateEventMessageAsync(CommandContext context, string title, DateTimeOffset date)
+        public static async Task<EventMessage> CreateEventMessageAsync(CommandContext context, string title, string description, DateTimeOffset date)
         {
             var message = new EventMessage(context.Client);
-            message.m_message = await context.RespondAsync(embed: CreateEventMessageEmbed(title, date));
+            message.m_message = await context.RespondAsync(embed: CreateEventMessageEmbed(title, description, date));
 
             await message.AddReactionsToEventMessageAsync();
             return message;
@@ -137,6 +137,7 @@ namespace Incite.Discord.Messages
             var embed = new DiscordEmbedBuilder()
             {
                 Title = previousEmbed.Title,
+                Description = previousEmbed.Description,
             };
 
             embed.WithFooter(previousEmbed.Footer.Text);
@@ -221,11 +222,12 @@ namespace Incite.Discord.Messages
             }
         }
 
-        static DiscordEmbedBuilder CreateEventMessageEmbed(string title, DateTimeOffset date)
+        static DiscordEmbedBuilder CreateEventMessageEmbed(string title, string description, DateTimeOffset date)
         {
             var embed = new DiscordEmbedBuilder()
             {
                 Title = $"{title}",
+                Description = $"{description}",
             };
 
             embed.WithFooter("Event");

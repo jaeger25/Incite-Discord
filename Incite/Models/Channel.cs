@@ -4,21 +4,19 @@ using System.Text;
 
 namespace Incite.Models
 {
-    public enum RoleKind
+    public enum ChannelKind
     {
-        Everyone,
-        Member,
-        Officer,
+        Unspecified,
         Admin,
     }
 
-    public class Role : BaseModel
+    public class Channel : BaseModel
     {
         public UInt64 DiscordId { get; set; }
 
+        public ChannelKind Kind { get; set; }
+
         public int GuildId { get; set; }
         public Guild Guild { get; set; }
-
-        public RoleKind Kind { get; set; }
     }
 }
