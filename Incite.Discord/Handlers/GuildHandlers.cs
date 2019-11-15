@@ -2,6 +2,7 @@
 using DSharpPlus.EventArgs;
 using Incite.Discord.DiscordExtensions;
 using Incite.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Incite.Discord.Handlers
         {
             using var dbContext = new InciteDbContext();
 
-            if (!dbContext.Guilds.Any(x => x.DiscordId == e.Guild.Id))
+            if (! await dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
             {
                 dbContext.Guilds.Add(new Guild()
                 {

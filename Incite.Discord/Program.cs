@@ -43,8 +43,8 @@ namespace Incite.Discord
                 EnableDms = false,
             });
 
-            commands.RegisterConverter(new InciteRoleArgumentConverter());
-            commands.RegisterUserFriendlyTypeName<InciteRole>(UserFriendlyEnumTypeConverter.GetUserFriendlyType<InciteRole>());
+            commands.RegisterConverter(new RoleKindArgumentConverter());
+            commands.RegisterUserFriendlyTypeName<RoleKind>(UserFriendlyEnumTypeConverter.GetUserFriendlyType<RoleKind>());
 
             commands.RegisterCommands(typeof(Program).Assembly);
 
