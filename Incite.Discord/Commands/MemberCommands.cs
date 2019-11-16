@@ -27,7 +27,7 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var members = dbContext.Members
                 .Where(x => x.Guild.DiscordId == context.Guild.Id)
@@ -56,7 +56,7 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var guild = dbContext.Guilds
                 .First(x => x.DiscordId == context.Guild.Id);
@@ -95,7 +95,7 @@ namespace Incite.Discord.Commands
             DiscordUser user,
             [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind)
         {
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var officer = await dbContext.Members.GetCurrentMemberAsync(context);
             if (roleKind > officer.Role.Kind)

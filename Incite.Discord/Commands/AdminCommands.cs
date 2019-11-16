@@ -25,7 +25,7 @@ namespace Incite.Discord.Commands
             [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
             [Description("Server role")] DiscordRole role)
         {
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
             var existingRole = await dbContext.Roles
                 .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
 
@@ -53,7 +53,7 @@ namespace Incite.Discord.Commands
             [Description("Values: Unspecified, Admin")] ChannelKind channelKind,
             [Description("Server channel")] DiscordChannel channel)
         {
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
             var existingChannel = await dbContext.Channels
                 .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == channelKind);
 

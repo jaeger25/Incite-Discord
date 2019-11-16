@@ -8,9 +8,9 @@ namespace Incite.Models
 {
     public class InciteDbContext : DbContext
     {
-        public InciteDbContext() : base()
-        {
-        }
+        //public InciteDbContext() : base()
+        //{
+        //}
 
         public InciteDbContext(DbContextOptions<InciteDbContext> options) : base(options)
         {
@@ -39,11 +39,6 @@ namespace Incite.Models
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            builder.UseInMemoryDatabase("Incite");
         }
     }
 }

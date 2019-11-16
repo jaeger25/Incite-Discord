@@ -26,7 +26,7 @@ namespace Incite.Discord.Attributes
                 return true;
             }
 
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var member = await dbContext.Members.GetCurrentMemberAsync(context);
             return member.Role.Kind >= RoleKind;

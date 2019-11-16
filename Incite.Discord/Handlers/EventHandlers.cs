@@ -32,7 +32,7 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (e.User != e.Client.CurrentUser && member == null)
@@ -57,7 +57,7 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
             var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);

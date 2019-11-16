@@ -31,7 +31,7 @@ namespace Incite.Discord.Handlers
 
         async Task CreateGuildAsyc(GuildCreateEventArgs e)
         {
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
 
             if (! await dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
             {

@@ -30,7 +30,7 @@ namespace Incite.Discord.Attributes
                 return true;
             }
 
-            using var dbContext = new InciteDbContext();
+            InciteDbContext dbContext = new InciteDbContext(null);
             var guild = await dbContext.Guilds.GetCurrentGuildAsync(context);
 
             int roleCount = await dbContext.Roles
