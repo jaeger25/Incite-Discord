@@ -22,7 +22,7 @@ namespace Incite.Discord.Commands
         [Command("setrole")]
         [Description("Sets the server role which corresponds with the RoleKind")]
         public async Task SetRole(CommandContext context,
-            [Description("Values: Member, Officer, Admin")] RoleKind roleKind,
+            [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
             [Description("Server role")] DiscordRole role)
         {
             using var dbContext = new InciteDbContext();

@@ -9,7 +9,7 @@ namespace Incite.Models
         Everyone,
         Member,
         Officer,
-        Admin,
+        Leader,
     }
 
     public class Role : BaseModel

@@ -44,5 +44,11 @@ namespace Incite.Discord.Extensions
         {
             return members.TryGetMemberAsync(context.Guild.Id, context.User.Id);
         }
+
+        public static Task<Member> GetMemberAsync(this DbSet<Member> members, DiscordUser user)
+        {
+            return members.
+                FirstAsync(x => x.DiscordId == user.Id);
+        }
     }
 }
