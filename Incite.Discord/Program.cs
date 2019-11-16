@@ -1,7 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
-using Incite.Discord.Converters;
 using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Handlers;
 using Incite.Models;
@@ -43,9 +43,8 @@ namespace Incite.Discord
                 EnableDms = false,
             });
 
-            commands.RegisterConverter(new RoleKindArgumentConverter());
-            commands.RegisterUserFriendlyTypeName<RoleKind>(UserFriendlyEnumTypeConverter.GetUserFriendlyType<RoleKind>());
-
+            commands.RegisterConverter(new EnumConverter<RoleKind>());
+            commands.RegisterConverter(new EnumConverter<ChannelKind>());
             commands.RegisterCommands(typeof(Program).Assembly);
 
             client.AddExtension(new HandlersExtension());

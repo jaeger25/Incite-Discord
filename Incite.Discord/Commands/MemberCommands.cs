@@ -88,6 +88,7 @@ namespace Incite.Discord.Commands
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
 
+        [Command("setrole")]
         [RequireInciteRole(RoleKind.Officer)]
         [Description("Sets the role for a user")]
         public async Task SetRole(CommandContext context,
