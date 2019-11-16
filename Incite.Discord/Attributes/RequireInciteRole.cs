@@ -20,6 +20,12 @@ namespace Incite.Discord.Attributes
 
         public override async Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
+            var user = await context.Guild.GetMemberAsync(context.User.Id);
+            if (user.IsOwner)
+            {
+                return true;
+            }
+
             using var dbContext = new InciteDbContext();
 
             var member = await dbContext.Members.GetCurrentMemberAsync(context);
