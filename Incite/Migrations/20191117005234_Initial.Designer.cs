@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    [Migration("20191117003421_Initial")]
+    [Migration("20191117005234_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -294,9 +294,9 @@ namespace Incite.Migrations
             modelBuilder.Entity("Incite.Models.Channel", b =>
                 {
                     b.HasOne("Incite.Models.Guild", "Guild")
-                        .WithMany()
+                        .WithMany("Channels")
                         .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

@@ -25,7 +25,6 @@ namespace Incite.Discord.Services
             {
                 StringPrefixes = new[] { "!" },
                 EnableDms = false,
-                DmHelp = true,
                 Services = serviceProvider
             });
 

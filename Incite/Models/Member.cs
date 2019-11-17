@@ -10,11 +10,11 @@ namespace Incite.Models
         public string PrimaryCharacterName { get; set; }
 
         public int GuildId { get; set; }
-        public Guild Guild { get; set; }
+        public virtual Guild Guild { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
-        public ICollection<MemberRole> MemberRoles { get; set; }
+        public virtual ICollection<MemberRole> MemberRoles { get; set; }
     }
 }

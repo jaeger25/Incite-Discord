@@ -40,9 +40,10 @@ namespace Incite.Discord
                     services.AddEntityFrameworkSqlServer()
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
-                        .AddDbContextPool<InciteDbContext>(options =>
+                        .AddDbContext<InciteDbContext>(options =>
                         {
-                            options.UseSqlServer(config["ConnectionStrings:Default"]);
+                            options.UseLazyLoadingProxies()
+                                .UseSqlServer(config["ConnectionStrings:Default"]);
                         });
 
                     services.AddHostedService<DiscordService>();

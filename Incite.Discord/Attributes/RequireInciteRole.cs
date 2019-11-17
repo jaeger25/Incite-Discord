@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext.Attributes;
 using Incite.Models;
 using Incite.Discord.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,9 +28,8 @@ namespace Incite.Discord.Attributes
                 return true;
             }
 
-            InciteDbContext m_dbContext = new InciteDbContext(null);
-
-            var member = await m_dbContext.Members.GetCurrentMemberAsync(context);
+            var dbContext = context.Services.GetService<InciteDbContext>();
+            var member = await dbContext.Members.GetCurrentMemberAsync(context);
             return member.MemberRoles
                 .Any(x => x.Role.Kind >= RoleKind);
         }

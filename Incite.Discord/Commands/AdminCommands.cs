@@ -59,7 +59,6 @@ namespace Incite.Discord.Commands
             [Description("Values: Unspecified, Admin")] ChannelKind channelKind,
             [Description("Server channel")] DiscordChannel channel)
         {
-            InciteDbContext m_dbContext = new InciteDbContext(null);
             var existingChannel = await m_dbContext.Channels
                 .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == channelKind);
 

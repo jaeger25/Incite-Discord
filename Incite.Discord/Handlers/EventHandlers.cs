@@ -35,8 +35,6 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            InciteDbContext m_dbContext = new InciteDbContext(null);
-
             var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (e.User != e.Client.CurrentUser && member == null)
             {

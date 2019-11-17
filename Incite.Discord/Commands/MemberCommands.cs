@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Incite.Discord.Attributes;
@@ -8,7 +9,6 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,16 +35,13 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            InciteDbContext m_dbContext = new InciteDbContext(null);
-
-            var members = m_dbContext.Members
-                .Where(x => x.Guild.DiscordId == context.Guild.Id)
-                .AsAsyncEnumerable();
+            var guild = await m_dbContext.Guilds
+                .FirstAsync(x => x.DiscordId == context.Guild.Id);
 
             StringBuilder memberList = new StringBuilder("Discord Name : Character Name");
             memberList.AppendLine();
 
-            await foreach (var member in members)
+            foreach (var member in guild.Members)
             {
                 string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
                     (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
@@ -64,10 +61,8 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            InciteDbContext m_dbContext = new InciteDbContext(null);
-
-            var guild = m_dbContext.Guilds
-                .First(x => x.DiscordId == context.Guild.Id);
+            var guild = await m_dbContext.Guilds
+                .FirstAsync(x => x.DiscordId == context.Guild.Id);
 
             User user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
             if (user == null)
@@ -102,8 +97,10 @@ namespace Incite.Discord.Commands
 
             await m_dbContext.SaveChangesAsync();
 
-            var adminChannel = await m_dbContext.Channels.GetChannelAsync(context, ChannelKind.Admin);
-            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"TODO has registered. Please assign them a role using the \"!member setrole\" command");
+            var adminChannel = guild.Channels
+                .First(x => x.Kind == ChannelKind.Admin);
+
+            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"TODO has registered. Please assign them a role using the \"!member grantrole\" command");
 
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
@@ -111,13 +108,17 @@ namespace Incite.Discord.Commands
         [Command("grantrole")]
         [RequireInciteRole(RoleKind.Officer)]
         [Description("Grants the role for a user")]
-        public async Task SetRole(CommandContext context,
+        public async Task GrantRole(CommandContext context,
             DiscordUser user,
             [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind)
         {
-            var officer = await m_dbContext.Members.GetCurrentMemberAsync(context);
-            bool allowedToChange = officer.MemberRoles
-                .Any(x => x.Role.Kind >= roleKind);
+            bool allowedToChange = PermissionMethods.HasPermission(context.Member.PermissionsIn(context.Channel), Permissions.ManageGuild);
+            if (!allowedToChange)
+            {
+                var officer = await m_dbContext.Members.GetCurrentMemberAsync(context);
+                allowedToChange = officer.MemberRoles
+                    .Any(x => x.Role.Kind >= roleKind);
+            }
 
             if (!allowedToChange)
             {

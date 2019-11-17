@@ -17,6 +17,6 @@ namespace Incite.Models
         public ChannelKind Kind { get; set; }
 
         public int GuildId { get; set; }
-        public Guild Guild { get; set; }
+        public virtual Guild Guild { get; set; }
     }
 }

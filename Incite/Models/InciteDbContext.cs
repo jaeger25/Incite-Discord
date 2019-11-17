@@ -29,9 +29,21 @@ namespace Incite.Models
             modelBuilder.Entity<User>()
                 .HasAlternateKey(x => x.DiscordId);
 
+            modelBuilder.Entity<Member>()
+                .HasOne(x => x.Guild)
+                    .WithMany(x => x.Members)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Role>()
                 .HasOne(x => x.Guild)
-                .WithMany(x => x.Roles)
+                    .WithMany(x => x.Roles)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Channel>()
+                .HasOne(x => x.Guild)
+                    .WithMany(x => x.Channels)
                 .HasForeignKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Restrict);
 

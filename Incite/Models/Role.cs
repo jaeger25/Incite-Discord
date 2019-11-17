@@ -17,7 +17,7 @@ namespace Incite.Models
         public UInt64 DiscordId { get; set; }
 
         public int GuildId { get; set; }
-        public Guild Guild { get; set; }
+        public virtual Guild Guild { get; set; }
 
         public RoleKind Kind { get; set; }
     }

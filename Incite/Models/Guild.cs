@@ -10,5 +10,9 @@ namespace Incite.Models
         public UInt64 DiscordId { get; set; }
 
         public virtual ICollection<Role> Roles { get; set; }
+
+        public virtual ICollection<Channel> Channels { get; set; }
+
+        public virtual ICollection<Member> Members { get; set; }
     }
 }
