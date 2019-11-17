@@ -21,6 +21,20 @@ namespace Incite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DiscordId = table.Column<decimal>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.UniqueConstraint("AK_Users_DiscordId", x => x.DiscordId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WowClasses",
                 columns: table => new
                 {
@@ -59,7 +73,6 @@ namespace Incite.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Channels", x => x.Id);
-                    table.UniqueConstraint("AK_Channels_DiscordId", x => x.DiscordId);
                     table.ForeignKey(
                         name: "FK_Channels_Guilds_GuildId",
                         column: x => x.GuildId,
@@ -81,13 +94,12 @@ namespace Incite.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                    table.UniqueConstraint("AK_Roles_DiscordId", x => x.DiscordId);
                     table.ForeignKey(
                         name: "FK_Roles_Guilds_GuildId",
                         column: x => x.GuildId,
                         principalTable: "Guilds",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,15 +108,13 @@ namespace Incite.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DiscordId = table.Column<decimal>(nullable: false),
                     PrimaryCharacterName = table.Column<string>(nullable: true),
                     GuildId = table.Column<int>(nullable: false),
-                    RoleId = table.Column<int>(nullable: false)
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Members", x => x.Id);
-                    table.UniqueConstraint("AK_Members_DiscordId", x => x.DiscordId);
                     table.ForeignKey(
                         name: "FK_Members_Guilds_GuildId",
                         column: x => x.GuildId,
@@ -112,7 +122,33 @@ namespace Incite.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Members_Roles_RoleId",
+                        name: "FK_Members_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MemberRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MemberId = table.Column<int>(nullable: false),
+                    RoleId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MemberRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MemberRoles_Members_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Members",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MemberRoles_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
@@ -161,14 +197,24 @@ namespace Incite.Migrations
                 column: "GuildId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MemberRoles_MemberId",
+                table: "MemberRoles",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MemberRoles_RoleId",
+                table: "MemberRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Members_GuildId",
                 table: "Members",
                 column: "GuildId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_RoleId",
+                name: "IX_Members_UserId",
                 table: "Members",
-                column: "RoleId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_GuildId",
@@ -182,7 +228,7 @@ namespace Incite.Migrations
                 name: "Channels");
 
             migrationBuilder.DropTable(
-                name: "Members");
+                name: "MemberRoles");
 
             migrationBuilder.DropTable(
                 name: "WowClasses");
@@ -191,7 +237,13 @@ namespace Incite.Migrations
                 name: "WowProfessions");
 
             migrationBuilder.DropTable(
+                name: "Members");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Guilds");

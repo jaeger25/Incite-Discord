@@ -116,9 +116,9 @@ namespace Incite.Discord.Commands
             [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind)
         {
             var officer = await m_dbContext.Members.GetCurrentMemberAsync(context);
-            var officerRoles = await m_dbContext.MemberRoles.GetMemberRolesAsync(officer);
-            bool allowedToChange = officerRoles
-                .Any(x => x.Kind >= roleKind);
+            bool allowedToChange = officer.MemberRoles
+                .Any(x => x.Role.Kind >= roleKind);
+
             if (!allowedToChange)
             {
                 await context.Channel.SendMessageAsync("Cannot set user's role higher than your own.");

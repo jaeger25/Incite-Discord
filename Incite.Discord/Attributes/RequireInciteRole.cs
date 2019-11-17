@@ -30,8 +30,8 @@ namespace Incite.Discord.Attributes
             InciteDbContext m_dbContext = new InciteDbContext(null);
 
             var member = await m_dbContext.Members.GetCurrentMemberAsync(context);
-            var memberRoles = await m_dbContext.MemberRoles.GetMemberRolesAsync(member);
-            return memberRoles.Any(x => x.Kind >= RoleKind);
+            return member.MemberRoles
+                .Any(x => x.Role.Kind >= RoleKind);
         }
     }
 }

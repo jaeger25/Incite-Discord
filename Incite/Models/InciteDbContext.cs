@@ -23,17 +23,17 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Channel>()
-                .HasAlternateKey(x => x.DiscordId);
-
             modelBuilder.Entity<Guild>()
-                .HasAlternateKey(x => x.DiscordId);
-
-            modelBuilder.Entity<Role>()
                 .HasAlternateKey(x => x.DiscordId);
 
             modelBuilder.Entity<User>()
                 .HasAlternateKey(x => x.DiscordId);
+
+            modelBuilder.Entity<Role>()
+                .HasOne(x => x.Guild)
+                .WithMany(x => x.Roles)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);

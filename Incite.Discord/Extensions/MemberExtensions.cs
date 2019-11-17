@@ -61,13 +61,5 @@ namespace Incite.Discord.Extensions
             return members
                 .FirstAsync(x => x.User.DiscordId == user.Id && x.Guild.DiscordId == guild.Id);
         }
-
-        public static Task<Role[]> GetMemberRolesAsync(this DbSet<MemberRole> roles, Member member)
-        {
-            return roles
-                .Where(x => x.MemberId == member.Id)
-                .Select(x => x.Role)
-                .ToArrayAsync();
-        }
     }
 }

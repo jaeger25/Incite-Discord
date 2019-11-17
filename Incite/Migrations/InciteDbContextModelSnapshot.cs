@@ -36,8 +36,6 @@ namespace Incite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("DiscordId");
-
                     b.HasIndex("GuildId");
 
                     b.ToTable("Channels");
@@ -67,27 +65,44 @@ namespace Incite.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("DiscordId")
-                        .HasColumnType("decimal(20,0)");
-
                     b.Property<int>("GuildId")
                         .HasColumnType("int");
 
                     b.Property<string>("PrimaryCharacterName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("Incite.Models.MemberRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("DiscordId");
-
-                    b.HasIndex("GuildId");
+                    b.HasIndex("MemberId");
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Members");
+                    b.ToTable("MemberRoles");
                 });
 
             modelBuilder.Entity("Incite.Models.Role", b =>
@@ -108,11 +123,26 @@ namespace Incite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("DiscordId");
-
                     b.HasIndex("GuildId");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Incite.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("DiscordId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("DiscordId");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Incite.Models.WowClass", b =>
@@ -276,6 +306,21 @@ namespace Incite.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Incite.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.MemberRole", b =>
+                {
+                    b.HasOne("Incite.Models.Member", "Member")
+                        .WithMany("MemberRoles")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Incite.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
@@ -286,9 +331,9 @@ namespace Incite.Migrations
             modelBuilder.Entity("Incite.Models.Role", b =>
                 {
                     b.HasOne("Incite.Models.Guild", "Guild")
-                        .WithMany()
+                        .WithMany("Roles")
                         .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
