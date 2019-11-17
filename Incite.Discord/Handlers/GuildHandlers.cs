@@ -13,8 +13,12 @@ namespace Incite.Discord.Handlers
 {
     public class GuildHandlers : BaseHandler
     {
-        public GuildHandlers(DiscordClient client)
+        readonly InciteDbContext m_dbContext;
+
+        public GuildHandlers(DiscordClient client, InciteDbContext dbContext)
         {
+            m_dbContext = dbContext;
+
             client.GuildCreated += Client_GuildCreated;
             client.GuildAvailable += Client_GuildAvailable;
         }
@@ -31,16 +35,14 @@ namespace Incite.Discord.Handlers
 
         async Task CreateGuildAsyc(GuildCreateEventArgs e)
         {
-            InciteDbContext dbContext = new InciteDbContext(null);
-
-            if (! await dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
+            if (! await m_dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
             {
-                dbContext.Guilds.Add(new Guild()
+                m_dbContext.Guilds.Add(new Guild()
                 {
                     DiscordId = e.Guild.Id
                 });
 
-                await dbContext.SaveChangesAsync();
+                await m_dbContext.SaveChangesAsync();
             }
         }
     }

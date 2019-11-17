@@ -17,10 +17,13 @@ namespace Incite.Discord.Handlers
 {
     public class EventHandlers : BaseHandler
     {
+        readonly InciteDbContext m_dbContext;
+
         Dictionary<ulong, AsyncLock> m_eventMessageLocks = new Dictionary<ulong, AsyncLock>();
 
-        public EventHandlers(DiscordClient client)
+        public EventHandlers(DiscordClient client, InciteDbContext dbContext)
         {
+            m_dbContext = dbContext;
             client.MessageReactionAdded += Client_MessageReactionAdded;
             client.MessageReactionRemoved += Client_MessageReactionRemoved;
         }
@@ -32,9 +35,9 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            InciteDbContext dbContext = new InciteDbContext(null);
+            InciteDbContext m_dbContext = new InciteDbContext(null);
 
-            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (e.User != e.Client.CurrentUser && member == null)
             {
                 await e.Message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
@@ -57,10 +60,8 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            InciteDbContext dbContext = new InciteDbContext(null);
-
             var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (message != null && member != null)
             {
                 await message.RemoveUserAsync(member, e.Emoji);

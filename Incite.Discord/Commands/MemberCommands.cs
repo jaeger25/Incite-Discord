@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,13 @@ namespace Incite.Discord.Commands
     [Description("Commands for managing guild members")]
     public class MemberCommands : BaseCommandModule
     {
+        readonly InciteDbContext m_dbContext;
+
+        public MemberCommands(InciteDbContext dbContext)
+        {
+            m_dbContext = dbContext;
+        }
+
         [Command("list")]
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
@@ -27,9 +35,9 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            InciteDbContext dbContext = new InciteDbContext(null);
+            InciteDbContext m_dbContext = new InciteDbContext(null);
 
-            var members = dbContext.Members
+            var members = m_dbContext.Members
                 .Where(x => x.Guild.DiscordId == context.Guild.Id)
                 .AsAsyncEnumerable();
 
@@ -38,8 +46,8 @@ namespace Incite.Discord.Commands
 
             await foreach (var member in members)
             {
-                string discordName = context.Guild.Members.ContainsKey(member.DiscordId) ?
-                    (context.Guild.Members[member.DiscordId].Nickname ?? context.Guild.Members[member.DiscordId].DisplayName) :
+                string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
+                    (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
                     "(Unknown)";
 
                 memberList.AppendLine($"{discordName} : {member.PrimaryCharacterName} ");
@@ -56,64 +64,86 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            InciteDbContext dbContext = new InciteDbContext(null);
+            InciteDbContext m_dbContext = new InciteDbContext(null);
 
-            var guild = dbContext.Guilds
+            var guild = m_dbContext.Guilds
                 .First(x => x.DiscordId == context.Guild.Id);
 
-            var member = await dbContext.Members
+            User user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
+            if (user == null)
+            {
+                user = new User()
+                {
+                    DiscordId = context.User.Id
+                };
+
+                m_dbContext.Users.Add(user);
+            }
+
+            var member = await m_dbContext.Members
                 .TryGetCurrentMemberAsync(context);
 
             if (member == null)
             {
-                dbContext.Add(new Member()
+                member = new Member()
                 {
-                    DiscordId = context.Member.Id,
+                    User = user,
                     GuildId = guild.Id,
-                    PrimaryCharacterName = primaryCharacterName,
-                    RoleId = (await dbContext.Roles.GetRoleAsync(context, RoleKind.Everyone)).Id
-                });
+                    PrimaryCharacterName = primaryCharacterName
+                };
+
+                m_dbContext.Members.Add(member);
             }
             else
             {
                 member.PrimaryCharacterName = primaryCharacterName;
-                dbContext.Update(member);
+                m_dbContext.Update(member);
             }
 
-            await dbContext.SaveChangesAsync();
+            await m_dbContext.SaveChangesAsync();
 
-            var adminChannel = await dbContext.Channels.GetChannelAsync(context, ChannelKind.Admin);
+            var adminChannel = await m_dbContext.Channels.GetChannelAsync(context, ChannelKind.Admin);
             await adminChannel.GetDiscordChannel(context).SendMessageAsync($"TODO has registered. Please assign them a role using the \"!member setrole\" command");
 
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
 
-        [Command("setrole")]
+        [Command("grantrole")]
         [RequireInciteRole(RoleKind.Officer)]
-        [Description("Sets the role for a user")]
+        [Description("Grants the role for a user")]
         public async Task SetRole(CommandContext context,
             DiscordUser user,
             [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind)
         {
-            InciteDbContext dbContext = new InciteDbContext(null);
-
-            var officer = await dbContext.Members.GetCurrentMemberAsync(context);
-            if (roleKind > officer.Role.Kind)
+            var officer = await m_dbContext.Members.GetCurrentMemberAsync(context);
+            var officerRoles = await m_dbContext.MemberRoles.GetMemberRolesAsync(officer);
+            bool allowedToChange = officerRoles
+                .Any(x => x.Kind >= roleKind);
+            if (!allowedToChange)
             {
                 await context.Channel.SendMessageAsync("Cannot set user's role higher than your own.");
                 return;
             }
 
-            var member = await dbContext.Members.GetMemberAsync(user);
-            var role = await dbContext.Roles.GetRoleAsync(context, roleKind);
-            member.RoleId = role.Id;
+            var member = await m_dbContext.Members.GetMemberAsync(context.Guild, user);
+            var role = await m_dbContext.Roles.GetRoleAsync(context, roleKind);
+            bool hasRole = await m_dbContext.MemberRoles
+                .AnyAsync(x => x.MemberId == member.Id && x.RoleId == role.Id);
+
+            if (!hasRole)
+            {
+                m_dbContext.MemberRoles.Add(new MemberRole()
+                {
+                    MemberId = member.Id,
+                    RoleId = role.Id
+                });
+
+                await m_dbContext.SaveChangesAsync();
+            }
 
             var discordRole = context.Guild.GetRole(role.DiscordId);
             var discordMember = await context.Guild.GetMemberAsync(user.Id);
             await discordMember.GrantRoleAsync(discordRole);
-
-            dbContext.Update(member);
-            await dbContext.SaveChangesAsync();
         }
     }
 }

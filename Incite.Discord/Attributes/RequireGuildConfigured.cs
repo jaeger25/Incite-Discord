@@ -30,15 +30,15 @@ namespace Incite.Discord.Attributes
                 return true;
             }
 
-            InciteDbContext dbContext = new InciteDbContext(null);
-            var guild = await dbContext.Guilds.GetCurrentGuildAsync(context);
+            InciteDbContext m_dbContext = new InciteDbContext(null);
+            var guild = await m_dbContext.Guilds.GetCurrentGuildAsync(context);
 
-            int roleCount = await dbContext.Roles
+            int roleCount = await m_dbContext.Roles
                 .Where(x => x.GuildId == guild.Id &&
                     (x.Kind == RoleKind.Everyone || x.Kind == RoleKind.Member || x.Kind == RoleKind.Officer || x.Kind == RoleKind.Leader))
                 .CountAsync();
 
-            int channelCount = await dbContext.Channels
+            int channelCount = await m_dbContext.Channels
                 .Where(x => x.Guild.Id == guild.Id &&
                     (x.Kind == ChannelKind.Admin))
                 .CountAsync();

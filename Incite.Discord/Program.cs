@@ -28,7 +28,18 @@ namespace Incite.Discord
                         .AddEnvironmentVariables()
                         .Build();
 
+                    var discordClient = new DiscordClient(new DiscordConfiguration
+                    {
+                        AutoReconnect = true,
+                        LogLevel = LogLevel.Debug,
+                        Token = config["Discord:BotToken"],
+                        TokenType = TokenType.Bot,
+                        UseInternalLogHandler = true,
+                    });
+
                     services.AddEntityFrameworkSqlServer()
+                        .AddSingleton<IConfiguration>(config)
+                        .AddSingleton<DiscordClient>(discordClient)
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseSqlServer(config["ConnectionStrings:Default"]);

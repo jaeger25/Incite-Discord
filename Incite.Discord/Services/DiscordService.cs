@@ -15,54 +15,41 @@ namespace Incite.Discord.Services
 {
     public class DiscordService : IHostedService
     {
-        DiscordClient Client { get; }
+        readonly DiscordClient m_discordClient;
 
-        public DiscordService(IConfiguration config, IServiceProvider provider)
+        public DiscordService(DiscordClient client, IServiceProvider serviceProvider)
         {
-            Client = new DiscordClient(new DiscordConfiguration
-            {
-                AutoReconnect = true,
-                LogLevel = LogLevel.Debug,
-                Token = config["Discord:BotToken"],
-                TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-            });
+            m_discordClient = client;
 
-            var commands = Client.UseCommandsNext(new CommandsNextConfiguration
+            var commands = m_discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = new[] { "!" },
                 EnableDms = false,
                 DmHelp = true,
-                Services = provider
+                Services = serviceProvider
             });
 
             commands.RegisterConverter(new EnumConverter<RoleKind>());
             commands.RegisterConverter(new EnumConverter<ChannelKind>());
             commands.RegisterCommands(GetType().Assembly);
 
-            Client.AddExtension(new HandlersExtension());
-            Client.AddExtension(new DatabaseExtension(config));
-
-            Client.GetExtension<HandlersExtension>().RegisterHandlers(typeof(Program).Assembly);
+            client.AddExtension(new HandlersExtension());
+            client.GetExtension<HandlersExtension>().RegisterHandlers(typeof(Program).Assembly);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var commands = Client.GetCommandsNext();
+            var commands = m_discordClient.GetCommandsNext();
             commands.CommandErrored += Commands_CommandErrored;
 
-            await Client.ConnectAsync();
+            await m_discordClient.ConnectAsync();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await Client?.DisconnectAsync();
+            await m_discordClient.DisconnectAsync();
 
-            var commands = Client?.GetCommandsNext();
-            if (commands == null)
-            {
-                commands.CommandErrored -= Commands_CommandErrored;
-            }
+            m_discordClient.GetCommandsNext().CommandErrored -= Commands_CommandErrored;
         }
 
         private Task Commands_CommandErrored(CommandErrorEventArgs e)

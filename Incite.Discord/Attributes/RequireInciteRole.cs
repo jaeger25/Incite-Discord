@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Incite.Discord.Attributes
 {
@@ -26,10 +27,11 @@ namespace Incite.Discord.Attributes
                 return true;
             }
 
-            InciteDbContext dbContext = new InciteDbContext(null);
+            InciteDbContext m_dbContext = new InciteDbContext(null);
 
-            var member = await dbContext.Members.GetCurrentMemberAsync(context);
-            return member.Role.Kind >= RoleKind;
+            var member = await m_dbContext.Members.GetCurrentMemberAsync(context);
+            var memberRoles = await m_dbContext.MemberRoles.GetMemberRolesAsync(member);
+            return memberRoles.Any(x => x.Kind >= RoleKind);
         }
     }
 }

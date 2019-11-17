@@ -8,10 +8,6 @@ namespace Incite.Models
 {
     public class InciteDbContext : DbContext
     {
-        //public InciteDbContext() : base()
-        //{
-        //}
-
         public InciteDbContext(DbContextOptions<InciteDbContext> options) : base(options)
         {
         }
@@ -19,7 +15,9 @@ namespace Incite.Models
         public DbSet<Channel> Channels { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<MemberRole> MemberRoles { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
 
@@ -31,10 +29,10 @@ namespace Incite.Models
             modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
 
-            modelBuilder.Entity<Member>()
+            modelBuilder.Entity<Role>()
                 .HasAlternateKey(x => x.DiscordId);
 
-            modelBuilder.Entity<Role>()
+            modelBuilder.Entity<User>()
                 .HasAlternateKey(x => x.DiscordId);
 
             WowClass.Seed(modelBuilder);

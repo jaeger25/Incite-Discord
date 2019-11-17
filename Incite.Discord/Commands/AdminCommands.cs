@@ -19,32 +19,38 @@ namespace Incite.Discord.Commands
     [Description("Commands for managing bot settings for this guild")]
     public class AdminCommands : BaseCommandModule
     {
+        readonly InciteDbContext m_dbContext;
+
+        public AdminCommands(InciteDbContext dbContext)
+        {
+            m_dbContext = dbContext;
+        }
+
         [Command("setrole")]
         [Description("Sets the server role which corresponds with the RoleKind")]
         public async Task SetRole(CommandContext context,
             [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
             [Description("Server role")] DiscordRole role)
         {
-            InciteDbContext dbContext = new InciteDbContext(null);
-            var existingRole = await dbContext.Roles
+            var existingRole = await m_dbContext.Roles
                 .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
 
             if (existingRole == null)
             {
-                dbContext.Roles.Add(new Role()
+                m_dbContext.Roles.Add(new Role()
                 {
                     DiscordId = role.Id,
-                    GuildId = (await dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
+                    GuildId = (await m_dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
                     Kind = roleKind
                 });
             }
             else
             {
                 existingRole.DiscordId = role.Id;
-                dbContext.Roles.Update(existingRole);
+                m_dbContext.Roles.Update(existingRole);
             }
 
-            await dbContext.SaveChangesAsync();
+            await m_dbContext.SaveChangesAsync();
         }
 
         [Command("setchannel")]
@@ -53,26 +59,26 @@ namespace Incite.Discord.Commands
             [Description("Values: Unspecified, Admin")] ChannelKind channelKind,
             [Description("Server channel")] DiscordChannel channel)
         {
-            InciteDbContext dbContext = new InciteDbContext(null);
-            var existingChannel = await dbContext.Channels
+            InciteDbContext m_dbContext = new InciteDbContext(null);
+            var existingChannel = await m_dbContext.Channels
                 .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == channelKind);
 
             if (existingChannel == null && channelKind != ChannelKind.Unspecified)
             {
-                dbContext.Channels.Add(new Channel()
+                m_dbContext.Channels.Add(new Channel()
                 {
                     DiscordId = channel.Id,
-                    GuildId = (await dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
+                    GuildId = (await m_dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
                     Kind = channelKind
                 });
             }
             else
             {
                 existingChannel.DiscordId = channel.Id;
-                dbContext.Channels.Update(existingChannel);
+                m_dbContext.Channels.Update(existingChannel);
             }
 
-            await dbContext.SaveChangesAsync();
+            await m_dbContext.SaveChangesAsync();
         }
     }
 }
