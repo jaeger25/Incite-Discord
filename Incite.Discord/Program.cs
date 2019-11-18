@@ -40,6 +40,7 @@ namespace Incite.Discord
                     services.AddEntityFrameworkSqlServer()
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
+                        .AddSingleton<EmojiService>()
                         .AddDbContext<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()

@@ -4,6 +4,7 @@ using DSharpPlus.EventArgs;
 using Incite.Discord.Extensions;
 using Incite.Discord.Messages;
 using Incite.Models;
+using Microsoft.EntityFrameworkCore;
 using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
@@ -30,7 +31,15 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionAdded(MessageReactionAddEventArgs e)
         {
-            if (e.User.IsCurrent)
+            if (e.User.IsCurrent || !e.Message.Author.IsCurrent)
+            {
+                return;
+            }
+
+            var guildEvent = await m_dbContext.Events
+                .FirstOrDefaultAsync(x => x.Message.DiscordId == e.Message.Id);
+
+            if (guildEvent == null)
             {
                 return;
             }
@@ -48,21 +57,47 @@ namespace Incite.Discord.Handlers
             }
 
             using var messageLock = await LockOnMessageAsync(e.Message.Id);
-            var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-            if (message != null)
+
+            var eventMember = guildEvent.EventMembers
+                .FirstOrDefault(x => x.MemberId == member.Id);
+
+            if (eventMember == null)
             {
-                await message.RemovePreviousReactionsAsync(e.User, e.Emoji);
-                await message.AddUserAsync(member, e.Emoji);
+                eventMember = new EventMember()
+                {
+                    EventId = guildEvent.Id,
+                    MemberId = member.Id,
+                    EmojiDiscordId = e.Emoji.Id
+                };
             }
+
+            var message = await e.Message.HydrateAsync();
+            var eventMessage = new EventMessage(e.Client, e.Message);
+            await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
+
+            await eventMessage.AddUserAsync(member, e.Emoji);
         }
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            var message = await EventMessage.TryCreateFromMessageAsync(e.Client, e.Message);
-            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
-            if (message != null && member != null)
+            if (!e.Message.Author.IsCurrent)
             {
-                await message.RemoveUserAsync(member, e.Emoji);
+                return;
+            }
+
+            var guildEvent = m_dbContext.Events
+                .FirstOrDefaultAsync(x => x.Message.DiscordId == e.Message.Id);
+
+            if (guildEvent == null)
+            {
+                return;
+            }
+
+            var eventMessage = new EventMessage(e.Client, e.Message);
+            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            if (eventMessage != null && member != null)
+            {
+                await eventMessage.RemoveUserAsync(member, e.Emoji);
             }
         }
 

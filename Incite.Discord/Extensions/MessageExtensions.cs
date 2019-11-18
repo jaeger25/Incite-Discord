@@ -20,9 +20,14 @@ namespace Incite.Discord.Extensions
             return await message.Channel.GetMessageAsync(message.Id);
         }
 
-        public static DiscordEmbedBuilder AddBlankField(this DiscordEmbedBuilder embed, bool inline = false)
+        public static DiscordEmbedBuilder AddBlankFields(this DiscordEmbedBuilder embed, bool inline = false, int count = 1)
         {
-            return embed.AddField("\u200b", "\u200b", inline);
+            for(int i = 0; i < count; i++)
+            {
+                embed.AddField("\u200b", "\u200b", inline);
+            }
+
+            return embed;
         }
     }
 }

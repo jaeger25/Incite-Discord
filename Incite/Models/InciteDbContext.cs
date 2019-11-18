@@ -13,9 +13,12 @@ namespace Incite.Models
         }
 
         public DbSet<Channel> Channels { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventMember> EventMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<MemberRole> MemberRoles { get; set; }
+        public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
@@ -45,6 +48,12 @@ namespace Incite.Models
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Channels)
                 .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(x => x.Channel)
+                    .WithMany(x => x.Messages)
+                .HasForeignKey(x => x.ChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             WowClass.Seed(modelBuilder);

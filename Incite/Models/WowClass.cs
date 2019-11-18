@@ -11,53 +11,51 @@ namespace Incite.Models
 
         public static void Seed(ModelBuilder builder)
         {
-            int nextId = 1;
-
             builder.Entity<WowClass>()
                 .HasData(
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 1,
                         Name = "Warrior",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 2,
                         Name = "Rogue",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 3,
                         Name = "Hunter",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 4,
                         Name = "Mage",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 5,
                         Name = "Warlock",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 6,
                         Name = "Priest",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 7,
                         Name = "Druid",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 8,
                         Name = "Shaman",
                     },
                     new WowClass
                     {
-                        Id = nextId++,
+                        Id = 9,
                         Name = "Paladin",
                     }
                 );
