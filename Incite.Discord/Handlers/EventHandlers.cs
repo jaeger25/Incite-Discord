@@ -69,13 +69,20 @@ namespace Incite.Discord.Handlers
                     MemberId = member.Id,
                     EmojiDiscordId = e.Emoji.Id
                 };
+
+                guildEvent.EventMembers.Add(eventMember);
+            }
+            else
+            {
+                eventMember.EmojiDiscordId = e.Emoji.Id;
             }
 
-            var message = await e.Message.HydrateAsync();
-            var eventMessage = new EventMessage(e.Client, e.Message);
+            await m_dbContext.SaveChangesAsync();
+
+            var eventMessage = new EventMessage(e.Client, e.Message, guildEvent);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
 
-            await eventMessage.AddUserAsync(member, e.Emoji);
+            await eventMessage.UpdateAsync(guildEvent);
         }
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
@@ -85,7 +92,7 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var guildEvent = m_dbContext.Events
+            var guildEvent = await m_dbContext.Events
                 .FirstOrDefaultAsync(x => x.Message.DiscordId == e.Message.Id);
 
             if (guildEvent == null)
@@ -93,12 +100,10 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var eventMessage = new EventMessage(e.Client, e.Message);
-            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
-            if (eventMessage != null && member != null)
-            {
-                await eventMessage.RemoveUserAsync(member, e.Emoji);
-            }
+            // TODO: remove from context
+
+            var eventMessage = new EventMessage(e.Client, e.Message, guildEvent);
+            await eventMessage.UpdateAsync(guildEvent);
         }
 
         private async Task<IDisposable> LockOnMessageAsync(ulong messageId)

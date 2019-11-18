@@ -17,74 +17,15 @@ namespace Incite.Discord.Messages
     {
         readonly EmojiService m_emojis;
         readonly DiscordClient m_client;
+        readonly Models.Event m_guildEvent;
+
         DiscordMessage m_message;
 
-        public int TankCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.ProtEmoji.Value || x.Emoji == m_emojis.BearEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int MeleeCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.CatEmoji.Value || x.Emoji == m_emojis.EnhanceEmoji.Value || x.Emoji == m_emojis.RougeEmoji.Value || x.Emoji == m_emojis.WarriorEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int RangedCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.BoomkinEmoji.Value || x.Emoji == m_emojis.EleShamanEmoji.Value || x.Emoji == m_emojis.HunterEmoji.Value || x.Emoji == m_emojis.MageEmoji.Value || x.Emoji == m_emojis.ShadowEmoji.Value || x.Emoji == m_emojis.WarlockEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int HealerCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.PriestEmoji.Value || x.Emoji == m_emojis.RestoDruidEmoji.Value || x.Emoji == m_emojis.RestoShamanEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int AttendingCount => TankCount + MeleeCount + RangedCount + HealerCount;
-
-        public int LateCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.LateEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int AbsentCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.AbsentEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int WarriorCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.WarriorEmoji.Value || x.Emoji == m_emojis.ProtEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int RogueCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.RougeEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int HunterCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.HunterEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int MageCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.MageEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int WarlockCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.WarlockEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int DruidCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.BearEmoji.Value || x.Emoji == m_emojis.CatEmoji.Value || x.Emoji == m_emojis.RestoDruidEmoji.Value || x.Emoji == m_emojis.BoomkinEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int ShamanCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.RestoShamanEmoji.Value || x.Emoji == m_emojis.EleShamanEmoji.Value || x.Emoji == m_emojis.EnhanceEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public int PriestCount => m_message?.Reactions
-            .Where(x => x.Emoji == m_emojis.PriestEmoji.Value || x.Emoji == m_emojis.ShadowEmoji.Value)
-            .Sum(x => x.Count - 1) ?? 0;
-
-        public EventMessage(DiscordClient client, DiscordMessage message) : this(client)
-        {
-            m_message = message;
-        }
-
-        EventMessage(DiscordClient client)
+        public EventMessage(DiscordClient client, DiscordMessage message, Models.Event guildEvent)
         {
             m_client = client;
+            m_message = message;
+            m_guildEvent = guildEvent;
             m_emojis = client.GetCommandsNext().Services.GetService<EmojiService>();
         }
 
@@ -101,141 +42,110 @@ namespace Incite.Discord.Messages
             m_message = await m_message.RefreshAsync();
         }
 
-        public async Task AddUserAsync(Member member, DiscordEmoji emoji)
+        public async Task UpdateAsync(Models.Event guildEvent)
         {
-            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(member, emoji, true));
+            await m_message.ModifyAsync(embed: CreateEventMessageEmbed(guildEvent));
         }
 
-        public async Task RemoveUserAsync(Member member, DiscordEmoji emoji)
+        public async Task AddReactionsToEventMessageAsync()
         {
-            await m_message.ModifyAsync(embed: ModifyEventMessageEmbed(member, emoji, false));
+            await m_message.CreateReactionAsync(m_emojis.ProtEmoji);
+            await m_message.CreateReactionAsync(m_emojis.BearEmoji);
+            await m_message.CreateReactionAsync(m_emojis.WarriorEmoji);
+            await m_message.CreateReactionAsync(m_emojis.RogueEmoji);
+            await m_message.CreateReactionAsync(m_emojis.CatEmoji);
+            await m_message.CreateReactionAsync(m_emojis.EnhanceEmoji);
+            await m_message.CreateReactionAsync(m_emojis.HunterEmoji);
+            await m_message.CreateReactionAsync(m_emojis.MageEmoji);
+            await m_message.CreateReactionAsync(m_emojis.WarlockEmoji);
+            await m_message.CreateReactionAsync(m_emojis.ShadowEmoji);
+            await m_message.CreateReactionAsync(m_emojis.EleShamanEmoji);
+            await m_message.CreateReactionAsync(m_emojis.BoomkinEmoji);
+            await m_message.CreateReactionAsync(m_emojis.RestoDruidEmoji);
+            await m_message.CreateReactionAsync(m_emojis.RestoShamanEmoji);
+            await m_message.CreateReactionAsync(m_emojis.PriestEmoji);
+            await m_message.CreateReactionAsync(m_emojis.AbsentEmoji);
+            await m_message.CreateReactionAsync(m_emojis.LateEmoji);
         }
 
-        public static async Task<EventMessage> CreateEventMessageAsync(CommandContext context, string title, string description, DateTimeOffset date)
+        void AddClassField(DiscordEmbedBuilder embed, string className, IEnumerable<EventMember> members)
         {
-            var message = new EventMessage(context.Client);
-            message.m_message = await context.RespondAsync(embed: CreateEventMessageEmbed(title, description, date));
+            var classMembers = members
+                .ToArray();
 
-            await message.AddReactionsToEventMessageAsync();
-            return message;
+            StringBuilder classColumnText = new StringBuilder($"__**{className}**__ - {classMembers.Length}");
+            foreach(var member in classMembers)
+            {
+                classColumnText.Append($"\n{m_emojis.GetByDiscordId(member.EmojiDiscordId)} {member.Member.PrimaryCharacterName}");
+            }
         }
 
-        DiscordEmbed ModifyEventMessageEmbed(Member member, DiscordEmoji emoji, bool isAdd)
+        DiscordEmbed CreateEventMessageEmbed(Models.Event guildEvent)
         {
-            var previousEmbed = m_message.Embeds[0];
             var embed = new DiscordEmbedBuilder()
             {
-                Title = previousEmbed.Title,
-                Description = previousEmbed.Description,
+                Title = $"{guildEvent.Name}",
+                Description = $"{guildEvent.Description}",
             };
 
-            embed.WithFooter(previousEmbed.Footer.Text);
-            for (int i = 0; i < 2; i++)
-            {
-                var field = previousEmbed.Fields[i];
-                embed.AddField(field.Name, field.Value, field.Inline);
-            }
-
-            return AddCountFieldsToEmbed(embed, member, emoji, isAdd);
-        }
-
-        async Task AddReactionsToEventMessageAsync()
-        {
-            await m_message.CreateReactionAsync(m_emojis.ProtEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.BearEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.WarriorEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.RougeEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.CatEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.EnhanceEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.HunterEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.MageEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.WarlockEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.ShadowEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.EleShamanEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.BoomkinEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.RestoDruidEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.RestoShamanEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.PriestEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.AbsentEmoji.Value);
-            await m_message.CreateReactionAsync(m_emojis.LateEmoji.Value);
-        }
-
-        DiscordEmbedBuilder AddCountFieldsToEmbed(DiscordEmbedBuilder embed, Member member, DiscordEmoji emoji, bool isAdd)
-        {
-            // Attending count
-            AddEventField(embed, "Count", $"{AttendingCount}");
+            // Player count and date
+            AddEventField(embed, "Count", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordId != m_emojis.LateEmoji.Id && x.EmojiDiscordId != m_emojis.AbsentEmoji.Id )}");
+            AddEventField(embed, "Date", $"{guildEvent.DateTime.ToString("MM-dd")}");
+            AddEventField(embed, "Time", $"{guildEvent.DateTime.ToString("t")}");
 
             // Melee, Ranged, Healer counts
-            AddEventField(embed, "Tanks", $"{TankCount}");
-            AddEventField(embed, "DPS", $"{MeleeCount}", $"{RangedCount}");
-            AddEventField(embed, "Healers", $"{HealerCount}");
+            AddEventField(embed, "Tanks", $"{guildEvent.EventMembers.Count(x => m_emojis.TankEmojis().Select(x => x.Id).Contains(x.EmojiDiscordId))}");
+            AddEventField(embed, "DPS", $"{guildEvent.EventMembers.Count(x => m_emojis.MeleeEmojis().Select(x => x.Id).Contains(x.EmojiDiscordId))}",
+                $"{guildEvent.EventMembers.Count(x => m_emojis.RangeEmojis().Select(x => x.Id).Contains(x.EmojiDiscordId))}");
+            AddEventField(embed, "Healers", $"{guildEvent.EventMembers.Count(x => m_emojis.HealerEmojis().Select(x => x.Id).Contains(x.EmojiDiscordId))}");
 
             // Class counts
-            AddClassField(embed, "Warrior", WarriorCount, member, emoji, isAdd);
-            AddClassField(embed, "Rogue", RogueCount, member, emoji, isAdd);
-            AddClassField(embed, "Hunter", HunterCount, member, emoji, isAdd);
+            AddClassField(embed, "Warrior", guildEvent.EventMembers
+                .Where(x => m_emojis.WarriorEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
 
-            AddClassField(embed, "Mage", MageCount, member, emoji, isAdd);
-            AddClassField(embed, "Warlock", WarlockCount, member, emoji, isAdd);
-            AddClassField(embed, "Druid", DruidCount, member, emoji, isAdd);
+            AddClassField(embed, "Rogue", guildEvent.EventMembers
+                .Where(x => m_emojis.RogueEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
 
-            AddClassField(embed, "Shaman", ShamanCount, member, emoji, isAdd);
-            AddClassField(embed, "Priest", PriestCount, member, emoji, isAdd);
+            AddClassField(embed, "Hunter", guildEvent.EventMembers
+                .Where(x => m_emojis.HunterEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
+
+            AddClassField(embed, "Mage", guildEvent.EventMembers
+                .Where(x => m_emojis.MageEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
+
+            AddClassField(embed, "Warlock", guildEvent.EventMembers
+                .Where(x => m_emojis.WarlockEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
+
+            AddClassField(embed, "Druid", guildEvent.EventMembers
+                .Where(x => m_emojis.DruidEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
+
+            AddClassField(embed, "Shaman", guildEvent.EventMembers
+                .Where(x => m_emojis.ShamanEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
+
+            AddClassField(embed, "Priest", guildEvent.EventMembers
+                .Where(x => m_emojis.PriestEmojis()
+                    .Select(x => x.Id)
+                    .Contains(x.EmojiDiscordId)));
 
             embed.AddBlankFields();
 
-            AddEventField(embed, "Late", $"{LateCount}");
-            AddEventField(embed, "Absent", $"{AbsentCount}");
+            AddEventField(embed, "Late", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordId == m_emojis.LateEmoji.Id)}");
+            AddEventField(embed, "Absent", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordId == m_emojis.AbsentEmoji.Id)}");
 
-            return embed;
-        }
-
-        DiscordEmbedBuilder AddClassField(DiscordEmbedBuilder embed, string className, int count, Member member, DiscordEmoji emoji, bool isAdd)
-        {
-            if (count == 0)
-            {
-                return embed;
-            }
-
-            string userText = $"\n{emoji} {member.PrimaryCharacterName}";
-            string classText = $"__**{className}**__";
-
-            if (count == 1 && isAdd)
-            {
-                return embed.AddField("\u200b", $"{classText} - {count}{userText}", true);
-            }
-            else
-            {
-                var field = m_message.Embeds[0].Fields
-                    .Where(x => x.Value.Contains(classText))
-                    .FirstOrDefault();
-
-                if (field != null)
-                {
-                    return isAdd ?
-                        embed.AddField("\u200b", $"{field.Value}{userText}", true) :
-                        embed.AddField("\u200b", $"{field.Value.Replace(userText, "")}", true);
-                }
-            }
-
-            return embed;
-        }
-
-        static DiscordEmbedBuilder CreateEventMessageEmbed(string title, string description, DateTimeOffset date)
-        {
-            var embed = new DiscordEmbedBuilder()
-            {
-                Title = $"{title}",
-                Description = $"{description}",
-            };
-
-            embed.WithFooter("Event");
-
-            // Player count and date
-            AddEventField(embed, "Date", $"{date.ToString("MM-dd")}");
-            AddEventField(embed, "Time", $"{date.ToString("t")}");
-
-            return embed;
+            return embed.Build();
         }
 
         static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format)
