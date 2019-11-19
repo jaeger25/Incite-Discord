@@ -15,11 +15,6 @@ namespace Incite.Discord.Extensions
                 await message.Channel.GetMessageAsync(message.Id);
         }
 
-        public static async Task<DiscordMessage> RefreshAsync(this DiscordMessage message)
-        {
-            return await message.Channel.GetMessageAsync(message.Id);
-        }
-
         public static DiscordEmbedBuilder AddBlankFields(this DiscordEmbedBuilder embed, bool inline = false, int count = 1)
         {
             for(int i = 0; i < count; i++)

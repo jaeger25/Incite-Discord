@@ -31,13 +31,14 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionAdded(MessageReactionAddEventArgs e)
         {
-            if (e.User.IsCurrent || !e.Message.Author.IsCurrent)
+            var message = await e.Message.HydrateAsync();
+            if (e.User.IsCurrent || !message.Author.IsCurrent)
             {
                 return;
             }
 
             var guildEvent = await m_dbContext.Events
-                .FirstOrDefaultAsync(x => x.Message.DiscordId == e.Message.Id);
+                .FirstOrDefaultAsync(x => x.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
             {
@@ -47,7 +48,7 @@ namespace Incite.Discord.Handlers
             var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (e.User != e.Client.CurrentUser && member == null)
             {
-                await e.Message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
+                await message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
 
                 var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
                 var dmChannel = await discordMember.CreateDmChannelAsync();
@@ -56,7 +57,7 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            using var messageLock = await LockOnMessageAsync(e.Message.Id);
+            using var messageLock = await LockOnMessageAsync(message.Id);
 
             var eventMember = guildEvent.EventMembers
                 .FirstOrDefault(x => x.MemberId == member.Id);
@@ -79,7 +80,7 @@ namespace Incite.Discord.Handlers
 
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new EventMessage(e.Client, e.Message, guildEvent);
+            var eventMessage = new EventMessage(e.Client, message, guildEvent);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
 
             await eventMessage.UpdateAsync(guildEvent);
@@ -87,22 +88,30 @@ namespace Incite.Discord.Handlers
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
         {
-            if (!e.Message.Author.IsCurrent)
+            var message = await e.Message.HydrateAsync();
+            if (!message.Author.IsCurrent)
             {
                 return;
             }
 
             var guildEvent = await m_dbContext.Events
-                .FirstOrDefaultAsync(x => x.Message.DiscordId == e.Message.Id);
+                .FirstOrDefaultAsync(x => x.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
             {
                 return;
             }
 
-            // TODO: remove from context
+            var member = guildEvent.EventMembers
+                .First(x => x.Member.User.DiscordId == e.User.Id);
 
-            var eventMessage = new EventMessage(e.Client, e.Message, guildEvent);
+            if (member.EmojiDiscordId == e.Emoji.Id)
+            {
+                m_dbContext.EventMembers.Remove(member);
+                await m_dbContext.SaveChangesAsync();
+            }
+
+            var eventMessage = new EventMessage(e.Client, message, guildEvent);
             await eventMessage.UpdateAsync(guildEvent);
         }
 

@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using Incite.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,33 +17,33 @@ namespace Incite.Discord.Services
         {
             m_client = client;
 
-            AbsentEmoji = DiscordEmoji.FromGuildEmote(m_client, 612343589070045200);
-            LateEmoji = DiscordEmoji.FromGuildEmote(m_client, 612373443551297689);
-            RangedEmoji = DiscordEmoji.FromGuildEmote(m_client, 592446395596931072);
-            TankEmoji = DiscordEmoji.FromGuildEmote(m_client, 598989638098747403);
-            HealerEmoji = DiscordEmoji.FromGuildEmote(m_client, 592438128057253898);
-            MeleeEmoji = DiscordEmoji.FromGuildEmote(m_client, 592440132129521664);
-            RestoShamanEmoji = DiscordEmoji.FromGuildEmote(m_client, 606343376497016854);
-            EnhanceEmoji = DiscordEmoji.FromGuildEmote(m_client, 597942199593730059);
-            EleShamanEmoji = DiscordEmoji.FromGuildEmote(m_client, 597939529394946068);
-            ShamanEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532030056857600);
-            BearEmoji = DiscordEmoji.FromGuildEmote(m_client, 603627895956439079);
-            CatEmoji = DiscordEmoji.FromGuildEmote(m_client, 597939529592078336);
-            BoomkinEmoji = DiscordEmoji.FromGuildEmote(m_client, 597939529806249996);
-            RestoDruidEmoji = DiscordEmoji.FromGuildEmote(m_client, 606343445803696157);
-            DruidEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532029675438081);
-            WarlockEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532029851336716);
-            PriestEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532029901799437);
-            ShadowEmoji = DiscordEmoji.FromGuildEmote(m_client, 597921879159734284);
-            RogueEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532030086217748);
-            HunterEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532029880827924);
-            MageEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532030161977355);
-            ProtEmoji = DiscordEmoji.FromGuildEmote(m_client, 580801859221192714);
-            WarriorEmoji = DiscordEmoji.FromGuildEmote(m_client, 579532030153588739);
+            AbsentEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482817134593];
+            LateEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482884374535];
+            RangedEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482892632104];
+            TankEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482850689024];
+            HealerEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482733248512];
+            MeleeEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482657619979];
+            RestoShamanEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155483177975824];
+            EnhanceEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482905214976];
+            EleShamanEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482879918090];
+            ShamanEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482678591498];
+            BearEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482942963722];
+            CatEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482900889610];
+            BoomkinEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482888306688];
+            RestoDruidEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482825654292];
+            DruidEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482389446676];
+            WarlockEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482800357396];
+            PriestEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482477527041];
+            ShadowEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482770866176];
+            RogueEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482716602399];
+            HunterEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482704019486];
+            MageEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482678722570];
+            ProtEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482301235211];
+            WarriorEmoji = m_client.Guilds[Guild.InciteDiscordId].Emojis[637155482301104129];
 
             var emojis = GetType().GetProperties()
                 .Where(x => x.PropertyType == typeof(DiscordEmoji))
-                .Select(x => (DiscordEmoji)x.GetValue(x));
+                .Select(x => (DiscordEmoji)x.GetValue(this));
 
             foreach (var emoji in emojis)
             {

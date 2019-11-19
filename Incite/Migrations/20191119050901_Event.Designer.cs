@@ -4,14 +4,16 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191119050901_Event")]
+    partial class Event
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,13 +57,7 @@ namespace Incite.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GuildId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MessageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MessageId1")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -70,8 +66,6 @@ namespace Incite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MessageId");
-
-                    b.HasIndex("MessageId1");
 
                     b.ToTable("Events");
                 });
@@ -380,15 +374,9 @@ namespace Incite.Migrations
 
             modelBuilder.Entity("Incite.Models.Event", b =>
                 {
-                    b.HasOne("Incite.Models.Guild", "Guild")
-                        .WithMany("Events")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Incite.Models.Message", "Message")
                         .WithMany()
-                        .HasForeignKey("MessageId1")
+                        .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

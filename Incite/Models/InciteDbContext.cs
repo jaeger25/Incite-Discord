@@ -56,6 +56,13 @@ namespace Incite.Models
                 .HasForeignKey(x => x.ChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Event>()
+                .HasOne(x => x.Guild)
+                    .WithMany(x => x.Events)
+                .HasForeignKey(x => x.GuildId)
+                .HasForeignKey(x => x.MessageId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);
         }

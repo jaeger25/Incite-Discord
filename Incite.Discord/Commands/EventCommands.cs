@@ -35,17 +35,21 @@ namespace Incite.Discord.Commands
             string description,
             [Description("Format: \"10-31-2019 9:00 PM -04:00\"")] DateTimeOffset dateTime)
         {
-            var message = await context.Message.RespondAsync("EVENT");
+            var message = await context.Message.RespondAsync("\u200b");
             await context.Message.DeleteAsync();
 
-            var channel = m_dbContext.Channels
-                .FirstAsync(x => x.DiscordId == context.Channel.Id);
+            var guild = await m_dbContext.Guilds
+                .FirstAsync(x => x.DiscordId == context.Guild.Id);
+
+            var channel = await m_dbContext.Channels
+                .FirstOrDefaultAsync(x => x.DiscordId == context.Channel.Id);
 
             var guildEvent = new Models.Event()
             {
                 Name = name,
                 Description = description,
                 DateTime = dateTime,
+                GuildId = guild.Id,
                 Message = new Message()
                 {
                     DiscordId = message.Id,
@@ -56,7 +60,8 @@ namespace Incite.Discord.Commands
             {
                 guildEvent.Message.Channel = new Channel()
                 {
-                    DiscordId = context.Channel.Id
+                    DiscordId = context.Channel.Id,
+                    GuildId = guild.Id
                 };
             }
             else
@@ -64,9 +69,11 @@ namespace Incite.Discord.Commands
                 guildEvent.Message.ChannelId = channel.Id;
             }
 
+            guild.Events.Add(guildEvent);
             await m_dbContext.SaveChangesAsync();
 
             var eventMessage = new EventMessage(context.Client, message, guildEvent);
+            await eventMessage.UpdateAsync(guildEvent);
 
             await eventMessage.AddReactionsToEventMessageAsync();
         }

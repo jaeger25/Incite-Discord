@@ -19,6 +19,6 @@ namespace Incite.Models
         public int GuildId { get; set; }
         public virtual Guild Guild { get; set; }
 
-        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
     }
 }

@@ -15,6 +15,6 @@ namespace Incite.Models
         public int UserId { get; set; }
         public virtual User User { get; set; }
 
-        public virtual ICollection<MemberRole> MemberRoles { get; set; }
+        public virtual ICollection<MemberRole> MemberRoles { get; set; } = new List<MemberRole>();
     }
 }
