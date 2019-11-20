@@ -35,6 +35,14 @@ namespace Incite.Discord.Commands
             string description,
             [Description("Format: \"10-31-2019 9:00 PM -04:00\"")] DateTimeOffset dateTime)
         {
+            if (DateTimeOffset.UtcNow > dateTime.UtcDateTime)
+            {
+                var dmChannel = await context.Member.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("The event cannot be in the past.");
+                return;
+            }
+
             var message = await context.Message.RespondAsync("\u200b");
             await context.Message.DeleteAsync();
 

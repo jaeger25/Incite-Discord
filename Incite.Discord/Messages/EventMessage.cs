@@ -47,23 +47,23 @@ namespace Incite.Discord.Messages
 
         public async Task AddReactionsToEventMessageAsync()
         {
-            await m_message.CreateReactionAsync(m_emojis.ProtEmoji);
-            await m_message.CreateReactionAsync(m_emojis.BearEmoji);
-            await m_message.CreateReactionAsync(m_emojis.WarriorEmoji);
-            await m_message.CreateReactionAsync(m_emojis.RogueEmoji);
-            await m_message.CreateReactionAsync(m_emojis.CatEmoji);
-            await m_message.CreateReactionAsync(m_emojis.EnhanceEmoji);
-            await m_message.CreateReactionAsync(m_emojis.HunterEmoji);
-            await m_message.CreateReactionAsync(m_emojis.MageEmoji);
-            await m_message.CreateReactionAsync(m_emojis.WarlockEmoji);
-            await m_message.CreateReactionAsync(m_emojis.ShadowEmoji);
-            await m_message.CreateReactionAsync(m_emojis.EleShamanEmoji);
-            await m_message.CreateReactionAsync(m_emojis.BoomkinEmoji);
-            await m_message.CreateReactionAsync(m_emojis.RestoDruidEmoji);
-            await m_message.CreateReactionAsync(m_emojis.RestoShamanEmoji);
-            await m_message.CreateReactionAsync(m_emojis.PriestEmoji);
-            await m_message.CreateReactionAsync(m_emojis.AbsentEmoji);
-            await m_message.CreateReactionAsync(m_emojis.LateEmoji);
+            await m_message.CreateReactionAsync(m_emojis.Events.Warrior_Prot);
+            await m_message.CreateReactionAsync(m_emojis.Events.Warrior_Dps);
+            await m_message.CreateReactionAsync(m_emojis.Events.Druid_Bear);
+            await m_message.CreateReactionAsync(m_emojis.Events.Druid_Cat);
+            await m_message.CreateReactionAsync(m_emojis.Events.Druid_Boomkin);
+            await m_message.CreateReactionAsync(m_emojis.Events.Druid_Resto);
+            await m_message.CreateReactionAsync(m_emojis.Events.Shaman_Ele);
+            await m_message.CreateReactionAsync(m_emojis.Events.Shaman_Enhance);
+            await m_message.CreateReactionAsync(m_emojis.Events.Shaman_Resto);
+            await m_message.CreateReactionAsync(m_emojis.Events.Priest_Healer);
+            await m_message.CreateReactionAsync(m_emojis.Events.Priest_Shadow);
+            await m_message.CreateReactionAsync(m_emojis.Events.Class_Warlock);
+            await m_message.CreateReactionAsync(m_emojis.Events.Class_Mage);
+            await m_message.CreateReactionAsync(m_emojis.Events.Class_Hunter);
+            await m_message.CreateReactionAsync(m_emojis.Events.Class_Rogue);
+            await m_message.CreateReactionAsync(m_emojis.Events.Icon_Late);
+            await m_message.CreateReactionAsync(m_emojis.Events.Icon_Absent);
         }
 
         void AddMemberListField(DiscordEmbedBuilder embed, string header, IEnumerable<EventMember> members, bool inline = true, bool inclueEmoji = true)
@@ -95,7 +95,7 @@ namespace Incite.Discord.Messages
             };
 
             // Player count and date
-            AddEventField(embed, "Count", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordId != m_emojis.LateEmoji.Id && x.EmojiDiscordId != m_emojis.AbsentEmoji.Id )}");
+            AddEventField(embed, "Count", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordId != m_emojis.Events.Icon_Late.Id && x.EmojiDiscordId != m_emojis.Events.Icon_Absent.Id )}");
             AddEventField(embed, "Date", $"{guildEvent.DateTime.ToString("MM-dd")}");
             AddEventField(embed, "Time", $"{guildEvent.DateTime.ToString("t")}");
 
@@ -149,10 +149,10 @@ namespace Incite.Discord.Messages
             embed.AddBlankFields(true);
 
             AddMemberListField(embed, "Late", guildEvent.EventMembers
-                .Where(x => x.EmojiDiscordId == m_emojis.LateEmoji.Id), false, false);
+                .Where(x => x.EmojiDiscordId == m_emojis.Events.Icon_Late.Id), false, false);
 
             AddMemberListField(embed, "Absent", guildEvent.EventMembers
-                .Where(x => x.EmojiDiscordId == m_emojis.AbsentEmoji.Id), false, false);
+                .Where(x => x.EmojiDiscordId == m_emojis.Events.Icon_Absent.Id), false, false);
 
             return embed.Build();
         }
