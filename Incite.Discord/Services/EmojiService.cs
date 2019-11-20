@@ -11,7 +11,8 @@ namespace Incite.Discord.Services
     public class EmojiService
     {
         readonly DiscordClient m_client;
-        readonly Dictionary<ulong, DiscordEmoji> m_emojis = new Dictionary<ulong, DiscordEmoji>();
+        readonly DiscordGuild m_inciteGuild;
+        readonly Dictionary<string, DiscordEmoji> m_emojis = new Dictionary<string, DiscordEmoji>();
 
         public class EventEmojis
         {
@@ -51,58 +52,49 @@ namespace Incite.Discord.Services
         {
             m_client = client;
 
-            var guild = m_client.Guilds.ContainsKey(Guild.InciteDiscordId) ?
+            m_inciteGuild = m_client.Guilds.ContainsKey(Guild.InciteDiscordId) ?
                 m_client.Guilds[Guild.InciteDiscordId] :
                 m_client.Guilds[Guild.InciteTestDiscordId];
 
-            Events.Icon_Absent = guild.Emojis.First(x => x.Value.Name == "Event_Icon_Absent").Value;
-            Events.Icon_Count = guild.Emojis.First(x => x.Value.Name == "Event_Icon_Count").Value;
-            Events.Icon_Date = guild.Emojis.First(x => x.Value.Name == "Event_Icon_Date").Value;
-            Events.Icon_Late = guild.Emojis.First(x => x.Value.Name == "Event_Icon_Late").Value;
-            Events.Icon_Time = guild.Emojis.First(x => x.Value.Name == "Event_Icon_Time").Value;
+            Events.Icon_Absent = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Absent").Value;
+            Events.Icon_Count = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Count").Value;
+            Events.Icon_Date = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Date").Value;
+            Events.Icon_Late = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Late").Value;
+            Events.Icon_Time = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Time").Value;
 
-            Events.Role_Range = guild.Emojis.First(x => x.Value.Name == "Event_Role_Range").Value;
-            Events.Role_Tank = guild.Emojis.First(x => x.Value.Name == "Event_Role_Tank").Value;
-            Events.Role_Healer = guild.Emojis.First(x => x.Value.Name == "Event_Role_Healer").Value;
-            Events.Role_Melee = guild.Emojis.First(x => x.Value.Name == "Event_Role_Melee").Value;
+            Events.Role_Range = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Role_Range").Value;
+            Events.Role_Tank = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Role_Tank").Value;
+            Events.Role_Healer = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Role_Healer").Value;
+            Events.Role_Melee = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Role_Melee").Value;
 
-            Events.Shaman_Resto = guild.Emojis.First(x => x.Value.Name == "Event_Shaman_Resto").Value;
-            Events.Shaman_Enhance = guild.Emojis.First(x => x.Value.Name == "Event_Shaman_Enhance").Value;
-            Events.Shaman_Ele = guild.Emojis.First(x => x.Value.Name == "Event_Shaman_Ele").Value;
-            Events.Class_Shaman = guild.Emojis.First(x => x.Value.Name == "Event_Class_Shaman").Value;
+            Events.Shaman_Resto = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Shaman_Resto").Value;
+            Events.Shaman_Enhance = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Shaman_Enhance").Value;
+            Events.Shaman_Ele = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Shaman_Ele").Value;
+            Events.Class_Shaman = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Shaman").Value;
 
-            Events.Druid_Bear = guild.Emojis.First(x => x.Value.Name == "Event_Druid_Bear").Value;
-            Events.Druid_Cat = guild.Emojis.First(x => x.Value.Name == "Event_Druid_Cat").Value;
-            Events.Druid_Boomkin = guild.Emojis.First(x => x.Value.Name == "Event_Druid_Boomkin").Value;
-            Events.Druid_Resto = guild.Emojis.First(x => x.Value.Name == "Event_Druid_Resto").Value;
-            Events.Class_Druid = guild.Emojis.First(x => x.Value.Name == "Event_Class_Druid").Value;
+            Events.Druid_Bear = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Druid_Bear").Value;
+            Events.Druid_Cat = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Druid_Cat").Value;
+            Events.Druid_Boomkin = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Druid_Boomkin").Value;
+            Events.Druid_Resto = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Druid_Resto").Value;
+            Events.Class_Druid = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Druid").Value;
 
-            Events.Priest_Healer = guild.Emojis.First(x => x.Value.Name == "Event_Priest_Healer").Value;
-            Events.Priest_Shadow = guild.Emojis.First(x => x.Value.Name == "Event_Priest_Shadow").Value;
-            Events.Class_Priest = guild.Emojis.First(x => x.Value.Name == "Event_Class_Priest").Value;
+            Events.Priest_Healer = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Priest_Healer").Value;
+            Events.Priest_Shadow = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Priest_Shadow").Value;
+            Events.Class_Priest = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Priest").Value;
 
-            Events.Warrior_Prot = guild.Emojis.First(x => x.Value.Name == "Event_Warrior_Prot").Value;
-            Events.Warrior_Dps = guild.Emojis.First(x => x.Value.Name == "Event_Warrior_Dps").Value;
-            Events.Class_Warrior = guild.Emojis.First(x => x.Value.Name == "Event_Class_Warrior").Value;
+            Events.Warrior_Prot = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Warrior_Prot").Value;
+            Events.Warrior_Dps = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Warrior_Dps").Value;
+            Events.Class_Warrior = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Warrior").Value;
 
-            Events.Class_Warlock = guild.Emojis.First(x => x.Value.Name == "Event_Class_Warlock").Value;
-            Events.Class_Rogue = guild.Emojis.First(x => x.Value.Name == "Event_Class_Rouge").Value;
-            Events.Class_Hunter = guild.Emojis.First(x => x.Value.Name == "Event_Class_Hunter").Value;
-            Events.Class_Mage = guild.Emojis.First(x => x.Value.Name == "Event_Class_Mage").Value;
-
-            var emojis = GetType().GetProperties()
-                .Where(x => x.PropertyType == typeof(DiscordEmoji))
-                .Select(x => (DiscordEmoji)x.GetValue(this));
-
-            foreach (var emoji in emojis)
-            {
-                m_emojis.Add(emoji.Id, emoji);
-            }
+            Events.Class_Warlock = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Warlock").Value;
+            Events.Class_Rogue = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Rouge").Value;
+            Events.Class_Hunter = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Hunter").Value;
+            Events.Class_Mage = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Class_Mage").Value;
         }
 
-        public DiscordEmoji GetByDiscordId(ulong id)
+        public DiscordEmoji GetByDiscordName(string emojiName)
         {
-            return m_emojis[id];
+            return m_inciteGuild.Emojis.First(x => x.Value.Name == emojiName).Value;
         }
 
         public IEnumerable<DiscordEmoji> WarriorEmojis()

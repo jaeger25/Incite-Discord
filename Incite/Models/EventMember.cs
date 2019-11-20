@@ -6,7 +6,7 @@ namespace Incite.Models
 {
     public class EventMember : BaseModel
     {
-        public UInt64 EmojiDiscordId { get; set; }
+        public string EmojiDiscordName { get; set; }
 
         public int EventId { get; set; }
         public virtual Event Event { get; set; }

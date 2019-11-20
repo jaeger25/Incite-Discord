@@ -68,14 +68,14 @@ namespace Incite.Discord.Handlers
                 {
                     EventId = guildEvent.Id,
                     MemberId = member.Id,
-                    EmojiDiscordId = e.Emoji.Id
+                    EmojiDiscordName = e.Emoji.Name
                 };
 
                 guildEvent.EventMembers.Add(eventMember);
             }
             else
             {
-                eventMember.EmojiDiscordId = e.Emoji.Id;
+                eventMember.EmojiDiscordName = e.Emoji.Name;
             }
 
             await m_dbContext.SaveChangesAsync();
@@ -105,7 +105,7 @@ namespace Incite.Discord.Handlers
             var member = guildEvent.EventMembers
                 .First(x => x.Member.User.DiscordId == e.User.Id);
 
-            if (member.EmojiDiscordId == e.Emoji.Id)
+            if (member.EmojiDiscordName == e.Emoji.Name)
             {
                 m_dbContext.EventMembers.Remove(member);
                 await m_dbContext.SaveChangesAsync();
