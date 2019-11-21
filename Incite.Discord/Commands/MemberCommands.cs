@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using Incite.Discord.Attributes;
 using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Extensions;
@@ -28,6 +29,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
+        [RequireMemberRegistered]
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
         {
@@ -128,8 +130,8 @@ namespace Incite.Discord.Commands
 
             var member = await m_dbContext.Members.GetMemberAsync(context.Guild, user);
             var role = await m_dbContext.Roles.GetRoleAsync(context, roleKind);
-            bool hasRole = await m_dbContext.MemberRoles
-                .AnyAsync(x => x.MemberId == member.Id && x.RoleId == role.Id);
+            bool hasRole = member.MemberRoles
+                .Any(x => x.RoleId == role.Id);
 
             if (!hasRole)
             {
@@ -144,7 +146,15 @@ namespace Incite.Discord.Commands
 
             var discordRole = context.Guild.GetRole(role.DiscordId);
             var discordMember = await context.Guild.GetMemberAsync(user.Id);
-            await discordMember.GrantRoleAsync(discordRole);
+            try
+            {
+                await discordMember.GrantRoleAsync(discordRole);
+            }
+            catch(UnauthorizedException e)
+            {
+                var dmChannel = await context.Member.CreateDmChannelAsync();
+                await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
+            }
         }
     }
 }

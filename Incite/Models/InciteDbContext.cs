@@ -17,6 +17,7 @@ namespace Incite.Models
         public DbSet<EventMember> EventMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<MemberEvent> MemberEvents { get; set; }
         public DbSet<MemberRole> MemberRoles { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -26,10 +27,25 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Guild>()
-                .HasAlternateKey(x => x.DiscordId);
+            modelBuilder.Entity<Channel>()
+                .HasOne(x => x.Guild)
+                    .WithMany(x => x.Channels)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<Event>()
+                .HasOne(x => x.Guild)
+                    .WithMany(x => x.Events)
+                .HasForeignKey(x => x.GuildId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Event>()
+                .OwnsOne(x => x.EventMessage);
+
+            modelBuilder.Entity<Event>()
+                .OwnsMany(x => x.EventMembers);
+
+            modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
 
             modelBuilder.Entity<Member>()
@@ -38,17 +54,8 @@ namespace Incite.Models
                 .HasForeignKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Role>()
-                .HasOne(x => x.Guild)
-                    .WithMany(x => x.Roles)
-                .HasForeignKey(x => x.GuildId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Channel>()
-                .HasOne(x => x.Guild)
-                    .WithMany(x => x.Channels)
-                .HasForeignKey(x => x.GuildId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Member>()
+                .OwnsMany(x => x.MemberEvents);
 
             modelBuilder.Entity<Message>()
                 .HasOne(x => x.Channel)
@@ -56,12 +63,14 @@ namespace Incite.Models
                 .HasForeignKey(x => x.ChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Event>()
+            modelBuilder.Entity<Role>()
                 .HasOne(x => x.Guild)
-                    .WithMany(x => x.Events)
+                    .WithMany(x => x.Roles)
                 .HasForeignKey(x => x.GuildId)
-                .HasForeignKey(x => x.MessageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasAlternateKey(x => x.DiscordId);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);

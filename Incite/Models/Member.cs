@@ -16,5 +16,6 @@ namespace Incite.Models
         public virtual User User { get; set; }
 
         public virtual ICollection<MemberRole> MemberRoles { get; set; } = new List<MemberRole>();
+        public virtual ICollection<MemberEvent> MemberEvents { get; set; } = new List<MemberEvent>();
     }
 }

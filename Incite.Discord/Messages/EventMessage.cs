@@ -16,14 +16,12 @@ namespace Incite.Discord.Messages
     public class EventMessage
     {
         readonly EmojiService m_emojis;
-        readonly DiscordClient m_client;
         readonly Models.Event m_guildEvent;
 
         DiscordMessage m_message;
 
         public EventMessage(DiscordClient client, DiscordMessage message, Models.Event guildEvent)
         {
-            m_client = client;
             m_message = message;
             m_guildEvent = guildEvent;
             m_emojis = client.GetCommandsNext().Services.GetService<EmojiService>();
@@ -40,9 +38,9 @@ namespace Incite.Discord.Messages
             }
         }
 
-        public async Task UpdateAsync(Models.Event guildEvent)
+        public async Task UpdateAsync()
         {
-            await m_message.ModifyAsync(embed: CreateEventMessageEmbed(guildEvent));
+            await m_message.ModifyAsync(embed: CreateEventMessageEmbed(m_guildEvent));
         }
 
         public async Task AddReactionsToEventMessageAsync()
@@ -95,9 +93,9 @@ namespace Incite.Discord.Messages
             };
 
             // Player count and date
-            AddEventField(embed, "Count", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordName != m_emojis.Events.Icon_Late.Name && x.EmojiDiscordName != m_emojis.Events.Icon_Absent.Name )}");
-            AddEventField(embed, "Date", $"{guildEvent.DateTime.ToString("MM-dd")}");
-            AddEventField(embed, "Time", $"{guildEvent.DateTime.ToString("t")}");
+            AddEventField(embed, $"{m_emojis.Events.Icon_Count}", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordName != m_emojis.Events.Icon_Late.Name && x.EmojiDiscordName != m_emojis.Events.Icon_Absent.Name )}");
+            AddEventField(embed, $"{m_emojis.Events.Icon_Date}", $"{guildEvent.DateTime.ToString("MM-dd")}");
+            AddEventField(embed, $"{m_emojis.Events.Icon_Time}", $"{guildEvent.DateTime.ToString("t")}");
 
             // Melee, Ranged, Healer counts
             AddEventField(embed, "Tanks", $"{guildEvent.EventMembers.Count(x => m_emojis.TankEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
@@ -165,13 +163,6 @@ namespace Incite.Discord.Messages
         static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format1, string format2)
         {
             return embed.AddField("\u200b", $"{format1} - __**{label}**__ - {format2}", true);
-        }
-
-        static bool IsEventMessage(DiscordMessage message)
-        {
-            return message.Author.IsCurrent &&
-                message.Embeds.Count > 0 &&
-                message.Embeds[0].Footer.Text.Trim() == "Event";
         }
     }
 }

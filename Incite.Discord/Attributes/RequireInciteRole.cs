@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Incite.Models;
 using Incite.Discord.Extensions;
@@ -22,16 +23,17 @@ namespace Incite.Discord.Attributes
 
         public override async Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var user = await context.Guild.GetMemberAsync(context.User.Id);
-            if (user.IsOwner)
+            var discordMember = await context.Guild.GetMemberAsync(context.User.Id);
+            if (PermissionMethods.HasPermission(discordMember.PermissionsIn(context.Channel), Permissions.ManageGuild))
             {
                 return true;
             }
 
             var dbContext = context.Services.GetService<InciteDbContext>();
-            var member = await dbContext.Members.GetCurrentMemberAsync(context);
-            return member.MemberRoles
-                .Any(x => x.Role.Kind >= RoleKind);
+            var member = await dbContext.Members.TryGetCurrentMemberAsync(context);
+
+            return member?.MemberRoles
+                .Any(x => x.Role.Kind >= RoleKind) ?? false;
         }
     }
 }

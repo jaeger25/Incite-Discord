@@ -9,6 +9,7 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Incite.Discord.Commands
 {
     [Group("event")]
     [RequireGuildConfigured]
+    [RequireMemberRegistered]
     [Description("Commands for setting and retrieving info about the guild's schedule")]
     public class EventCommands : BaseCommandModule
     {
@@ -43,7 +45,7 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            var message = await context.Message.RespondAsync("\u200b");
+            var discordMessage = await context.Message.RespondAsync("\u200b");
             await context.Message.DeleteAsync();
 
             var guild = await m_dbContext.Guilds
@@ -52,36 +54,52 @@ namespace Incite.Discord.Commands
             var channel = await m_dbContext.Channels
                 .FirstOrDefaultAsync(x => x.DiscordId == context.Channel.Id);
 
-            var guildEvent = new Models.Event()
+            var creator = guild.Members
+                .First(x => x.User.DiscordId == context.User.Id);
+
+            var message = new Message()
             {
-                Name = name,
-                Description = description,
-                DateTime = dateTime,
-                GuildId = guild.Id,
-                Message = new Message()
-                {
-                    DiscordId = message.Id,
-                }
+                DiscordId = discordMessage.Id,
             };
 
             if (channel == null)
             {
-                guildEvent.Message.Channel = new Channel()
+                message.Channel = new Channel()
                 {
                     DiscordId = context.Channel.Id,
                     GuildId = guild.Id
                 };
+
+                m_dbContext.Channels.Add(message.Channel);
             }
             else
             {
-                guildEvent.Message.ChannelId = channel.Id;
+                message.ChannelId = channel.Id;
             }
 
-            guild.Events.Add(guildEvent);
+            var memberEvent = new MemberEvent()
+            {
+                MemberId = creator.Id,
+                Event = new Models.Event()
+                {
+                    Name = name,
+                    Description = description,
+                    DateTime = dateTime,
+                    GuildId = guild.Id
+                }
+            };
+
+            memberEvent.Event.EventMessage = new Models.EventMessage()
+            {
+                Event = memberEvent.Event,
+                Message = message
+            };
+
+            creator.MemberEvents.Add(memberEvent);
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new EventMessage(context.Client, message, guildEvent);
-            await eventMessage.UpdateAsync(guildEvent);
+            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent.Event);
+            await eventMessage.UpdateAsync();
 
             await eventMessage.AddReactionsToEventMessageAsync();
         }

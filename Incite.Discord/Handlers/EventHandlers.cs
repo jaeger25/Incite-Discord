@@ -38,7 +38,7 @@ namespace Incite.Discord.Handlers
             }
 
             var guildEvent = await m_dbContext.Events
-                .FirstOrDefaultAsync(x => x.Message.DiscordId == message.Id);
+                .FirstOrDefaultAsync(x => x.EventMessage.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
             {
@@ -80,10 +80,10 @@ namespace Incite.Discord.Handlers
 
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new EventMessage(e.Client, message, guildEvent);
+            var eventMessage = new Messages.EventMessage(e.Client, message, guildEvent);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
 
-            await eventMessage.UpdateAsync(guildEvent);
+            await eventMessage.UpdateAsync();
         }
 
         private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
@@ -95,7 +95,7 @@ namespace Incite.Discord.Handlers
             }
 
             var guildEvent = await m_dbContext.Events
-                .FirstOrDefaultAsync(x => x.Message.DiscordId == message.Id);
+                .FirstOrDefaultAsync(x => x.EventMessage.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
             {
@@ -111,8 +111,8 @@ namespace Incite.Discord.Handlers
                 await m_dbContext.SaveChangesAsync();
             }
 
-            var eventMessage = new EventMessage(e.Client, message, guildEvent);
-            await eventMessage.UpdateAsync(guildEvent);
+            var eventMessage = new Messages.EventMessage(e.Client, message, guildEvent);
+            await eventMessage.UpdateAsync();
         }
 
         private async Task<IDisposable> LockOnMessageAsync(ulong messageId)

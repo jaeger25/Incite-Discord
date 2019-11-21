@@ -55,13 +55,10 @@ namespace Incite.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EventMessageId")
+                        .HasColumnType("int");
+
                     b.Property<int>("GuildId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MessageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MessageId1")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -69,36 +66,9 @@ namespace Incite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MessageId");
-
-                    b.HasIndex("MessageId1");
+                    b.HasIndex("GuildId");
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("Incite.Models.EventMember", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("EmojiDiscordName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MemberId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("MemberId");
-
-                    b.ToTable("EventMembers");
                 });
 
             modelBuilder.Entity("Incite.Models.Guild", b =>
@@ -382,30 +352,75 @@ namespace Incite.Migrations
                 {
                     b.HasOne("Incite.Models.Guild", "Guild")
                         .WithMany("Events")
-                        .HasForeignKey("MessageId")
+                        .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Incite.Models.Message", "Message")
-                        .WithMany()
-                        .HasForeignKey("MessageId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.OwnsMany("Incite.Models.EventMember", "EventMembers", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Incite.Models.EventMember", b =>
-                {
-                    b.HasOne("Incite.Models.Event", "Event")
-                        .WithMany("EventMembers")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.Property<string>("EmojiDiscordName")
+                                .HasColumnType("nvarchar(max)");
 
-                    b.HasOne("Incite.Models.Member", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.Property<int>("EventId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("MemberId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("EventId");
+
+                            b1.HasIndex("MemberId");
+
+                            b1.ToTable("EventMembers");
+
+                            b1.WithOwner("Event")
+                                .HasForeignKey("EventId");
+
+                            b1.HasOne("Incite.Models.Member", "Member")
+                                .WithMany()
+                                .HasForeignKey("MemberId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+                        });
+
+                    b.OwnsOne("Incite.Models.EventMessage", "EventMessage", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("EventId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("MessageId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("EventId")
+                                .IsUnique();
+
+                            b1.HasIndex("MessageId");
+
+                            b1.ToTable("Events1");
+
+                            b1.WithOwner("Event")
+                                .HasForeignKey("EventId");
+
+                            b1.HasOne("Incite.Models.Message", "Message")
+                                .WithMany()
+                                .HasForeignKey("MessageId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+                        });
                 });
 
             modelBuilder.Entity("Incite.Models.Member", b =>
@@ -421,6 +436,37 @@ namespace Incite.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("Incite.Models.MemberEvent", "MemberEvents", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("EventId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("MemberId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("EventId");
+
+                            b1.HasIndex("MemberId");
+
+                            b1.ToTable("MemberEvents");
+
+                            b1.HasOne("Incite.Models.Event", "Event")
+                                .WithMany()
+                                .HasForeignKey("EventId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b1.WithOwner("Member")
+                                .HasForeignKey("MemberId");
+                        });
                 });
 
             modelBuilder.Entity("Incite.Models.MemberRole", b =>
