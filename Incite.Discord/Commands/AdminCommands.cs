@@ -51,6 +51,8 @@ namespace Incite.Discord.Commands
             }
 
             await m_dbContext.SaveChangesAsync();
+
+            await context.Message.DeleteAsync();
         }
 
         [Command("setchannel")]

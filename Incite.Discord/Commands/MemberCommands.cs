@@ -102,7 +102,7 @@ namespace Incite.Discord.Commands
             var adminChannel = guild.Channels
                 .First(x => x.Kind == ChannelKind.Admin);
 
-            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"TODO has registered. Please assign them a role using the \"!member grantrole\" command");
+            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"{context.Member} has registered as <{primaryCharacterName}>. Please assign them a role using the \"!member grantrole\" command");
 
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
@@ -155,12 +155,17 @@ namespace Incite.Discord.Commands
             try
             {
                 await discordMember.GrantRoleAsync(discordRole);
+
+                var dmChannel = await discordMember.CreateDmChannelAsync();
+                await dmChannel.SendMessageAsync($"You're guild role has been set to: {roleKind.ToString()}");
             }
             catch(UnauthorizedException e)
             {
                 var dmChannel = await context.Member.CreateDmChannelAsync();
                 await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
             }
+
+            await context.Message.ModifyAsync($"Role set for: {user}");
         }
     }
 }
