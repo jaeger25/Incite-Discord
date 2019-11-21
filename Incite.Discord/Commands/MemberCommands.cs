@@ -128,7 +128,13 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            var member = await m_dbContext.Members.GetMemberAsync(context.Guild, user);
+            var member = await m_dbContext.Members.TryGetMemberAsync(context.Guild.Id, user.Id);
+            if (member == null)
+            {
+                await context.Channel.SendMessageAsync("User is not registered.");
+                return;
+            }
+
             var role = await m_dbContext.Roles.GetRoleAsync(context, roleKind);
             bool hasRole = member.MemberRoles
                 .Any(x => x.RoleId == role.Id);

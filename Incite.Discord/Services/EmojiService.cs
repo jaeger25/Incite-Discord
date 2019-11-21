@@ -20,6 +20,7 @@ namespace Incite.Discord.Services
             public DiscordEmoji Icon_Count { get; set; }
             public DiscordEmoji Icon_Date { get; set; }
             public DiscordEmoji Icon_Late { get; set; }
+            public DiscordEmoji Icon_Maybe { get; set; }
             public DiscordEmoji Icon_Time { get; set; }
             public DiscordEmoji Role_Range { get; set; }
             public DiscordEmoji Role_Tank { get; set; }
@@ -60,6 +61,7 @@ namespace Incite.Discord.Services
             Events.Icon_Count = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Count").Value;
             Events.Icon_Date = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Date").Value;
             Events.Icon_Late = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Late").Value;
+            Events.Icon_Maybe = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Maybe").Value;
             Events.Icon_Time = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Icon_Time").Value;
 
             Events.Role_Range = m_inciteGuild.Emojis.First(x => x.Value.Name == "Event_Role_Range").Value;

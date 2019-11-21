@@ -52,7 +52,10 @@ namespace Incite.Discord
 
         static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            host.Services.GetService<InciteDbContext>().Database.MigrateAsync();
+            host.Run();
         }
     }
 }

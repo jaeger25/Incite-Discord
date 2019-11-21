@@ -61,6 +61,7 @@ namespace Incite.Discord.Messages
             await m_message.CreateReactionAsync(m_emojis.Events.Class_Hunter);
             await m_message.CreateReactionAsync(m_emojis.Events.Class_Rogue);
             await m_message.CreateReactionAsync(m_emojis.Events.Icon_Late);
+            await m_message.CreateReactionAsync(m_emojis.Events.Icon_Maybe);
             await m_message.CreateReactionAsync(m_emojis.Events.Icon_Absent);
         }
 
@@ -81,7 +82,7 @@ namespace Incite.Discord.Messages
                 classColumnText.Append(memberString);
             }
 
-            embed.AddField("\u200b", classColumnText.ToString(), inline);
+            embed.AddField("\u200b", classColumnText.ToString().TrimEnd( new[] { ' ', ',' }), inline);
         }
 
         DiscordEmbed CreateEventMessageEmbed(Models.Event guildEvent)
@@ -92,16 +93,18 @@ namespace Incite.Discord.Messages
                 Description = $"{guildEvent.Description}",
             };
 
+            embed.WithFooter($"=====================================================================\nEventId: {guildEvent.Id}");
+
             // Player count and date
             AddEventField(embed, $"{m_emojis.Events.Icon_Count}", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordName != m_emojis.Events.Icon_Late.Name && x.EmojiDiscordName != m_emojis.Events.Icon_Absent.Name )}");
             AddEventField(embed, $"{m_emojis.Events.Icon_Date}", $"{guildEvent.DateTime.ToString("MM-dd")}");
             AddEventField(embed, $"{m_emojis.Events.Icon_Time}", $"{guildEvent.DateTime.ToString("t")}");
 
             // Melee, Ranged, Healer counts
-            AddEventField(embed, "Tanks", $"{guildEvent.EventMembers.Count(x => m_emojis.TankEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
-            AddEventField(embed, "DPS", $"{guildEvent.EventMembers.Count(x => m_emojis.MeleeEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}",
+            AddEventField(embed, $"{m_emojis.Events.Role_Tank}", $"{guildEvent.EventMembers.Count(x => m_emojis.TankEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
+            AddEventField(embed, $"{m_emojis.Events.Role_Melee}", $"{m_emojis.Events.Role_Range}", $"{guildEvent.EventMembers.Count(x => m_emojis.MeleeEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}",
                 $"{guildEvent.EventMembers.Count(x => m_emojis.RangeEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
-            AddEventField(embed, "Healers", $"{guildEvent.EventMembers.Count(x => m_emojis.HealerEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
+            AddEventField(embed, $"{m_emojis.Events.Role_Healer}", $"{guildEvent.EventMembers.Count(x => m_emojis.HealerEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
 
             // Class counts
             AddMemberListField(embed, "Warrior", guildEvent.EventMembers
@@ -149,6 +152,9 @@ namespace Incite.Discord.Messages
             AddMemberListField(embed, "Late", guildEvent.EventMembers
                 .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Late.Name), false, false);
 
+            AddMemberListField(embed, "Maybe", guildEvent.EventMembers
+                .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Maybe.Name), false, false);
+
             AddMemberListField(embed, "Absent", guildEvent.EventMembers
                 .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Absent.Name), false, false);
 
@@ -157,12 +163,12 @@ namespace Incite.Discord.Messages
 
         static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format)
         {
-            return embed.AddField("\u200b", $"__**{label}**__ - {format}", true);
+            return embed.AddField("\u200b", $"{label} - {format}", true);
         }
 
-        static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label, string format1, string format2)
+        static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label1, string label2, string format1, string format2)
         {
-            return embed.AddField("\u200b", $"{format1} - __**{label}**__ - {format2}", true);
+            return embed.AddField("\u200b", $"{label1} - {format1}        {label2} - {format2}", true);
         }
     }
 }
