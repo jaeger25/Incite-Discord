@@ -26,10 +26,10 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("setrole")]
+        [Command("set-role")]
         [Description("Sets the server role which corresponds with the RoleKind")]
         public async Task SetRole(CommandContext context,
-            [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
+            [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind,
             [Description("Server role")] DiscordRole role)
         {
             var existingRole = await m_dbContext.Roles
@@ -52,10 +52,16 @@ namespace Incite.Discord.Commands
 
             await m_dbContext.SaveChangesAsync();
 
+            if (!role.IsMentionable)
+            {
+                await role.ModifyAsync(mentionable: true);
+            }
+
             await context.Message.DeleteAsync();
+            await context.Channel.SendMessageAsync($"Role set: {roleKind.ToString()} - {role}");
         }
 
-        [Command("setchannel")]
+        [Command("set-channel")]
         [Description("Sets the server channel which corresponds with the ChannelKind")]
         public async Task SetChannel(CommandContext context,
             [Description("Values: Unspecified, Admin")] ChannelKind channelKind,
@@ -80,6 +86,9 @@ namespace Incite.Discord.Commands
             }
 
             await m_dbContext.SaveChangesAsync();
+
+            await context.Message.DeleteAsync();
+            await context.Channel.SendMessageAsync($"Channel set: {channelKind.ToString()} - {channel}");
         }
     }
 }

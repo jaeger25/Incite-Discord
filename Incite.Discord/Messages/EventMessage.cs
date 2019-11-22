@@ -168,7 +168,7 @@ namespace Incite.Discord.Messages
 
         static DiscordEmbedBuilder AddEventField(DiscordEmbedBuilder embed, string label1, string label2, string format1, string format2)
         {
-            return embed.AddField("\u200b", $"{label1} - {format1}        {label2} - {format2}", true);
+            return embed.AddField("\u200b", $"{label1} - {format1} {label2} - {format2}", true);
         }
     }
 }

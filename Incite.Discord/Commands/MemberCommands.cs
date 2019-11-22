@@ -107,7 +107,7 @@ namespace Incite.Discord.Commands
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
 
-        [Command("grantrole")]
+        [Command("grant-role")]
         [RequireInciteRole(RoleKind.Officer)]
         [Description("Grants the role for a user")]
         public async Task GrantRole(CommandContext context,
@@ -135,38 +135,59 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            var role = await m_dbContext.Roles.GetRoleAsync(context, roleKind);
-            bool hasRole = member.MemberRoles
-                .Any(x => x.RoleId == role.Id);
+            var guildRoles = member.Guild.Roles
+                .Where(x => x.Kind > RoleKind.Everyone && x.Kind <= roleKind);
 
-            if (!hasRole)
+            var rolesToAdd = guildRoles
+                .Except(member.MemberRoles
+                    .Select(x => x.Role));
+
+            foreach(var roleToAdd in rolesToAdd)
             {
-                m_dbContext.MemberRoles.Add(new MemberRole()
+                member.MemberRoles.Add(new MemberRole()
                 {
                     MemberId = member.Id,
-                    RoleId = role.Id
+                    RoleId = roleToAdd.Id
                 });
-
-                await m_dbContext.SaveChangesAsync();
             }
 
-            var discordRole = context.Guild.GetRole(role.DiscordId);
+            await m_dbContext.SaveChangesAsync();
+
+            bool error = false;
+            StringBuilder rolesString = new StringBuilder();
             var discordMember = await context.Guild.GetMemberAsync(user.Id);
-            try
+            foreach (var role in member.MemberRoles.Select(x => x.Role))
             {
-                await discordMember.GrantRoleAsync(discordRole);
+                if (!discordMember.Roles.Any(x => x.Id == role.DiscordId))
+                {
+                    var discordRole = context.Guild.GetRole(role.DiscordId);
+                    try
+                    {
+                        await discordMember.GrantRoleAsync(discordRole);
 
+                        rolesString.Append(role.Kind.ToString()).Append(",");
+                    }
+                    catch (UnauthorizedException e)
+                    {
+                        error = true;
+
+                        var dmChannel = await context.Member.CreateDmChannelAsync();
+                        await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
+                    }
+                }
+            }
+
+            if (rolesString.Length > 0)
+            {
                 var dmChannel = await discordMember.CreateDmChannelAsync();
-                await dmChannel.SendMessageAsync($"You're guild role has been set to: {roleKind.ToString()}");
-            }
-            catch(UnauthorizedException e)
-            {
-                var dmChannel = await context.Member.CreateDmChannelAsync();
-                await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
+                await dmChannel.SendMessageAsync($"<{context.Guild.Name}> guild role(s) added: {rolesString.ToString().Trim(',')}");
             }
 
-            await context.Message.DeleteAsync();
-            await context.Channel.SendMessageAsync($"Role set for: {user}");
+            if (!error)
+            {
+                await context.Message.DeleteAsync();
+                await context.Channel.SendMessageAsync($"Role set for: {user}");
+            }
         }
     }
 }

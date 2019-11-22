@@ -54,7 +54,10 @@ namespace Incite.Discord
                                 .AddConsole();
                         });
 
+                    services.Configure<EventScheduledTaskOptions>(config.GetSection("EventScheduledTaskOptions"));
+
                     services.AddHostedService<DiscordService>();
+                    //services.AddHostedService<EventScheduledTask>();
                 });
 
         static void Main(string[] args)
