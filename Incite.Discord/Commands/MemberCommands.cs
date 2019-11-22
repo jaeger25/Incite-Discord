@@ -165,7 +165,8 @@ namespace Incite.Discord.Commands
                 await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
             }
 
-            await context.Message.ModifyAsync($"Role set for: {user}");
+            await context.Message.DeleteAsync();
+            await context.Channel.SendMessageAsync($"Role set for: {user}");
         }
     }
 }

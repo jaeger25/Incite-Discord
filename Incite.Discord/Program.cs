@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace Incite.Discord
                     var discordClient = new DiscordClient(new DiscordConfiguration
                     {
                         AutoReconnect = true,
-                        LogLevel = LogLevel.Debug,
+                        LogLevel = DSharpPlus.LogLevel.Debug,
                         Token = config["Discord:BotToken"],
                         TokenType = TokenType.Bot,
                         UseInternalLogHandler = true,
@@ -45,6 +46,12 @@ namespace Incite.Discord
                         {
                             options.UseLazyLoadingProxies()
                                 .UseSqlServer(config["ConnectionStrings:Default"]);
+                        })
+                        .AddLogging(builder =>
+                        {
+                            builder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
+                                .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
+                                .AddConsole();
                         });
 
                     services.AddHostedService<DiscordService>();
