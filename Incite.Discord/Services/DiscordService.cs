@@ -59,13 +59,13 @@ namespace Incite.Discord.Services
 
         Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            m_logger.LogError($"CommandErrored: {e.Command.Name}\nParams: {e.Context.RawArguments?.Aggregate((x, y) => x + " " + y)}\n{e.Exception.Message}");
+            m_logger.LogError($"CommandErrored: {e.Command.Name}\nParams: {e.Context.RawArguments?.Aggregate((x, y) => $"'{x}' '{y}'")}\n{e.Exception}");
             return Task.CompletedTask;
         }
 
         Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
-            m_logger.LogInformation($"CommandExecuted: {e.Command.Name}\nParams: {e.Context.RawArguments?.Aggregate((x, y) => x + " " + y)}");
+            m_logger.LogInformation($"CommandExecuted: {e.Command.Name}\nParams: {e.Context.RawArguments?.Aggregate((x, y) => $"'{x}' '{y}'")}");
             return Task.CompletedTask;
         }
     }

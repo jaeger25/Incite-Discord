@@ -16,6 +16,14 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord
 {
+    class InciteDiscordOptions
+    {
+        public const string Environment_Production = "Production";
+        public const string Environment_Development = "Development";
+
+        public string Environment { get; set; }
+    }
+
     class Program
     {
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -29,13 +37,20 @@ namespace Incite.Discord
                         .AddEnvironmentVariables()
                         .Build();
 
+                    services.Configure<InciteDiscordOptions>(config);
+                    services.Configure<EventScheduledTaskOptions>(config.GetSection("EventScheduledTaskOptions"));
+
+                    bool isProduction =
+                        config.Get<InciteDiscordOptions>().Environment == InciteDiscordOptions.Environment_Production;
+
                     var discordClient = new DiscordClient(new DiscordConfiguration
                     {
                         AutoReconnect = true,
-                        LogLevel = DSharpPlus.LogLevel.Debug,
                         Token = config["Discord:BotToken"],
                         TokenType = TokenType.Bot,
                         UseInternalLogHandler = true,
+                        LogLevel = isProduction ?
+                            DSharpPlus.LogLevel.Warning : DSharpPlus.LogLevel.Info,
                     });
 
                     services.AddEntityFrameworkSqlServer()
@@ -51,10 +66,9 @@ namespace Incite.Discord
                         {
                             builder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
                                 .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
+                                .SetMinimumLevel(isProduction ? Microsoft.Extensions.Logging.LogLevel.Warning : Microsoft.Extensions.Logging.LogLevel.Information)
                                 .AddConsole();
                         });
-
-                    services.Configure<EventScheduledTaskOptions>(config.GetSection("EventScheduledTaskOptions"));
 
                     services.AddHostedService<DiscordService>();
                     //services.AddHostedService<EventScheduledTask>();

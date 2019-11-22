@@ -7,8 +7,7 @@ namespace Incite.Models
 {
     public class Guild : BaseModel
     {
-        public const ulong InciteDiscordId = 407066938078920705;
-        public const ulong InciteTestDiscordId = 637168144732913675;
+        public const ulong InciteBotDiscordId = 637168144732913675;
 
         public UInt64 DiscordId { get; set; }
 
