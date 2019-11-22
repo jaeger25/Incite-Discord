@@ -15,9 +15,9 @@ namespace Incite.Discord.Handlers
 {
     public class LogHandlers : BaseHandler
     {
-        readonly ILogger m_logger;
+        readonly ILogger<LogHandlers> m_logger;
 
-        public LogHandlers(DiscordClient client, ILogger logger)
+        public LogHandlers(DiscordClient client, ILogger<LogHandlers> logger)
         {
             m_logger = logger;
 
@@ -28,13 +28,13 @@ namespace Incite.Discord.Handlers
 
         private Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            m_logger.LogError($"CommandErrored: {e.Command.Name}\nParams: {e.Context.RawArguments}\n{e.Exception.Message}");
+            m_logger.LogError($"CommandErrored: {e.Command.Name}\nParams: {e.Context.RawArguments.Aggregate((x, y) => x + " " + y)}\n{e.Exception.Message}");
             return Task.FromResult(0);
         }
 
         private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
-            m_logger.LogInformation($"CommandExecuted: {e.Command.Name}\nParams: {e.Context.RawArguments}");
+            m_logger.LogInformation($"CommandExecuted: {e.Command.Name}\nParams: {e.Context.RawArguments.Aggregate((x, y) => x + y)}");
             return Task.FromResult(0);
         }
     }
