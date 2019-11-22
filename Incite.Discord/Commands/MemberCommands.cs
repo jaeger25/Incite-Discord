@@ -165,14 +165,14 @@ namespace Incite.Discord.Commands
                     {
                         await discordMember.GrantRoleAsync(discordRole);
 
-                        rolesString.Append(role.Kind.ToString()).Append(",");
+                        rolesString.Append(discordRole.Name).Append(",");
                     }
                     catch (UnauthorizedException e)
                     {
                         error = true;
 
                         var dmChannel = await context.Member.CreateDmChannelAsync();
-                        await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' role is higher than any other roles you wish it to auto-assign");
+                        await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' bot role is higher than any other roles you wish it to auto-assign");
                     }
                 }
             }
