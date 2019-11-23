@@ -46,7 +46,7 @@ namespace Incite.Discord.Handlers
             }
 
             var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
-            if (e.User != e.Client.CurrentUser && member == null)
+            if (member == null)
             {
                 await message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
 
@@ -103,7 +103,16 @@ namespace Incite.Discord.Handlers
             }
 
             var member = guildEvent.EventMembers
-                .First(x => x.Member.User.DiscordId == e.User.Id);
+                .FirstOrDefault(x => x.Member.User.DiscordId == e.User.Id);
+
+            if (member == null)
+            {
+                var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
+                var dmChannel = await discordMember.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("You must first register with the '!member register' command");
+                return;
+            }
 
             if (member.EmojiDiscordName == e.Emoji.Name)
             {
