@@ -24,6 +24,7 @@ namespace Incite.Models
         public DbSet<User> Users { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
+        public DbSet<WowServer> WowServers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -74,6 +75,7 @@ namespace Incite.Models
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);
+            WowServer.Seed(modelBuilder);
         }
     }
 }

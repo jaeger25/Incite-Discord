@@ -60,7 +60,10 @@ namespace Incite.Discord
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
-                                .UseSqlServer(config["ConnectionStrings:Default"]);
+                                .UseSqlServer(config["ConnectionStrings:Default"], sqlOptions =>
+                                {
+                                    sqlOptions.EnableRetryOnFailure();
+                                });
                         })
                         .AddLogging(builder =>
                         {
