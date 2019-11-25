@@ -22,6 +22,7 @@ namespace Incite.Models
         public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<WowCharacter> WowCharacters { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
         public DbSet<WowServer> WowServers { get; set; }
@@ -72,6 +73,24 @@ namespace Incite.Models
 
             modelBuilder.Entity<User>()
                 .HasAlternateKey(x => x.DiscordId);
+
+            modelBuilder.Entity<WowCharacter>()
+                .HasOne(x => x.User)
+                    .WithMany(x => x.WowCharacters)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WowCharacter>()
+                .HasOne(x => x.WowClass)
+                    .WithMany(x => x.WowCharacters)
+                .HasForeignKey(x => x.WowClassId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WowCharacter>()
+                .HasOne(x => x.WowServer)
+                    .WithMany(x => x.WowCharacters)
+                .HasForeignKey(x => x.WowServerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);
