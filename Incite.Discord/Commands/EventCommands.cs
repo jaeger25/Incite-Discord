@@ -103,5 +103,48 @@ namespace Incite.Discord.Commands
 
             await eventMessage.AddReactionsToEventMessageAsync();
         }
+
+        [Command("update")]
+        [RequireUserPermissions(Permissions.SendMessages)]
+        [Description("Updates an event")]
+        public async Task Update(CommandContext context,
+            int eventId,
+            string name,
+            string description,
+            [Description("Format: \"10-31-2019 9:00 PM -05:00\"")] DateTimeOffset dateTime)
+        {
+            if (DateTimeOffset.UtcNow > dateTime.UtcDateTime)
+            {
+                var dmChannel = await context.Member.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("The event cannot be in the past.");
+                return;
+            }
+
+            await context.Message.DeleteAsync();
+
+            var guild = await m_dbContext.Guilds
+                .FirstAsync(x => x.DiscordId == context.Guild.Id);
+
+            var memberEvent = guild.Events
+                .FirstOrDefault(x => x.Id == eventId);
+
+            if (memberEvent == null)
+            {
+                await context.Message.RespondAsync("Failed to find event");
+                return;
+            }
+
+            var discordMessage = await context.Channel.GetMessageAsync(memberEvent.EventMessage.Message.DiscordId);
+
+            memberEvent.Name = name;
+            memberEvent.Description = description;
+            memberEvent.DateTime = dateTime;
+
+            await m_dbContext.SaveChangesAsync();
+
+            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
+            await eventMessage.UpdateAsync();
+        }
     }
 }

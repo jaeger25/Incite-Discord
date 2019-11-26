@@ -81,7 +81,7 @@ namespace Incite.Migrations
                     b.Property<decimal>("DiscordId")
                         .HasColumnType("decimal(20,0)");
 
-                    b.Property<int>("WowServerId")
+                    b.Property<int?>("WowServerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -454,9 +454,7 @@ namespace Incite.Migrations
                 {
                     b.HasOne("Incite.Models.WowServer", "WowServer")
                         .WithMany()
-                        .HasForeignKey("WowServerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WowServerId");
                 });
 
             modelBuilder.Entity("Incite.Models.Member", b =>

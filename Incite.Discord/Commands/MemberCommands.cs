@@ -102,7 +102,7 @@ namespace Incite.Discord.Commands
             var adminChannel = guild.Channels
                 .First(x => x.Kind == ChannelKind.Admin);
 
-            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"{context.Member} has registered as <{primaryCharacterName}>. Please assign them a role using the \"!member grant-role\" command");
+            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"-----------\n{context.Member} has registered as <{primaryCharacterName}>. Please assign them a role using the \"!member grant-role\" command");
 
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }
