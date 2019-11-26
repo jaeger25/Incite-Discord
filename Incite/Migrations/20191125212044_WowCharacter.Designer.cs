@@ -4,14 +4,16 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191125212044_WowCharacter")]
+    partial class WowCharacter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +83,7 @@ namespace Incite.Migrations
                     b.Property<decimal>("DiscordId")
                         .HasColumnType("decimal(20,0)");
 
-                    b.Property<int?>("WowServerId")
+                    b.Property<int>("WowServerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -484,7 +486,9 @@ namespace Incite.Migrations
                 {
                     b.HasOne("Incite.Models.WowServer", "WowServer")
                         .WithMany()
-                        .HasForeignKey("WowServerId");
+                        .HasForeignKey("WowServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Incite.Models.Member", b =>

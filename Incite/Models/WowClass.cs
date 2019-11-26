@@ -9,6 +9,8 @@ namespace Incite.Models
     {
         public string Name { get; set; }
 
+        public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
+
         public static void Seed(ModelBuilder builder)
         {
             builder.Entity<WowClass>()
