@@ -12,26 +12,61 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord.Commands
 {
-    [Group("wow")]
+    [Group("wow-character")]
     [Description("Commands for managing info related to in-game WoW concepts")]
-    public class WowCommands : BaseCommandModule
+    public class WowCharacterCommands : BaseCommandModule
     {
         readonly InciteDbContext m_dbContext;
 
-        public WowCommands(InciteDbContext dbContext)
+        public WowCharacterCommands(InciteDbContext dbContext)
         {
             m_dbContext = dbContext;
         }
 
-        [Command("add-character")]
+        [Command("list")]
+        [Description("Lists your characters")]
+        public async Task List(CommandContext context)
+        {
+            var user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
+            if (user == null)
+            {
+                return;
+            }
+
+            StringBuilder characterList = new StringBuilder();
+            HashSet<string> servers = new HashSet<string>();
+            foreach(var character in user.WowCharacters.OrderBy(x => x.WowServerId))
+            {
+                if (!servers.Contains(character.WowServer.Name))
+                {
+                    characterList.Append($"\n__{character.WowServer.Name}__\n");
+                    servers.Add(character.WowServer.Name);
+                }
+                characterList.Append($"{character.Name} - {character.WowClass.Name}\n");
+            }
+
+            var dmChannel = await context.Member.CreateDmChannelAsync();
+            await dmChannel.SendMessageAsync(characterList.ToString());
+        }
+
+        [Command("add")]
         [Description("Adds a character to your character list")]
         public async Task AddCharacter(CommandContext context,
             string characterName,
             string characterClass,
             string serverName)
         {
-            var server = m_dbContext.WowServers
+            var server = await m_dbContext.WowServers
                 .FirstOrDefaultAsync(x => x.Name == serverName);
+
+            var wowClass = await m_dbContext.WowClasses
+                .FirstOrDefaultAsync(x => x.Name == characterClass);
+
+            if (wowClass == null)
+            {
+                await context.Message.RespondAsync($"Unable to finder class: {characterClass}");
+                return;
+            }
 
             if (server == null)
             {
@@ -42,7 +77,6 @@ namespace Incite.Discord.Commands
             var user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
             if (user == null)
             {
-                // TODO
                 return;
             }
 
@@ -50,14 +84,14 @@ namespace Incite.Discord.Commands
             {
                 Name = characterName,
                 UserId = user.Id,
-                WowClassId = 0, // TODO: Convert to enum
+                WowClassId = wowClass.Id,
                 WowServerId = server.Id,
             });
 
             await m_dbContext.SaveChangesAsync();
         }
 
-        [Command("remove-character")]
+        [Command("remove")]
         [Description("Removes a character from your character list")]
         public async Task RemoveCharacter(CommandContext context,
             string characterName,
