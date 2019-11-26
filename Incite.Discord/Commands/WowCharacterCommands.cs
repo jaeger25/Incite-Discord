@@ -39,10 +39,10 @@ namespace Incite.Discord.Commands
             {
                 if (!servers.Contains(character.WowServer.Name))
                 {
-                    characterList.Append($"\n__{character.WowServer.Name}__\n");
+                    characterList.Append($"\n__Id__ - __Name__ - __Server__\n");
                     servers.Add(character.WowServer.Name);
                 }
-                characterList.Append($"{character.Name} - {character.WowClass.Name}\n");
+                characterList.Append($"{character.Name} - {character.WowClass.Name} - {character.WowServer.Name}\n");
             }
 
             var dmChannel = await context.Member.CreateDmChannelAsync();
@@ -62,15 +62,17 @@ namespace Incite.Discord.Commands
             var wowClass = await m_dbContext.WowClasses
                 .FirstOrDefaultAsync(x => x.Name == characterClass);
 
+            var guild = await m_dbContext.Guilds.GetCurrentGuildAsync(context);
+
             if (wowClass == null)
             {
-                await context.Message.RespondAsync($"Unable to finder class: {characterClass}");
+                await context.Message.RespondAsync($"Unable to find class: {characterClass}");
                 return;
             }
 
             if (server == null)
             {
-                await context.Message.RespondAsync($"Unable to finder server: {serverName}");
+                await context.Message.RespondAsync($"Unable to find server: {serverName}");
                 return;
             }
 
@@ -83,6 +85,7 @@ namespace Incite.Discord.Commands
             user.WowCharacters.Add(new WowCharacter()
             {
                 Name = characterName,
+                GuildId = guild.Id,
                 UserId = user.Id,
                 WowClassId = wowClass.Id,
                 WowServerId = server.Id,
@@ -114,6 +117,59 @@ namespace Incite.Discord.Commands
             }
 
             m_dbContext.WowCharacters.Remove(character);
+            await m_dbContext.SaveChangesAsync();
+        }
+
+        [Command("set-property")]
+        [Description("Sets a property for one of your characters")]
+        public async Task SetClass(CommandContext context,
+            [Description("The id of the character you wish to modify. You can obtain this by running 'wow-character list'.")] int characterId,
+            [Description("The property to set. Values: class, server")] string propertyName,
+            string propertyValue)
+        {
+            var user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
+            if (user == null)
+            {
+                // TODO
+                return;
+            }
+
+            var character = user.WowCharacters
+                .FirstOrDefault(x => x.Id == characterId);
+
+            if (character == null)
+            {
+                await context.RespondAsync($"Unable to find character with Id: {characterId}");
+                return;
+            }
+
+            if (propertyName == "class")
+            {
+                var wowClass = await m_dbContext.WowClasses
+                    .FirstOrDefaultAsync(x => x.Name == propertyValue);
+
+                if (wowClass == null)
+                {
+                    await context.Message.RespondAsync($"Unable to find class: {propertyValue}");
+                    return;
+                }
+
+                character.WowClassId = wowClass.Id;
+            }
+            else if (propertyName == "server")
+            {
+                var wowServer = await m_dbContext.WowServers
+                    .FirstOrDefaultAsync(x => x.Name == propertyValue);
+
+                if (wowServer == null)
+                {
+                    await context.Message.RespondAsync($"Unable to find server: {propertyValue}");
+                    return;
+                }
+
+                character.WowServerId = wowServer.Id;
+            }
+
             await m_dbContext.SaveChangesAsync();
         }
     }

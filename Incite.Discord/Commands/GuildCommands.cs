@@ -6,6 +6,7 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,6 +45,23 @@ namespace Incite.Discord.Commands
 
             guild.WowServerId = realm.Id;
             await m_dbContext.SaveChangesAsync();
+        }
+
+        [Command("list-characters")]
+        [Description("Lists the characters in the guild")]
+        public async Task ListCharacters(CommandContext context)
+        {
+            var guild = await m_dbContext.Guilds
+                .FirstAsync(x => x.DiscordId == context.Guild.Id);
+
+            StringBuilder characterList = new StringBuilder("\n__UserId__ - __Id__ - __Name__\n");
+            foreach (var character in guild.WowCharacters)
+            {
+                characterList.Append($"{character.UserId} - {character.Id} - {character.Name}\n");
+            }
+
+            var dmChannel = await context.Member.CreateDmChannelAsync();
+            await dmChannel.SendMessageAsync(characterList.ToString());
         }
     }
 }

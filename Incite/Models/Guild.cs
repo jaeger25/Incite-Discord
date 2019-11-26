@@ -21,5 +21,7 @@ namespace Incite.Models
         public virtual ICollection<Member> Members { get; set; } = new List<Member>();
 
         public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+
+        public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
     }
 }

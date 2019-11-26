@@ -4,14 +4,16 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191126040101_MigrateUserCharacters")]
+    partial class MigrateUserCharacters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,9 +209,6 @@ namespace Incite.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("GuildId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -223,8 +222,6 @@ namespace Incite.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GuildId");
 
                     b.HasIndex("UserId");
 
@@ -573,10 +570,6 @@ namespace Incite.Migrations
 
             modelBuilder.Entity("Incite.Models.WowCharacter", b =>
                 {
-                    b.HasOne("Incite.Models.Guild", "Guild")
-                        .WithMany("WowCharacters")
-                        .HasForeignKey("GuildId");
-
                     b.HasOne("Incite.Models.User", "User")
                         .WithMany("WowCharacters")
                         .HasForeignKey("UserId")
