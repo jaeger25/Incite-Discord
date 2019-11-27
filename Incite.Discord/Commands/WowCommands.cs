@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Incite.Discord.Services;
+using DSharpPlus.Entities;
 
 namespace Incite.Discord.Commands
 {
@@ -230,6 +231,10 @@ namespace Incite.Discord.Commands
             public async Task Link(CommandContext context,
                 WowItem item)
             {
+                var embed = new DiscordEmbedBuilder()
+                    .WithTitle(item.Name)
+                    .WithThumbnailUrl(item.IconUrl)
+                    .WithUrl(item.WowHeadUrl);
             }
         }
     }

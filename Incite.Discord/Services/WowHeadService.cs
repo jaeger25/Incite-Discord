@@ -11,10 +11,21 @@ using System.Xml;
 
 namespace Incite.Discord.Services
 {
+    public class WowHeadReagent
+    {
+        public WowHeadItem Item { get; set; }
+        public int Count { get; set; }
+    }
+
     public class WowHeadItem
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int Quality { get; set; }
+        public string Icon { get; set; }
+        public string Link { get; set; }
+
+        public List<WowHeadReagent> CreatedBy { get; } = new List<WowHeadReagent>();
     }
 
     public class WowHeadService
@@ -40,9 +51,23 @@ namespace Incite.Discord.Services
             };
 
             itemXmlReader.ReadToDescendant("item");
-            itemXmlReader.ReadToDescendant("name");
 
+            itemXmlReader.ReadToDescendant("name");
             item.Name = itemXmlReader.ReadElementContentAsString();
+
+            itemXmlReader.ReadToDescendant("quality");
+            itemXmlReader.MoveToAttribute("id");
+
+            item.Quality = itemXmlReader.ReadContentAsInt();
+
+            itemXmlReader.ReadToNextSibling("icon");
+            item.Icon = itemXmlReader.ReadElementContentAsString();
+
+            itemXmlReader.ReadToNextSibling("htmlTooltip");
+            item.HtmlTooltip = itemXmlReader.ReadElementContentAsString();
+
+            itemXmlReader.ReadToNextSibling("link");
+            item.Link = itemXmlReader.ReadElementContentAsString();
 
             return item;
         }
