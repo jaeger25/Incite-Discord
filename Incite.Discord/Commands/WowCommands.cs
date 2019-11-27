@@ -36,7 +36,7 @@ namespace Incite.Discord.Commands
                 StringBuilder characterList = new StringBuilder("__**Character**__ , __**Class**__");
                 foreach (var character in User.WowCharacters.OrderBy(x => x.WowServerId))
                 {
-                    characterList.Append($"\n{character} , {character.WowClass}\n");
+                    characterList.Append($"\n{character} , {character.WowClass}");
                 }
 
                 var dmChannel = await context.Member.CreateDmChannelAsync();
