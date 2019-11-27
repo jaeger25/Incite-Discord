@@ -23,6 +23,7 @@ namespace Incite.Models
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WowCharacter> WowCharacters { get; set; }
+        public DbSet<WowCharacterProfession> WowCharacterProfessions { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
         public DbSet<WowServer> WowServers { get; set; }
@@ -42,10 +43,12 @@ namespace Incite.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Event>()
-                .OwnsOne(x => x.EventMessage);
+                .OwnsOne(x => x.EventMessage)
+                    .WithOwner(x => x.Event);
 
             modelBuilder.Entity<Event>()
-                .OwnsMany(x => x.EventMembers);
+                .OwnsMany(x => x.EventMembers)
+                    .WithOwner(x => x.Event);
 
             modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
@@ -57,7 +60,8 @@ namespace Incite.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Member>()
-                .OwnsMany(x => x.MemberEvents);
+                .OwnsMany(x => x.MemberEvents)
+                    .WithOwner(x => x.Member);
 
             modelBuilder.Entity<Message>()
                 .HasOne(x => x.Channel)
@@ -91,6 +95,10 @@ namespace Incite.Models
                     .WithMany(x => x.WowCharacters)
                 .HasForeignKey(x => x.WowServerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WowCharacter>()
+                .OwnsMany(x => x.WowCharacterProfessions)
+                    .WithOwner(x => x.WowCharacter);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);

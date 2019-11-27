@@ -129,6 +129,88 @@ namespace Incite.Discord.Commands
             {
                 m_dbContext = dbContext;
             }
+
+            [Command("list")]
+            [Description("Lists your characters' profressions")]
+            public async Task List(CommandContext context)
+            {
+                StringBuilder message = new StringBuilder();
+                foreach(var character in User.WowCharacters)
+                {
+                    message.Append($"{character}\n");
+
+                    foreach(var profession in character.WowCharacterProfessions)
+                    {
+                        message.Append($"\t{profession.WowProfession}\n");
+                    }
+                }
+
+                var dmChannel = await context.Member.CreateDmChannelAsync();
+                await dmChannel.SendMessageAsync(message.ToString());
+
+                ResponseString = "Command executed. Check your DMs.";
+            }
+
+            [Command("list")]
+            [Description("Lists your character's profressions")]
+            public async Task List(CommandContext context,
+                [Description(Descriptions.WowCharacter)] UserWowCharacter character)
+            {
+                StringBuilder message = new StringBuilder();
+
+                message.Append($"{character}\n");
+                foreach (var profession in character.Character.WowCharacterProfessions)
+                {
+                    message.Append($"\t{profession.WowProfession}\n");
+                }
+
+                var dmChannel = await context.Member.CreateDmChannelAsync();
+                await dmChannel.SendMessageAsync(message.ToString());
+
+                ResponseString = "Command executed. Check your DMs.";
+            }
+
+            [Command("add")]
+            [Description("Adds a profession to the specified character")]
+            public async Task Add(CommandContext context,
+                [Description(Descriptions.WowCharacter)] UserWowCharacter character,
+                [Description(Descriptions.WowProfession)] WowProfession profession)
+            {
+                if (character.Character.WowCharacterProfessions.Count == 2)
+                {
+                    ResponseString = $"{character.Character} already has two professions added. Pleae remove one first.";
+                    return;
+                }
+                else if (character.Character.WowCharacterProfessions.Any(x => x.WowProfessionId == profession.Id))
+                {
+                    ResponseString = $"{character.Character} already has this profession added.";
+                    return;
+                }
+
+                m_dbContext.WowCharacterProfessions.Add(new WowCharacterProfession()
+                {
+                    WowCharacterId = character.Character.Id,
+                    WowProfessionId = profession.Id,
+                });
+
+                await m_dbContext.SaveChangesAsync();
+            }
+
+            [Command("remove")]
+            [Description("Removes a profession to the specified character")]
+            public async Task Remove(CommandContext context,
+                [Description(Descriptions.WowCharacter)] UserWowCharacter character,
+                [Description(Descriptions.WowProfession)] WowProfession profession)
+            {
+                var charProfession = character.Character.WowCharacterProfessions
+                    .FirstOrDefault(x => x.WowProfessionId == profession.Id);
+
+                if (charProfession != null)
+                {
+                    m_dbContext.WowCharacterProfessions.Remove(charProfession);
+                    await m_dbContext.SaveChangesAsync();
+                }
+            }
         }
     }
 }

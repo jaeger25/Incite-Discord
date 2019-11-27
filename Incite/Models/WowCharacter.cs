@@ -29,6 +29,8 @@ namespace Incite.Models
         public int WowServerId { get; set; }
         public virtual WowServer WowServer { get; set; }
 
+        public virtual ICollection<WowCharacterProfession> WowCharacterProfessions { get; set; } = new List<WowCharacterProfession>();
+
         public override string ToString()
         {
             return $"{Name}-{WowServer.Name}";

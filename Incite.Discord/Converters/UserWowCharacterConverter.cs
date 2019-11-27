@@ -16,9 +16,10 @@ namespace Incite.Discord.Converters
 {
     public class UserWowCharacterConverter : IArgumentConverter<UserWowCharacter>
     {
-        public Task<Optional<UserWowCharacter>> ConvertAsync(string value, CommandContext ctx)
+        public async Task<Optional<UserWowCharacter>> ConvertAsync(string value, CommandContext ctx)
         {
             var command = (BaseInciteCommand)ctx.Command.Module.GetInstance(ctx.Services);
+            await command.BeforeExecutionAsync(ctx);
 
             var nameServerPair = value.Split('-');
             var characters = command.User.WowCharacters
@@ -34,13 +35,13 @@ namespace Incite.Discord.Converters
 
             if (characters.Length == 1)
             {
-                return Task.FromResult(Optional.FromValue(new UserWowCharacter()
+                return Optional.FromValue(new UserWowCharacter()
                 {
                     Character = characters[0]
-                }));
+                });
             }
 
-            return Task.FromResult(Optional.FromNoValue<UserWowCharacter>());
+            return Optional.FromNoValue<UserWowCharacter>();
         }
     }
 }
