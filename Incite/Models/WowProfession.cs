@@ -9,6 +9,11 @@ namespace Incite.Models
     {
         public string Name { get; set; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         public static void Seed(ModelBuilder builder)
         {
             int nextId = 1;

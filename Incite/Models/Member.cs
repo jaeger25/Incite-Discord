@@ -7,7 +7,8 @@ namespace Incite.Models
 {
     public class Member : BaseModel
     {
-        public string PrimaryCharacterName { get; set; }
+        public int? PrimaryWowCharacterId { get; set; }
+        public virtual WowCharacter? PrimaryWowCharacter { get; set; }
 
         public int GuildId { get; set; }
         public virtual Guild Guild { get; set; }

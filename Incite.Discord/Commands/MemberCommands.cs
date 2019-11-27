@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Extensions;
@@ -49,7 +50,7 @@ namespace Incite.Discord.Commands
                     (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
                     "(Unknown)";
 
-                memberList.AppendLine($"{discordName} : {member.PrimaryCharacterName} ");
+                memberList.AppendLine($"{discordName} : {member.PrimaryWowCharacter} ");
             }
 
             await channel.SendMessageAsync(memberList.ToString());
@@ -57,7 +58,7 @@ namespace Incite.Discord.Commands
 
         [Command("register")]
         [Description("Lists the official guild raid days and times")]
-        public async Task Register(CommandContext context, string primaryCharacterName)
+        public async Task Register(CommandContext context, UserWowCharacter primaryCharacter)
         {
             await context.Message.DeleteAsync();
 
@@ -75,15 +76,14 @@ namespace Incite.Discord.Commands
                 {
                     UserId = User.Id,
                     GuildId = guild.Id,
-                    PrimaryCharacterName = primaryCharacterName
+                    PrimaryWowCharacterId = primaryCharacter.Character.Id
                 };
 
                 m_dbContext.Members.Add(member);
             }
             else
             {
-                member.PrimaryCharacterName = primaryCharacterName;
-                m_dbContext.Update(member);
+                return;
             }
 
             await m_dbContext.SaveChangesAsync();
@@ -91,7 +91,7 @@ namespace Incite.Discord.Commands
             var adminChannel = guild.Channels
                 .First(x => x.Kind == ChannelKind.Admin);
 
-            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"-----------\n{context.Member} has registered as <{primaryCharacterName}>. Please assign them a role using the \"!member grant-role\" command");
+            await adminChannel.GetDiscordChannel(context).SendMessageAsync($"-----------\n{context.Member} has registered as {primaryCharacter.Character.Name}. Please assign them a role using the \"!member grant-role {context.User.Username}#{context.User.Discriminator}\" command");
 
             await channel.SendMessageAsync("Your registration is complete, but pending Officer role assignment");
         }

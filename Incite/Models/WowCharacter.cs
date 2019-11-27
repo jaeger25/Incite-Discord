@@ -20,5 +20,10 @@ namespace Incite.Models
 
         public int WowServerId { get; set; }
         public virtual WowServer WowServer { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}-{WowServer.Name}";
+        }
     }
 }

@@ -76,8 +76,8 @@ namespace Incite.Discord.Messages
                 string separator = inline ? "\n" : ", ";
 
                 string memberString = inclueEmoji ?
-                    $"{(inline ? "\n" : "")}{m_emojis.GetByDiscordName(member.EmojiDiscordName)} {member.Member.PrimaryCharacterName}{(inline ? "" : ", ")}" :
-                    $"{(inline ? "\n" : "")}{member.Member.PrimaryCharacterName}{(inline ? "" : ", ")}";
+                    $"{(inline ? "\n" : "")}{m_emojis.GetByDiscordName(member.EmojiDiscordName)} {member.Member.PrimaryWowCharacter.Name}{(inline ? "" : ", ")}" :
+                    $"{(inline ? "\n" : "")}{member.Member.PrimaryWowCharacter.Name}{(inline ? "" : ", ")}";
 
                 classColumnText.Append(memberString);
             }

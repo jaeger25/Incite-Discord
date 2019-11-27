@@ -11,6 +11,11 @@ namespace Incite.Models
 
         public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         public static void Seed(ModelBuilder builder)
         {
             builder.Entity<WowServer>()
