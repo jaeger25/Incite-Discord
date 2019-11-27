@@ -6,7 +6,7 @@ namespace Incite.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("INSERT INTO dbo.WowCharacters (Name, UserId, WowClassId, WowServerId) SELECT PrimaryCharacterName, UserId, 1, 1 FROM dbo.Members ");
+            migrationBuilder.Sql("INSERT INTO dbo.WowCharacters (Name, UserId, GuildId, WowClassId, WowServerId) SELECT PrimaryCharacterName, UserId, 1, 1, 1 FROM dbo.Members ");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

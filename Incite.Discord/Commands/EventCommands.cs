@@ -20,7 +20,7 @@ namespace Incite.Discord.Commands
     [RequireGuildConfigured]
     [RequireMemberRegistered]
     [Description("Commands for setting and retrieving info about the guild's schedule")]
-    public class EventCommands : BaseCommandModule
+    public class EventCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
 

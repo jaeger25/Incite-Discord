@@ -17,7 +17,7 @@ namespace Incite.Discord.Commands
     [RequireGuild]
     [RequireUserPermissions(Permissions.ManageGuild)]
     [Description("Commands for managing bot settings for this guild")]
-    public class AdminCommands : BaseCommandModule
+    public class AdminCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
 

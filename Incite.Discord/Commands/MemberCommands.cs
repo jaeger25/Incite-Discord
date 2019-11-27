@@ -19,7 +19,7 @@ namespace Incite.Discord.Commands
     [Group("member")]
     [RequireGuildConfigured]
     [Description("Commands for managing guild members")]
-    public class MemberCommands : BaseCommandModule
+    public class MemberCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
 
@@ -66,17 +66,6 @@ namespace Incite.Discord.Commands
             var guild = await m_dbContext.Guilds
                 .FirstAsync(x => x.DiscordId == context.Guild.Id);
 
-            User user = await m_dbContext.Users.TryGetCurrentUserAsync(context);
-            if (user == null)
-            {
-                user = new User()
-                {
-                    DiscordId = context.User.Id
-                };
-
-                m_dbContext.Users.Add(user);
-            }
-
             var member = await m_dbContext.Members
                 .TryGetCurrentMemberAsync(context);
 
@@ -84,7 +73,7 @@ namespace Incite.Discord.Commands
             {
                 member = new Member()
                 {
-                    User = user,
+                    UserId = User.Id,
                     GuildId = guild.Id,
                     PrimaryCharacterName = primaryCharacterName
                 };
