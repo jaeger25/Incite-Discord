@@ -52,7 +52,13 @@ namespace Incite.Discord.Commands
                 [Description(Descriptions.WowClass)] WowClass characterClass,
                 [Description(Descriptions.WowFaction)] WowFaction faction)
             {
-                User.WowCharacters.Add(new WowCharacter()
+                if (User.WowCharacters.Any(x => x.Name == character.Name && x.WowServerId == character.Server.Id))
+                {
+                    ResponseString = "You have already registered this character";
+                    return;
+                }
+
+                var wowCharacter = new WowCharacter()
                 {
                     Name = character.Name,
                     WowFaction = faction,
@@ -60,7 +66,14 @@ namespace Incite.Discord.Commands
                     UserId = User.Id,
                     WowClassId = characterClass.Id,
                     WowServerId = character.Server.Id,
-                });
+                };
+
+                User.WowCharacters.Add(wowCharacter);
+
+                if (Member.PrimaryWowCharacter == null)
+                {
+                    Member.PrimaryWowCharacter = wowCharacter;
+                }
 
                 await m_dbContext.SaveChangesAsync();
             }
@@ -102,6 +115,19 @@ namespace Incite.Discord.Commands
             {
                 character.Character.WowFaction = faction;
                 await m_dbContext.SaveChangesAsync();
+            }
+        }
+
+        [Group("profession")]
+        [Aliases("prof")]
+        [Description("Commands for searching and managing professions")]
+        public class WowProfessionCommands : BaseInciteCommand
+        {
+            readonly InciteDbContext m_dbContext;
+
+            public WowProfessionCommands(InciteDbContext dbContext)
+            {
+                m_dbContext = dbContext;
             }
         }
     }
