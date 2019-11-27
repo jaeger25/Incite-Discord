@@ -40,8 +40,12 @@ namespace Incite.Discord.Commands
         public async Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
         {
+            var characters = Guild.WowCharacters
+                .Where(x => x.WowCharacterProfessions
+                    .Any(x => x.WowProfessionId == profession.Id));
+
             StringBuilder message = new StringBuilder($"{profession}\n");
-            foreach (var character in Guild.WowCharacters)
+            foreach (var character in characters)
             {
                 message.Append($"{character}\n");
             }
