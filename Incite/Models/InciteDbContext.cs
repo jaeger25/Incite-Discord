@@ -25,6 +25,7 @@ namespace Incite.Models
         public DbSet<WowCharacter> WowCharacters { get; set; }
         public DbSet<WowCharacterProfession> WowCharacterProfessions { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
+        public DbSet<WowItem> WowItems { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
         public DbSet<WowServer> WowServers { get; set; }
 

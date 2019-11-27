@@ -46,6 +46,7 @@ namespace Incite.Discord.Services
             commands.RegisterConverter(new UserWowCharacterConverter());
             commands.RegisterConverter(new WowCharacterConverter());
             commands.RegisterConverter(new WowClassConverter());
+            commands.RegisterConverter(new WowItemConverter());
             commands.RegisterConverter(new WowProfessionConverter());
             commands.RegisterConverter(new WowServerConverter());
 
@@ -82,7 +83,7 @@ namespace Incite.Discord.Services
 
         async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            m_logger.LogError($"CommandErrored: {e.Command?.Name}\nUser: {e.Context?.User}\n{e?.Exception}");
+            m_logger.LogError($"CommandErrored: {e.Command?.QualifiedName}\nUser: {e.Context?.User}\n{e?.Exception}");
 
             if (e.Command?.Name != "help")
             {
@@ -95,7 +96,7 @@ namespace Incite.Discord.Services
 
         Task Commands_CommandExecuted(CommandExecutionEventArgs e)
         {
-            m_logger.LogInformation($"CommandExecuted: {e.Command?.Name}\nUser: {e.Context?.User}");
+            m_logger.LogInformation($"CommandExecuted: {e.Command?.QualifiedName}\nUser: {e.Context?.User}");
             return Task.CompletedTask;
         }
     }

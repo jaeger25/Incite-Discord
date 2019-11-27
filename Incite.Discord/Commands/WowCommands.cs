@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Incite.Discord.Services;
 
 namespace Incite.Discord.Commands
 {
@@ -135,11 +136,11 @@ namespace Incite.Discord.Commands
             public async Task List(CommandContext context)
             {
                 StringBuilder message = new StringBuilder();
-                foreach(var character in User.WowCharacters)
+                foreach (var character in User.WowCharacters)
                 {
                     message.Append($"{character}\n");
 
-                    foreach(var profession in character.WowCharacterProfessions)
+                    foreach (var profession in character.WowCharacterProfessions)
                     {
                         message.Append($"\t{profession.WowProfession}\n");
                     }
@@ -210,6 +211,25 @@ namespace Incite.Discord.Commands
                     m_dbContext.WowCharacterProfessions.Remove(charProfession);
                     await m_dbContext.SaveChangesAsync();
                 }
+            }
+        }
+
+        [Group("item")]
+        [Description("Commands for searching wow items")]
+        public class WowItemCommands : BaseInciteCommand
+        {
+            readonly WowHeadService m_wowHead;
+
+            public WowItemCommands(WowHeadService wowHead)
+            {
+                m_wowHead = wowHead;
+            }
+
+            [Command("link")]
+            [Description("Gets the WowHead link for the given item")]
+            public async Task Link(CommandContext context,
+                WowItem item)
+            {
             }
         }
     }

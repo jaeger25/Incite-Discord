@@ -34,5 +34,22 @@ namespace Incite.Discord.Commands
             Guild.WowServerId = server.Id;
             await m_dbContext.SaveChangesAsync();
         }
+
+        [Command("list")]
+        [Description("Lists the users which are the specified profession")]
+        public async Task List(CommandContext context,
+            [Description(Descriptions.WowProfession)] WowProfession profession)
+        {
+            StringBuilder message = new StringBuilder($"{profession}\n");
+            foreach (var character in Guild.WowCharacters)
+            {
+                message.Append($"{character}\n");
+            }
+
+            var dmChannel = await context.Member.CreateDmChannelAsync();
+            await dmChannel.SendMessageAsync(message.ToString());
+
+            ResponseString = "Command executed. Check your DMs.";
+        }
     }
 }

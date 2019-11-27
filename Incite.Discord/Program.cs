@@ -13,7 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Incite.Discord
 {
@@ -58,6 +60,7 @@ namespace Incite.Discord
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
                         .AddSingleton<EmojiService>()
+                        .AddScoped<WowHeadService>()
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
