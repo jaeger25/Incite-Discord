@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static DSharpPlus.CommandsNext.CommandsNextExtension;
 
 namespace Incite.Discord.Services
 {
@@ -79,10 +80,17 @@ namespace Incite.Discord.Services
             await e.Client.UpdateStatusAsync(new DiscordActivity("for !help command", ActivityType.Watching));
         }
 
-        Task Commands_CommandErrored(CommandErrorEventArgs e)
+        async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
             m_logger.LogError($"CommandErrored: {e.Command?.Name}\nUser: {e.Context?.User}\n{e?.Exception}");
-            return Task.CompletedTask;
+
+            if (e.Command?.Name != "help")
+            {
+                var helpCommand = e.Context.CommandsNext.FindCommand($"help {e.Command?.QualifiedName}", out string rawArgs);
+                var helpContext = e.Context.CommandsNext.CreateContext(e.Context.Message, "!", helpCommand, rawArgs);
+
+                await e.Context.CommandsNext.ExecuteCommandAsync(helpContext);
+            }
         }
 
         Task Commands_CommandExecuted(CommandExecutionEventArgs e)
