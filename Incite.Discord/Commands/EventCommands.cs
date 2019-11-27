@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.Extensions;
 using Incite.Discord.Messages;
@@ -19,7 +20,7 @@ namespace Incite.Discord.Commands
     [Group("event")]
     [RequireGuildConfigured]
     [RequireMemberRegistered]
-    [Description("Commands for setting and retrieving info about the guild's schedule")]
+    [Description("Commands for setting and retrieving info about the guild's events")]
     public class EventCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
@@ -35,27 +36,18 @@ namespace Incite.Discord.Commands
         public async Task Create(CommandContext context,
             string name,
             string description,
-            [Description("Format: \"10-31-2019 9:00 PM -04:00\"")] DateTimeOffset dateTime)
+            [Description(Descriptions.DateTime)] DateTimeOffset dateTime)
         {
             if (DateTimeOffset.UtcNow > dateTime.UtcDateTime)
             {
-                var dmChannel = await context.Member.CreateDmChannelAsync();
-
-                await dmChannel.SendMessageAsync("The event cannot be in the past.");
+                ResponseString = "The event cannot be in the past";
                 return;
             }
 
             var discordMessage = await context.Message.RespondAsync("\u200b");
-            await context.Message.DeleteAsync();
-
-            var guild = await m_dbContext.Guilds
-                .FirstAsync(x => x.DiscordId == context.Guild.Id);
 
             var channel = await m_dbContext.Channels
                 .FirstOrDefaultAsync(x => x.DiscordId == context.Channel.Id);
-
-            var creator = guild.Members
-                .First(x => x.User.DiscordId == context.User.Id);
 
             var message = new Message()
             {
@@ -67,7 +59,7 @@ namespace Incite.Discord.Commands
                 message.Channel = new Channel()
                 {
                     DiscordId = context.Channel.Id,
-                    GuildId = guild.Id
+                    GuildId = Guild.Id
                 };
 
                 m_dbContext.Channels.Add(message.Channel);
@@ -79,13 +71,13 @@ namespace Incite.Discord.Commands
 
             var memberEvent = new MemberEvent()
             {
-                MemberId = creator.Id,
+                MemberId = Member.Id,
                 Event = new Models.Event()
                 {
                     Name = name,
                     Description = description,
                     DateTime = dateTime,
-                    GuildId = guild.Id
+                    GuildId = Guild.Id
                 }
             };
 
@@ -95,13 +87,14 @@ namespace Incite.Discord.Commands
                 Message = message
             };
 
-            creator.MemberEvents.Add(memberEvent);
+            Member.MemberEvents.Add(memberEvent);
             await m_dbContext.SaveChangesAsync();
 
             var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent.Event);
             await eventMessage.UpdateAsync();
 
             await eventMessage.AddReactionsToEventMessageAsync();
+            ResponseString = "";
         }
 
         [Command("update")]
@@ -111,27 +104,22 @@ namespace Incite.Discord.Commands
             int eventId,
             string name,
             string description,
-            [Description("Format: \"10-31-2019 9:00 PM -05:00\"")] DateTimeOffset dateTime)
+            [Description(Descriptions.DateTime)] DateTimeOffset dateTime)
         {
             if (DateTimeOffset.UtcNow > dateTime.UtcDateTime)
             {
-                var dmChannel = await context.Member.CreateDmChannelAsync();
-
-                await dmChannel.SendMessageAsync("The event cannot be in the past.");
+                ResponseString = "The event cannot be in the past";
                 return;
             }
 
             await context.Message.DeleteAsync();
 
-            var guild = await m_dbContext.Guilds
-                .FirstAsync(x => x.DiscordId == context.Guild.Id);
-
-            var memberEvent = guild.Events
+            var memberEvent = Guild.Events
                 .FirstOrDefault(x => x.Id == eventId);
 
             if (memberEvent == null)
             {
-                await context.Message.RespondAsync("Failed to find event");
+                ResponseString = "Failed to find event";
                 return;
             }
 
@@ -145,6 +133,7 @@ namespace Incite.Discord.Commands
 
             var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
+            ResponseString = "";
         }
     }
 }

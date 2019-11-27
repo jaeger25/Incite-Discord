@@ -30,17 +30,17 @@ namespace Incite.Discord.Commands
         [Description("Sets the server role which corresponds with the RoleKind")]
         public async Task SetRole(CommandContext context,
             [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind,
-            [Description("Server role")] DiscordRole role)
+            [Description("Name of the corresponding discord role")] DiscordRole role)
         {
-            var existingRole = await m_dbContext.Roles
-                .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
+            var existingRole = Guild.Roles
+                .FirstOrDefault(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
 
             if (existingRole == null)
             {
                 m_dbContext.Roles.Add(new Role()
                 {
                     DiscordId = role.Id,
-                    GuildId = (await m_dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
+                    GuildId = Guild.Id,
                     Kind = roleKind
                 });
             }
@@ -56,9 +56,6 @@ namespace Incite.Discord.Commands
             {
                 await role.ModifyAsync(mentionable: true);
             }
-
-            await context.Message.DeleteAsync();
-            await context.Channel.SendMessageAsync($"Role set: {roleKind.ToString()} - {role}");
         }
 
         [Command("set-channel")]
@@ -75,7 +72,7 @@ namespace Incite.Discord.Commands
                 m_dbContext.Channels.Add(new Channel()
                 {
                     DiscordId = channel.Id,
-                    GuildId = (await m_dbContext.Guilds.GetCurrentGuildAsync(context)).Id,
+                    GuildId = Guild.Id,
                     Kind = channelKind
                 });
             }
@@ -86,9 +83,6 @@ namespace Incite.Discord.Commands
             }
 
             await m_dbContext.SaveChangesAsync();
-
-            await context.Message.DeleteAsync();
-            await context.Channel.SendMessageAsync($"Channel set: {channelKind.ToString()} - {channel}");
         }
     }
 }

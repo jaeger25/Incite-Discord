@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,12 +28,10 @@ namespace Incite.Discord.Commands
         [Command("set-server")]
         [RequireInciteRole(RoleKind.Leader)]
         [Description("Sets the WoW server for the guild")]
-        public async Task SetRealm(CommandContext context, WowServer server)
+        public async Task SetRealm(CommandContext context,
+            [Description(Descriptions.WowServer)] WowServer server)
         {
-            var guild = await m_dbContext.Guilds
-                .FirstAsync(x => x.DiscordId == context.Guild.Id);
-
-            guild.WowServerId = server.Id;
+            Guild.WowServerId = server.Id;
             await m_dbContext.SaveChangesAsync();
         }
     }

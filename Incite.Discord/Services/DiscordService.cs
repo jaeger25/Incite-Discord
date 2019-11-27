@@ -2,6 +2,9 @@
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
+using Incite.Discord.Converters;
 using Incite.Discord.DiscordExtensions;
 using Incite.Models;
 using Microsoft.Extensions.Configuration;
@@ -30,12 +33,20 @@ namespace Incite.Discord.Services
             {
                 StringPrefixes = new[] { "!" },
                 EnableDms = false,
-                Services = serviceProvider
+                Services = serviceProvider,
             });
 
             commands.RegisterConverter(new EnumConverter<RoleKind>());
             commands.RegisterConverter(new EnumConverter<ChannelKind>());
+            commands.RegisterConverter(new EnumConverter<WowFaction>());
             commands.RegisterCommands(GetType().Assembly);
+
+            commands.RegisterConverter(new QualifiedWowCharacterConverter());
+            commands.RegisterConverter(new UserWowCharacterConverter());
+            commands.RegisterConverter(new WowCharacterConverter());
+            commands.RegisterConverter(new WowClassConverter());
+            commands.RegisterConverter(new WowProfessionConverter());
+            commands.RegisterConverter(new WowServerConverter());
 
             client.AddExtension(new HandlersExtension());
             client.GetExtension<HandlersExtension>().RegisterHandlers(typeof(Program).Assembly);
@@ -43,6 +54,8 @@ namespace Incite.Discord.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            m_discordClient.Ready += DiscordClient_Ready;
+
             var commands = m_discordClient.GetCommandsNext();
             commands.CommandExecuted += Commands_CommandExecuted;
             commands.CommandErrored += Commands_CommandErrored;
@@ -54,7 +67,16 @@ namespace Incite.Discord.Services
         {
             await m_discordClient.DisconnectAsync();
 
-            m_discordClient.GetCommandsNext().CommandErrored -= Commands_CommandErrored;
+            var commands = m_discordClient.GetCommandsNext();
+            commands.CommandErrored -= Commands_CommandErrored;
+            commands.CommandExecuted -= Commands_CommandExecuted;
+
+            m_discordClient.Ready -= DiscordClient_Ready;
+        }
+
+        async Task DiscordClient_Ready(ReadyEventArgs e)
+        {
+            await e.Client.UpdateStatusAsync(new DiscordActivity("for !help command", ActivityType.Watching));
         }
 
         Task Commands_CommandErrored(CommandErrorEventArgs e)

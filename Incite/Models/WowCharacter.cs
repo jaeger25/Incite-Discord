@@ -5,9 +5,17 @@ using System.Text;
 
 namespace Incite.Models
 {
+    public enum WowFaction
+    {
+        Horde,
+        Alliance,
+    }
+
     public class WowCharacter : BaseModel
     {
         public string Name { get; set; }
+
+        public WowFaction WowFaction { get; set; }
 
         public int GuildId { get; set; }
         public virtual Guild Guild { get; set; }

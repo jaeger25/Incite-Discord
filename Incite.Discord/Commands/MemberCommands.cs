@@ -38,13 +38,10 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            var guild = await m_dbContext.Guilds
-                .FirstAsync(x => x.DiscordId == context.Guild.Id);
-
             StringBuilder memberList = new StringBuilder("Discord Name : Character Name");
             memberList.AppendLine();
 
-            foreach (var member in guild.Members)
+            foreach (var member in Guild.Members)
             {
                 string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
                     (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
@@ -58,37 +55,17 @@ namespace Incite.Discord.Commands
 
         [Command("register")]
         [Description("Lists the official guild raid days and times")]
-        public async Task Register(CommandContext context, UserWowCharacter primaryCharacter)
+        public async Task Register(CommandContext context,
+            [Description(Descriptions.WowCharacter)] UserWowCharacter primaryCharacter)
         {
             await context.Message.DeleteAsync();
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            var guild = await m_dbContext.Guilds
-                .FirstAsync(x => x.DiscordId == context.Guild.Id);
-
-            var member = await m_dbContext.Members
-                .TryGetCurrentMemberAsync(context);
-
-            if (member == null)
-            {
-                member = new Member()
-                {
-                    UserId = User.Id,
-                    GuildId = guild.Id,
-                    PrimaryWowCharacterId = primaryCharacter.Character.Id
-                };
-
-                m_dbContext.Members.Add(member);
-            }
-            else
-            {
-                return;
-            }
-
+            Member.PrimaryWowCharacterId = primaryCharacter.Character.Id;
             await m_dbContext.SaveChangesAsync();
 
-            var adminChannel = guild.Channels
+            var adminChannel = Guild.Channels
                 .First(x => x.Kind == ChannelKind.Admin);
 
             await adminChannel.GetDiscordChannel(context).SendMessageAsync($"-----------\n{context.Member} has registered as {primaryCharacter.Character.Name}. Please assign them a role using the \"!member grant-role {context.User.Username}#{context.User.Discriminator}\" command");
@@ -106,8 +83,7 @@ namespace Incite.Discord.Commands
             bool allowedToChange = PermissionMethods.HasPermission(context.Member.PermissionsIn(context.Channel), Permissions.ManageGuild);
             if (!allowedToChange)
             {
-                var officer = await m_dbContext.Members.GetCurrentMemberAsync(context);
-                allowedToChange = officer.MemberRoles
+                allowedToChange = Member.MemberRoles
                     .Any(x => x.Role.Kind >= roleKind);
             }
 
@@ -142,7 +118,6 @@ namespace Incite.Discord.Commands
 
             await m_dbContext.SaveChangesAsync();
 
-            bool error = false;
             StringBuilder rolesString = new StringBuilder();
             var discordMember = await context.Guild.GetMemberAsync(user.Id);
             foreach (var role in member.MemberRoles.Select(x => x.Role))
@@ -158,8 +133,6 @@ namespace Incite.Discord.Commands
                     }
                     catch (UnauthorizedException e)
                     {
-                        error = true;
-
                         var dmChannel = await context.Member.CreateDmChannelAsync();
                         await dmChannel.SendMessageAsync("You must manually edit the server roles such that the 'Incite' bot role is higher than any other roles you wish it to auto-assign");
                     }
@@ -169,13 +142,7 @@ namespace Incite.Discord.Commands
             if (rolesString.Length > 0)
             {
                 var dmChannel = await discordMember.CreateDmChannelAsync();
-                await dmChannel.SendMessageAsync($"<{context.Guild.Name}> guild role(s) added: {rolesString.ToString().Trim(',')}");
-            }
-
-            if (!error)
-            {
-                await context.Message.DeleteAsync();
-                await context.Channel.SendMessageAsync($"Role set for: {user}");
+                await dmChannel.SendMessageAsync($"<{context.Guild}> guild role(s) added: {rolesString.ToString().Trim(',')}");
             }
         }
     }

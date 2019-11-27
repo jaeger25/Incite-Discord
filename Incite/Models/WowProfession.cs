@@ -23,7 +23,7 @@ namespace Incite.Models
                     new WowProfession()
                     {
                         Id = nextId++,
-                        Name = "First Aid"
+                        Name = "FirstAid"
                     },
                     new WowProfession()
                     {

@@ -83,17 +83,6 @@ namespace Incite.Discord
             var host = CreateHostBuilder(args).Build();
 
             host.Services.GetService<InciteDbContext>().Database.Migrate();
-
-            foreach(var member in host.Services.GetService<InciteDbContext>().Members)
-            {
-                if (member.User.WowCharacters.Count > 0)
-                {
-                    member.PrimaryWowCharacterId = member.User.WowCharacters.First().Id;
-                }
-            }
-
-            host.Services.GetService<InciteDbContext>().SaveChanges();
-
             host.Run();
         }
     }
