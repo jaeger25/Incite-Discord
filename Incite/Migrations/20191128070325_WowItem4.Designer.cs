@@ -4,14 +4,16 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191128070325_WowItem4")]
+    partial class WowItem4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

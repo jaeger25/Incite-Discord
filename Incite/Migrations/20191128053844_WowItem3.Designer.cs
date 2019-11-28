@@ -4,14 +4,16 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191128053844_WowItem3")]
+    partial class WowItem3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -324,64 +326,11 @@ namespace Incite.Migrations
                     b.Property<int>("WowId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WowItemClassId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WowItemSubclassId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("WowItemClassId");
-
-                    b.HasIndex("WowItemSubclassId");
-
                     b.ToTable("WowItems");
-                });
-
-            modelBuilder.Entity("Incite.Models.WowItemClass", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WowId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasAlternateKey("WowId");
-
-                    b.ToTable("WowItemClasses");
-                });
-
-            modelBuilder.Entity("Incite.Models.WowItemSubclass", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WowId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WowItemClassId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WowItemClassId");
-
-                    b.ToTable("WowItemSubclasses");
                 });
 
             modelBuilder.Entity("Incite.Models.WowProfession", b =>
@@ -743,27 +692,6 @@ namespace Incite.Migrations
                     b.HasOne("Incite.Models.WowSpell", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
-
-                    b.HasOne("Incite.Models.WowItemClass", "WowItemClass")
-                        .WithMany("WowItems")
-                        .HasForeignKey("WowItemClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Incite.Models.WowItemSubclass", "WowItemSubclass")
-                        .WithMany("WowItems")
-                        .HasForeignKey("WowItemSubclassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Incite.Models.WowItemSubclass", b =>
-                {
-                    b.HasOne("Incite.Models.WowItemClass", "WowItemClass")
-                        .WithMany("WowItemSubclasses")
-                        .HasForeignKey("WowItemClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Incite.Models.WowSpell", b =>

@@ -26,8 +26,12 @@ namespace Incite.Models
         public DbSet<WowCharacterProfession> WowCharacterProfessions { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowItem> WowItems { get; set; }
+        public DbSet<WowItemClass> WowItemClasses { get; set; }
+        public DbSet<WowItemSubclass> WowItemSubclasses { get; set; }
         public DbSet<WowProfession> WowProfessions { get; set; }
+        public DbSet<WowReagent> WowReagents { get; set; }
         public DbSet<WowServer> WowServers { get; set; }
+        public DbSet<WowSpell> WowSpells { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,6 +104,27 @@ namespace Incite.Models
             modelBuilder.Entity<WowCharacter>()
                 .OwnsMany(x => x.WowCharacterProfessions)
                     .WithOwner(x => x.WowCharacter);
+
+            modelBuilder.Entity<WowItem>()
+                .HasOne(x => x.WowItemClass)
+                    .WithMany(x => x.WowItems);
+
+            modelBuilder.Entity<WowItem>()
+                .HasOne(x => x.WowItemSubclass)
+                    .WithMany(x => x.WowItems)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WowItemClass>()
+                .HasMany(x => x.WowItemSubclasses)
+                    .WithOne(x => x.WowItemClass)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WowItemClass>()
+                .HasAlternateKey(x => x.WowId);
+
+            modelBuilder.Entity<WowSpell>()
+                .OwnsMany(x => x.WowReagents)
+                    .WithOwner(x => x.WowSpell);
 
             WowClass.Seed(modelBuilder);
             WowProfession.Seed(modelBuilder);

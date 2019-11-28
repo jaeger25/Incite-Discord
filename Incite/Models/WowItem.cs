@@ -7,7 +7,8 @@ namespace Incite.Models
 {
     public enum WowItemQuality
     {
-        Common = 1,
+        Poor,
+        Common,
         Uncommon,
         Rare,
         Epic,
@@ -18,10 +19,19 @@ namespace Incite.Models
     {
         public string Name { get; set; }
 
-        public int WowItemId { get; set; }
+        public int WowId { get; set; }
 
         public WowItemQuality ItemQuality { get; set; }
 
         public string WowHeadIcon { get; set; }
+
+        public int WowItemClassId { get; set; }
+        public virtual WowItemClass WowItemClass { get; set; }
+
+        public int WowItemSubclassId { get; set; }
+        public virtual WowItemSubclass WowItemSubclass { get; set; }
+
+        public int? CreatedById { get; set; }
+        public virtual WowSpell? CreatedBy { get; set; }
     }
 }

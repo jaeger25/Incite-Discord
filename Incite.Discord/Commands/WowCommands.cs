@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Incite.Discord.Services;
 using DSharpPlus.Entities;
+using Incite.Discord.Converters;
+using System.Threading;
 
 namespace Incite.Discord.Commands
 {
@@ -228,16 +230,42 @@ namespace Incite.Discord.Commands
             [Command("get-link")]
             [Description("Gets the WowHead link for the given item")]
             public async Task GetLink(CommandContext context,
-                WowItem item)
+                [Description(Descriptions.WowItem)] [RemainingText] WowItem item)
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithTitle(item.Name)
                     .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Large))
-                    .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowItemId))
+                    .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
                     .WithColor(WowItemQualityToColor(item.ItemQuality))
                     .Build();
 
                 await context.Message.RespondAsync(embed: embed);
+            }
+
+            [Command("seed")]
+            [RequireOwner]
+            public async Task Seed(CommandContext context)
+            {
+                var channel = await context.Member.CreateDmChannelAsync();
+                var converter = new WowItemConverter();
+
+                for(int i = 25; i <= 23328; i++)
+                {
+                    try
+                    {
+                        await converter.ConvertAsync(i.ToString(), context);
+                        await Task.Delay(1);
+                    }
+                    catch(Exception)
+                    {
+                        await channel.SendMessageAsync($"Seeding error: {i}");
+                    }
+
+                    if (i % 100 == 0)
+                    {
+                        await channel.SendMessageAsync($"Seeding: {i} out of {23328}");
+                    }
+                }
             }
 
             DiscordColor WowItemQualityToColor(WowItemQuality quality)

@@ -31,6 +31,7 @@ namespace Incite.Discord.Commands
                     .Include(x => x.Guild)
                         .ThenInclude(x => x.Roles)
                     .Include(x => x.MemberRoles)
+                        .ThenInclude(x => x.Role)
                     .Include(x => x.PrimaryWowCharacter)
                     .Include(x => x.User)
                         .ThenInclude(x => x.WowCharacters)

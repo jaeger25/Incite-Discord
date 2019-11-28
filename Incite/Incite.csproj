@@ -15,6 +15,8 @@
     <Compile Remove="Migrations\20191123222416_WowServer_NonNullable.Designer.cs" />
     <Compile Remove="Migrations\20191128032235_WowItem3.cs" />
     <Compile Remove="Migrations\20191128032235_WowItem3.Designer.cs" />
+    <Compile Remove="Migrations\20191128070139_WowItem4.cs" />
+    <Compile Remove="Migrations\20191128070139_WowItem4.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
