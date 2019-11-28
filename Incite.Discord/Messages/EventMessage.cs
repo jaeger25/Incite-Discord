@@ -75,10 +75,8 @@ namespace Incite.Discord.Messages
             {
                 string separator = inline ? "\n" : ", ";
 
-                var characterName = member.Member.PrimaryWowCharacter?.Name ??
-                    member.Member.User.WowCharacters.FirstOrDefault(x => x.GuildId == member.Member.GuildId)?.Name;
-
-                if (characterName == null)
+                var characterName = member.Member.PrimaryWowCharacter.Name;
+                if (string.IsNullOrEmpty(characterName))
                 {
                     throw new Exception($"MemberId: {member.MemberId}");
                 }

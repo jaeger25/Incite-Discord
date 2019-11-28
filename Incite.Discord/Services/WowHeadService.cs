@@ -61,7 +61,7 @@ namespace Incite.Discord.Services
             };
         }
 
-        public async Task<WowHeadItem> TryGetItemInfoAsync(int wowItemId)
+        public async Task<WowHeadItem?> TryGetItemInfoAsync(int wowItemId)
         {
             var itemResponse = await m_httpClient.GetAsync($"item={wowItemId}&xml");
             using var itemXmlReader = XmlReader.Create(await itemResponse.Content.ReadAsStreamAsync());

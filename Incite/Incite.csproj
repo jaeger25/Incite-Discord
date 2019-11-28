@@ -17,6 +17,14 @@
     <Compile Remove="Migrations\20191128032235_WowItem3.Designer.cs" />
     <Compile Remove="Migrations\20191128070139_WowItem4.cs" />
     <Compile Remove="Migrations\20191128070139_WowItem4.Designer.cs" />
+    <Compile Remove="Migrations\20191128080556_WowItem5.cs" />
+    <Compile Remove="Migrations\20191128080556_WowItem5.Designer.cs" />
+    <Compile Remove="Migrations\20191128080629_WowItem5.cs" />
+    <Compile Remove="Migrations\20191128080629_WowItem5.Designer.cs" />
+    <Compile Remove="Migrations\20191128081228_WowItem6.cs" />
+    <Compile Remove="Migrations\20191128081228_WowItem6.Designer.cs" />
+    <Compile Remove="Migrations\20191128081739_WowItem6.cs" />
+    <Compile Remove="Migrations\20191128081739_WowItem6.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

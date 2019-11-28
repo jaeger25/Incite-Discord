@@ -107,7 +107,8 @@ namespace Incite.Models
 
             modelBuilder.Entity<WowItem>()
                 .HasOne(x => x.WowItemClass)
-                    .WithMany(x => x.WowItems);
+                    .WithMany(x => x.WowItems)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<WowItem>()
                 .HasOne(x => x.WowItemSubclass)
@@ -117,10 +118,12 @@ namespace Incite.Models
             modelBuilder.Entity<WowItemClass>()
                 .HasMany(x => x.WowItemSubclasses)
                     .WithOne(x => x.WowItemClass)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<WowItemClass>()
-                .HasAlternateKey(x => x.WowId);
+            modelBuilder.Entity<WowItemSubclass>()
+                .HasOne(x => x.WowItemClass)
+                    .WithMany(x => x.WowItemSubclasses)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<WowSpell>()
                 .OwnsMany(x => x.WowReagents)
