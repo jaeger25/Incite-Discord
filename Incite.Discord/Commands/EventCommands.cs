@@ -20,6 +20,7 @@ namespace Incite.Discord.Commands
     [Group("event")]
     [RequireGuildConfigured]
     [RequireMemberRegistered]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [Description("Commands for setting and retrieving info about the guild's events")]
     public class EventCommands : BaseInciteCommand
     {

@@ -19,6 +19,7 @@ namespace Incite.Discord.Commands
 {
     [Group("member")]
     [RequireGuildConfigured]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [Description("Commands for managing guild members")]
     public class MemberCommands : BaseInciteCommand
     {
@@ -38,7 +39,7 @@ namespace Incite.Discord.Commands
 
             var channel = await context.Member.CreateDmChannelAsync();
 
-            StringBuilder memberList = new StringBuilder("Discord Name : Character Name");
+            StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name");
             memberList.AppendLine();
 
             foreach (var member in Guild.Members)
@@ -47,7 +48,7 @@ namespace Incite.Discord.Commands
                     (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
                     "(Unknown)";
 
-                memberList.AppendLine($"{discordName} : {member.PrimaryWowCharacter} ");
+                memberList.AppendLine($"{member.UserId} | {member.Id} | {discordName} | {member.PrimaryWowCharacter}");
             }
 
             await channel.SendMessageAsync(memberList.ToString());

@@ -22,8 +22,6 @@ namespace Incite.Models
 
         public WowItemQuality ItemQuality { get; set; }
 
-        public string IconUrl { get; set; }
-
-        public string WowHeadUrl { get; set; }
+        public string WowHeadIcon { get; set; }
     }
 }

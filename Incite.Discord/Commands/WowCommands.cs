@@ -16,11 +16,13 @@ using DSharpPlus.Entities;
 namespace Incite.Discord.Commands
 {
     [Group("wow")]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [Description("Commands for managing info related to in-game WoW concepts")]
     public class WowCommands : BaseCommandModule
     {
         [Group("character")]
         [Aliases("char")]
+        [ModuleLifespan(ModuleLifespan.Transient)]
         [Description("Commands for managing your characters")]
         public class WowCharacterCommands : BaseInciteCommand
         {
@@ -54,7 +56,7 @@ namespace Incite.Discord.Commands
                 [Description(Descriptions.WowClass)] WowClass characterClass,
                 [Description(Descriptions.WowFaction)] WowFaction faction)
             {
-                if (User.WowCharacters.Any(x => x.Name == character.Name && x.WowServerId == character.Server.Id))
+                if (User.WowCharacters.Any(x => x.WowServerId == character.Server.Id && x.Name.Equals(character.Name, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     ResponseString = "You have already registered this character";
                     return;
@@ -122,6 +124,7 @@ namespace Incite.Discord.Commands
 
         [Group("profession")]
         [Aliases("prof")]
+        [ModuleLifespan(ModuleLifespan.Transient)]
         [Description("Commands for searching and managing professions")]
         public class WowProfessionCommands : BaseInciteCommand
         {
@@ -178,12 +181,7 @@ namespace Incite.Discord.Commands
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
                 [Description(Descriptions.WowProfession)] WowProfession profession)
             {
-                if (character.Character.WowCharacterProfessions.Count == 2)
-                {
-                    ResponseString = $"{character.Character} already has two professions added. Pleae remove one first.";
-                    return;
-                }
-                else if (character.Character.WowCharacterProfessions.Any(x => x.WowProfessionId == profession.Id))
+                if (character.Character.WowCharacterProfessions.Any(x => x.WowProfessionId == profession.Id))
                 {
                     ResponseString = $"{character.Character} already has this profession added.";
                     return;
@@ -216,6 +214,7 @@ namespace Incite.Discord.Commands
         }
 
         [Group("item")]
+        [ModuleLifespan(ModuleLifespan.Transient)]
         [Description("Commands for searching wow items")]
         public class WowItemCommands : BaseInciteCommand
         {
@@ -226,15 +225,38 @@ namespace Incite.Discord.Commands
                 m_wowHead = wowHead;
             }
 
-            [Command("link")]
+            [Command("get-link")]
             [Description("Gets the WowHead link for the given item")]
-            public async Task Link(CommandContext context,
+            public async Task GetLink(CommandContext context,
                 WowItem item)
             {
                 var embed = new DiscordEmbedBuilder()
                     .WithTitle(item.Name)
-                    .WithThumbnailUrl(item.IconUrl)
-                    .WithUrl(item.WowHeadUrl);
+                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Large))
+                    .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowItemId))
+                    .WithColor(WowItemQualityToColor(item.ItemQuality))
+                    .Build();
+
+                await context.Message.RespondAsync(embed: embed);
+            }
+
+            DiscordColor WowItemQualityToColor(WowItemQuality quality)
+            {
+                switch (quality)
+                {
+                    case WowItemQuality.Common:
+                        return DiscordColor.White;
+                    case WowItemQuality.Uncommon:
+                        return DiscordColor.Green;
+                    case WowItemQuality.Rare:
+                        return DiscordColor.Blue;
+                    case WowItemQuality.Epic:
+                        return DiscordColor.Purple;
+                    case WowItemQuality.Legendary:
+                        return DiscordColor.Orange;
+                }
+
+                throw new ArgumentException();
             }
         }
     }

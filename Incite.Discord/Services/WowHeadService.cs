@@ -11,6 +11,13 @@ using System.Xml;
 
 namespace Incite.Discord.Services
 {
+    public enum WowHeadIconSize
+    {
+        Small,
+        Medium,
+        Large
+    }
+
     public class WowHeadReagent
     {
         public WowHeadItem Item { get; set; }
@@ -55,7 +62,7 @@ namespace Incite.Discord.Services
             itemXmlReader.ReadToDescendant("name");
             item.Name = itemXmlReader.ReadElementContentAsString();
 
-            itemXmlReader.ReadToDescendant("quality");
+            itemXmlReader.ReadToNextSibling("quality");
             itemXmlReader.MoveToAttribute("id");
 
             item.Quality = itemXmlReader.ReadContentAsInt();
@@ -63,13 +70,21 @@ namespace Incite.Discord.Services
             itemXmlReader.ReadToNextSibling("icon");
             item.Icon = itemXmlReader.ReadElementContentAsString();
 
-            itemXmlReader.ReadToNextSibling("htmlTooltip");
-            item.HtmlTooltip = itemXmlReader.ReadElementContentAsString();
-
             itemXmlReader.ReadToNextSibling("link");
             item.Link = itemXmlReader.ReadElementContentAsString();
 
             return item;
+        }
+
+        public string GetWowHeadItemUrl(int wowItemId)
+        {
+            return $"https://classic.wowhead.com/item={wowItemId}";
+        }
+
+        public string GetWowHeadIconUrl(string icon, WowHeadIconSize size)
+        {
+            string iconSize = size.ToString();
+            return $"https://wow.zamimg.com/images/wow/icons/large/{icon}.jpg";
         }
     }
 }

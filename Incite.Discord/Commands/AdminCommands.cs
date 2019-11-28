@@ -16,6 +16,7 @@ namespace Incite.Discord.Commands
     [Group("admin")]
     [RequireGuild]
     [RequireUserPermissions(Permissions.ManageGuild)]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [Description("Commands for managing bot settings for this guild")]
     public class AdminCommands : BaseInciteCommand
     {

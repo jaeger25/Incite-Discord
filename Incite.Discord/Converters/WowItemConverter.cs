@@ -39,14 +39,15 @@ namespace Incite.Discord.Converters
                             WowItemId = wowHeadItem.Id,
                             Name = wowHeadItem.Name,
                             ItemQuality = (WowItemQuality)wowHeadItem.Quality,
-                            IconUrl = $"https://wow.zamimg.com/images/wow/icons/large/{wowHeadItem.Icon}.jpg",
-                            WowHeadUrl = wowHeadItem.Link,
+                            WowHeadIcon = wowHeadItem.Icon,
                         };
 
                         dbContext.Add(wowItem);
 
                         await dbContext.SaveChangesAsync();
                     }
+
+                    return Optional.FromValue(wowItem);
                 }
             }
 

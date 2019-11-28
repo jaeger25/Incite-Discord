@@ -75,9 +75,17 @@ namespace Incite.Discord.Messages
             {
                 string separator = inline ? "\n" : ", ";
 
+                var characterName = member.Member.PrimaryWowCharacter?.Name ??
+                    member.Member.User.WowCharacters.FirstOrDefault(x => x.GuildId == member.Member.GuildId)?.Name;
+
+                if (characterName == null)
+                {
+                    throw new Exception($"MemberId: {member.MemberId}");
+                }
+
                 string memberString = inclueEmoji ?
-                    $"{(inline ? "\n" : "")}{m_emojis.GetByDiscordName(member.EmojiDiscordName)} {member.Member.PrimaryWowCharacter.Name}{(inline ? "" : ", ")}" :
-                    $"{(inline ? "\n" : "")}{member.Member.PrimaryWowCharacter.Name}{(inline ? "" : ", ")}";
+                    $"{(inline ? "\n" : "")}{m_emojis.GetByDiscordName(member.EmojiDiscordName)} {characterName}{(inline ? "" : ", ")}" :
+                    $"{(inline ? "\n" : "")}{characterName}{(inline ? "" : ", ")}";
 
                 classColumnText.Append(memberString);
             }

@@ -15,6 +15,7 @@ namespace Incite.Discord.Commands
 {
     [Group("guild")]
     [RequireGuildConfigured]
+    [ModuleLifespan(ModuleLifespan.Transient)]
     [Description("Commands for managing guild members and settings")]
     public class GuildCommands : BaseInciteCommand
     {
