@@ -229,20 +229,12 @@ namespace Incite.Discord.Commands
                 m_wowHead = wowHead;
             }
 
-            [Command("get-link")]
-            [Description("Gets the WowHead link for the given item")]
-            public async Task GetLink(CommandContext context,
-                [Description(Descriptions.WowItem)] [RemainingText] WowItem item)
-            {
-                await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
-            }
-
             [Command("search")]
             [Description("Gets the WowHead link for the given item")]
             public async Task Search(CommandContext context,
                 [Description(Descriptions.WowItem)] [RemainingText] IEnumerable<WowItem> items)
             {
-                foreach (var item in items.Take(5))
+                foreach (var item in items.Take(4))
                 {
                     await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
                 }
@@ -303,7 +295,7 @@ namespace Incite.Discord.Commands
             {
                 return new DiscordEmbedBuilder()
                     .WithTitle(item.Name)
-                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Large))
+                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Medium))
                     .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
                     .WithColor(WowItemQualityToColor(item.ItemQuality))
                     .Build();
@@ -313,6 +305,8 @@ namespace Incite.Discord.Commands
             {
                 switch (quality)
                 {
+                    case WowItemQuality.Poor:
+                        return DiscordColor.LightGray;
                     case WowItemQuality.Common:
                         return DiscordColor.White;
                     case WowItemQuality.Uncommon:
