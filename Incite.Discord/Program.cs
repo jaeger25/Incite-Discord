@@ -41,7 +41,6 @@ namespace Incite.Discord
                         .Build();
 
                     services.Configure<InciteDiscordOptions>(config);
-                    services.Configure<EventScheduledTaskOptions>(config.GetSection("EventScheduledTaskOptions"));
 
                     bool isProduction =
                         config.Get<InciteDiscordOptions>().Environment == InciteDiscordOptions.Environment_Production;
@@ -78,7 +77,6 @@ namespace Incite.Discord
                         });
 
                     services.AddHostedService<DiscordService>();
-                    //services.AddHostedService<EventScheduledTask>();
                 });
 
         static void Main(string[] args)

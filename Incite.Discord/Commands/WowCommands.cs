@@ -234,14 +234,18 @@ namespace Incite.Discord.Commands
             public async Task GetLink(CommandContext context,
                 [Description(Descriptions.WowItem)] [RemainingText] WowItem item)
             {
-                var embed = new DiscordEmbedBuilder()
-                    .WithTitle(item.Name)
-                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Large))
-                    .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
-                    .WithColor(WowItemQualityToColor(item.ItemQuality))
-                    .Build();
+                await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
+            }
 
-                await context.Message.RespondAsync(embed: embed);
+            [Command("search")]
+            [Description("Gets the WowHead link for the given item")]
+            public async Task Search(CommandContext context,
+                [Description(Descriptions.WowItem)] [RemainingText] IEnumerable<WowItem> items)
+            {
+                foreach (var item in items.Take(5))
+                {
+                    await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
+                }
             }
 
             [Command("seed")]
@@ -295,36 +299,14 @@ namespace Incite.Discord.Commands
                 scope.Dispose();
             }
 
-            public static int GetDamerauLevenshteinDistance(string s, string t)
+            DiscordEmbed CreateEmbedForWowItem(WowItem item)
             {
-                var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
-
-                int[,] matrix = new int[bounds.Height, bounds.Width];
-
-                for (int height = 0; height < bounds.Height; height++) { matrix[height, 0] = height; };
-                for (int width = 0; width < bounds.Width; width++) { matrix[0, width] = width; };
-
-                for (int height = 1; height < bounds.Height; height++)
-                {
-                    for (int width = 1; width < bounds.Width; width++)
-                    {
-                        int cost = (s[height - 1] == t[width - 1]) ? 0 : 1;
-                        int insertion = matrix[height, width - 1] + 1;
-                        int deletion = matrix[height - 1, width] + 1;
-                        int substitution = matrix[height - 1, width - 1] + cost;
-
-                        int distance = Math.Min(insertion, Math.Min(deletion, substitution));
-
-                        if (height > 1 && width > 1 && s[height - 1] == t[width - 2] && s[height - 2] == t[width - 1])
-                        {
-                            distance = Math.Min(distance, matrix[height - 2, width - 2] + cost);
-                        }
-
-                        matrix[height, width] = distance;
-                    }
-                }
-
-                return matrix[bounds.Height - 1, bounds.Width - 1];
+                return new DiscordEmbedBuilder()
+                    .WithTitle(item.Name)
+                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Large))
+                    .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
+                    .WithColor(WowItemQualityToColor(item.ItemQuality))
+                    .Build();
             }
 
             DiscordColor WowItemQualityToColor(WowItemQuality quality)
