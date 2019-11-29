@@ -14,6 +14,8 @@ using Incite.Discord.Services;
 using DSharpPlus.Entities;
 using Incite.Discord.Converters;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using DSharpPlus;
 
 namespace Incite.Discord.Commands
 {
@@ -246,26 +248,83 @@ namespace Incite.Discord.Commands
             [RequireOwner]
             public async Task Seed(CommandContext context)
             {
-                var channel = await context.Member.CreateDmChannelAsync();
                 var converter = new WowItemConverter();
 
-                for(int i = 25; i <= 23328; i++)
+                var scope = context.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
+
+                for (int wowItemId = 7075; wowItemId <= 23328; wowItemId++)
                 {
                     try
                     {
-                        await converter.ConvertAsync(i.ToString(), context);
-                        await Task.Delay(1);
+                        var wowItem = await dbContext.WowItems
+                            .FirstOrDefaultAsync(x => x.WowId == wowItemId);
+
+                        if (wowItem == null)
+                        {
+                            var wowHeadItem = await m_wowHead.TryGetItemInfoAsync(wowItemId);
+                            if (wowHeadItem != null)
+                            {
+                                await converter.GetOrCreateWowItemAsync(dbContext, wowHeadItem);
+                            }
+
+                            await Task.Delay(50);
+                        }
                     }
-                    catch(Exception)
+                    catch (Exception ex)
                     {
-                        await channel.SendMessageAsync($"Seeding error: {i}");
+                        context.Client.DebugLogger.LogMessage(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding error: {wowItemId}", DateTimeOffset.UtcNow.DateTime, ex);
                     }
 
-                    if (i % 100 == 0)
+                    if (wowItemId % 500 == 0)
                     {
-                        await channel.SendMessageAsync($"Seeding: {i} out of {23328}");
+                        dbContext.Dispose();
+                        scope.Dispose();
+
+                        scope = context.Services.CreateScope();
+                        dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
+
+
+                        context.Client.DebugLogger.LogMessage(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding: {wowItemId} out of {23328}", DateTimeOffset.UtcNow.DateTime);
+                    }
+
+                    await Task.Delay(1);
+                }
+
+                dbContext.Dispose();
+                scope.Dispose();
+            }
+
+            public static int GetDamerauLevenshteinDistance(string s, string t)
+            {
+                var bounds = new { Height = s.Length + 1, Width = t.Length + 1 };
+
+                int[,] matrix = new int[bounds.Height, bounds.Width];
+
+                for (int height = 0; height < bounds.Height; height++) { matrix[height, 0] = height; };
+                for (int width = 0; width < bounds.Width; width++) { matrix[0, width] = width; };
+
+                for (int height = 1; height < bounds.Height; height++)
+                {
+                    for (int width = 1; width < bounds.Width; width++)
+                    {
+                        int cost = (s[height - 1] == t[width - 1]) ? 0 : 1;
+                        int insertion = matrix[height, width - 1] + 1;
+                        int deletion = matrix[height - 1, width] + 1;
+                        int substitution = matrix[height - 1, width - 1] + cost;
+
+                        int distance = Math.Min(insertion, Math.Min(deletion, substitution));
+
+                        if (height > 1 && width > 1 && s[height - 1] == t[width - 2] && s[height - 2] == t[width - 1])
+                        {
+                            distance = Math.Min(distance, matrix[height - 2, width - 2] + cost);
+                        }
+
+                        matrix[height, width] = distance;
                     }
                 }
+
+                return matrix[bounds.Height - 1, bounds.Width - 1];
             }
 
             DiscordColor WowItemQualityToColor(WowItemQuality quality)

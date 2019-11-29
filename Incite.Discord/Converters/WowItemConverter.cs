@@ -57,7 +57,7 @@ namespace Incite.Discord.Converters
             return Optional.FromNoValue<WowItem>();
         }
 
-        async Task<WowItem> GetOrCreateWowItemAsync(InciteDbContext dbContext, WowHeadItem wowHeadItem)
+        public async Task<WowItem> GetOrCreateWowItemAsync(InciteDbContext dbContext, WowHeadItem wowHeadItem)
         {
             WowItem wowItem = await dbContext.WowItems
                 .FirstOrDefaultAsync(x => x.WowId == wowHeadItem.Id);

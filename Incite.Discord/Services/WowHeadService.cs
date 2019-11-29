@@ -110,24 +110,25 @@ namespace Incite.Discord.Services
                 item.CreatedBy.Name = itemXmlReader.ReadContentAsString();
 
                 itemXmlReader.MoveToElement();
-                itemXmlReader.ReadToDescendant("reagent");
-
-                do
+                if (itemXmlReader.ReadToDescendant("reagent"))
                 {
-                    itemXmlReader.MoveToAttribute("id");
-                    int reagentId = itemXmlReader.ReadContentAsInt();
-
-                    itemXmlReader.MoveToAttribute("count");
-                    int count = itemXmlReader.ReadContentAsInt();
-
-                    var reagentItem = await TryGetItemInfoAsync(reagentId);
-                    item.CreatedBy.Reagents.Add(new WowHeadReagent()
+                    do
                     {
-                        Count = count,
-                        Item = reagentItem,
-                    });
+                        itemXmlReader.MoveToAttribute("id");
+                        int reagentId = itemXmlReader.ReadContentAsInt();
+
+                        itemXmlReader.MoveToAttribute("count");
+                        int count = itemXmlReader.ReadContentAsInt();
+
+                        var reagentItem = await TryGetItemInfoAsync(reagentId);
+                        item.CreatedBy.Reagents.Add(new WowHeadReagent()
+                        {
+                            Count = count,
+                            Item = reagentItem,
+                        });
+                    }
+                    while (itemXmlReader.ReadToNextSibling("reagent"));
                 }
-                while (itemXmlReader.ReadToNextSibling("reagent"));
             }
 
             return item;
