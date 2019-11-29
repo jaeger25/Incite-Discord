@@ -20,7 +20,7 @@ namespace Incite.Discord.Services
 
     public class WowHeadReagent
     {
-        public WowHeadItem Item { get; set; }
+        public int ItemId { get; set; }
         public int Count { get; set; }
     }
 
@@ -99,36 +99,40 @@ namespace Incite.Discord.Services
             if (itemXmlReader.ReadToNextSibling("createdBy"))
             {
                 itemXmlReader.ReadToDescendant("spell");
-                itemXmlReader.MoveToAttribute("id");
 
-                item.CreatedBy = new WowHeadSpell()
+                do
                 {
-                    Id = itemXmlReader.ReadContentAsInt(),
-                };
+                    itemXmlReader.MoveToAttribute("id");
 
-                itemXmlReader.MoveToAttribute("name");
-                item.CreatedBy.Name = itemXmlReader.ReadContentAsString();
-
-                itemXmlReader.MoveToElement();
-                if (itemXmlReader.ReadToDescendant("reagent"))
-                {
-                    do
+                    item.CreatedBy = new WowHeadSpell()
                     {
-                        itemXmlReader.MoveToAttribute("id");
-                        int reagentId = itemXmlReader.ReadContentAsInt();
+                        Id = itemXmlReader.ReadContentAsInt(),
+                    };
 
-                        itemXmlReader.MoveToAttribute("count");
-                        int count = itemXmlReader.ReadContentAsInt();
+                    itemXmlReader.MoveToAttribute("name");
+                    item.CreatedBy.Name = itemXmlReader.ReadContentAsString();
 
-                        var reagentItem = await TryGetItemInfoAsync(reagentId);
-                        item.CreatedBy.Reagents.Add(new WowHeadReagent()
+                    itemXmlReader.MoveToElement();
+                    if (itemXmlReader.ReadToDescendant("reagent"))
+                    {
+                        do
                         {
-                            Count = count,
-                            Item = reagentItem,
-                        });
+                            itemXmlReader.MoveToAttribute("id");
+                            int reagentId = itemXmlReader.ReadContentAsInt();
+
+                            itemXmlReader.MoveToAttribute("count");
+                            int count = itemXmlReader.ReadContentAsInt();
+
+                            item.CreatedBy.Reagents.Add(new WowHeadReagent()
+                            {
+                                Count = count,
+                                ItemId = reagentId,
+                            });
+                        }
+                        while (itemXmlReader.ReadToNextSibling("reagent"));
                     }
-                    while (itemXmlReader.ReadToNextSibling("reagent"));
                 }
+                while (itemXmlReader.ReadToNextSibling("spell"));
             }
 
             return item;
