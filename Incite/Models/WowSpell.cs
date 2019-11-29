@@ -11,6 +11,9 @@ namespace Incite.Models
 
         public int WowId { get; set; }
 
+        public int? CreatedItemId { get; set; }
+        public virtual WowItem? CreatedItem { get; set; }
+
         public virtual ICollection<WowReagent> WowReagents { get; set; } = new List<WowReagent>();
     }
 }

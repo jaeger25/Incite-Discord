@@ -20,7 +20,7 @@ namespace Incite.Discord.Services
 
     public class WowHeadReagent
     {
-        public int ItemId { get; set; }
+        public WowHeadItem Item { get; set; }
         public int Count { get; set; }
     }
 
@@ -46,7 +46,7 @@ namespace Incite.Discord.Services
         public WowHeadItemClass ItemClass { get; set; } = new WowHeadItemClass();
         public WowHeadItemClass ItemSubclass { get; set; } = new WowHeadItemClass();
 
-        public WowHeadSpell? CreatedBy { get; set; }
+        public List<WowHeadSpell> CreatedBy { get; set; } = new List<WowHeadSpell>();
     }
 
     public class WowHeadService
@@ -61,8 +61,29 @@ namespace Incite.Discord.Services
             };
         }
 
-        public async Task<WowHeadItem?> TryGetItemInfoAsync(int wowItemId)
+        public Task<WowHeadItem?> TryGetItemInfoAsync(int wowItemId)
         {
+            return TryGetItemInfoAsync(wowItemId, new Dictionary<int, WowHeadItem>());
+        }
+
+        public string GetWowHeadItemUrl(int wowItemId)
+        {
+            return $"https://classic.wowhead.com/item={wowItemId}";
+        }
+
+        public string GetWowHeadIconUrl(string icon, WowHeadIconSize size)
+        {
+            string iconSize = size.ToString();
+            return $"https://wow.zamimg.com/images/wow/icons/large/{icon}.jpg";
+        }
+
+        public async Task<WowHeadItem?> TryGetItemInfoAsync(int wowItemId, Dictionary<int, WowHeadItem> seenItems)
+        {
+            if (seenItems.ContainsKey(wowItemId))
+            {
+                return seenItems[wowItemId];
+            }
+
             var itemResponse = await m_httpClient.GetAsync($"item={wowItemId}&xml");
             using var itemXmlReader = XmlReader.Create(await itemResponse.Content.ReadAsStreamAsync());
 
@@ -71,6 +92,7 @@ namespace Incite.Discord.Services
                 Id = wowItemId,
             };
 
+            seenItems[wowItemId] = item;
             if (!itemXmlReader.ReadToDescendant("item"))
             {
                 return null;
@@ -104,13 +126,15 @@ namespace Incite.Discord.Services
                 {
                     itemXmlReader.MoveToAttribute("id");
 
-                    item.CreatedBy = new WowHeadSpell()
+                    var spell = new WowHeadSpell()
                     {
                         Id = itemXmlReader.ReadContentAsInt(),
                     };
 
+                    item.CreatedBy.Add(spell);
+
                     itemXmlReader.MoveToAttribute("name");
-                    item.CreatedBy.Name = itemXmlReader.ReadContentAsString();
+                    spell.Name = itemXmlReader.ReadContentAsString();
 
                     itemXmlReader.MoveToElement();
                     if (itemXmlReader.ReadToDescendant("reagent"))
@@ -123,10 +147,10 @@ namespace Incite.Discord.Services
                             itemXmlReader.MoveToAttribute("count");
                             int count = itemXmlReader.ReadContentAsInt();
 
-                            item.CreatedBy.Reagents.Add(new WowHeadReagent()
+                            spell.Reagents.Add(new WowHeadReagent()
                             {
                                 Count = count,
-                                ItemId = reagentId,
+                                Item = await TryGetItemInfoAsync(reagentId, seenItems),
                             });
                         }
                         while (itemXmlReader.ReadToNextSibling("reagent"));
@@ -136,17 +160,6 @@ namespace Incite.Discord.Services
             }
 
             return item;
-        }
-
-        public string GetWowHeadItemUrl(int wowItemId)
-        {
-            return $"https://classic.wowhead.com/item={wowItemId}";
-        }
-
-        public string GetWowHeadIconUrl(string icon, WowHeadIconSize size)
-        {
-            string iconSize = size.ToString();
-            return $"https://wow.zamimg.com/images/wow/icons/large/{icon}.jpg";
         }
     }
 }

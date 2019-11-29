@@ -57,13 +57,24 @@ namespace Incite.Discord.Converters
             return Optional.FromNoValue<WowItem>();
         }
 
-        public async Task<WowItem> GetOrCreateWowItemAsync(InciteDbContext dbContext, WowHeadItem wowHeadItem)
+        public Task<WowItem> GetOrCreateWowItemAsync(InciteDbContext dbContext, WowHeadItem wowHeadItem)
         {
+            return GetOrCreateWowItemAsync(dbContext, wowHeadItem, new Dictionary<int, WowItem>());
+        }
+
+        public async Task<WowItem> GetOrCreateWowItemAsync(InciteDbContext dbContext, WowHeadItem wowHeadItem, Dictionary<int, WowItem> seenItems)
+        {
+            if (seenItems.ContainsKey(wowHeadItem.Id))
+            {
+                return seenItems[wowHeadItem.Id];
+            }
+
             WowItem wowItem = await dbContext.WowItems
                 .FirstOrDefaultAsync(x => x.WowId == wowHeadItem.Id);
 
             if (wowItem != null)
             {
+                seenItems[wowHeadItem.Id] = wowItem;
                 return wowItem;
             }
 
@@ -118,37 +129,42 @@ namespace Incite.Discord.Converters
                 WowItemSubclass = wowItemSubclass,
             };
 
+            seenItems[wowHeadItem.Id] = wowItem;
             dbContext.Add(wowItem);
 
-            if (wowHeadItem.CreatedBy != null)
+            if (wowHeadItem.CreatedBy.Count > 0)
             {
-                WowSpell wowSpell = await dbContext.WowSpells
-                    .FirstOrDefaultAsync(x => x.WowId == wowHeadItem.CreatedBy.Id);
-
-                if (wowSpell == null)
+                foreach (var wowHeadSpell in wowHeadItem.CreatedBy)
                 {
-                    wowSpell = new WowSpell()
-                    {
-                        WowId = wowHeadItem.CreatedBy.Id,
-                        Name = wowHeadItem.CreatedBy.Name,
-                    };
+                    WowSpell wowSpell = await dbContext.WowSpells
+                        .FirstOrDefaultAsync(x => x.WowId == wowHeadSpell.Id);
 
-                    dbContext.WowSpells.Add(wowSpell);
-
-                    foreach (var reagent in wowHeadItem.CreatedBy.Reagents)
+                    if (wowSpell == null)
                     {
-                        var wowReagent = new WowReagent()
+                        wowSpell = new WowSpell()
                         {
-                            Count = reagent.Count,
-                            WowSpell = wowSpell,
-                            WowItem = await GetOrCreateWowItemAsync(dbContext, reagent.Item),
+                            WowId = wowHeadSpell.Id,
+                            Name = wowHeadSpell.Name,
+                            CreatedItem = wowItem,
                         };
 
-                        dbContext.WowReagents.Add(wowReagent);
-                    }
-                }
+                        dbContext.WowSpells.Add(wowSpell);
 
-                wowItem.CreatedBy = wowSpell;
+                        foreach (var reagent in wowHeadSpell.Reagents)
+                        {
+                            var wowReagent = new WowReagent()
+                            {
+                                Count = reagent.Count,
+                                WowSpell = wowSpell,
+                                WowItem = await GetOrCreateWowItemAsync(dbContext, reagent.Item, seenItems),
+                            };
+
+                            dbContext.WowReagents.Add(wowReagent);
+                        }
+                    }
+
+                    wowItem.CreatedBy.Add(wowSpell);
+                }
             }
 
             await dbContext.SaveChangesAsync();

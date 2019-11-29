@@ -253,7 +253,7 @@ namespace Incite.Discord.Commands
                 var scope = context.Services.CreateScope();
                 var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
 
-                for (int wowItemId = 7075; wowItemId <= 23328; wowItemId++)
+                for (int wowItemId = 0; wowItemId <= 23328; wowItemId++)
                 {
                     try
                     {
@@ -268,7 +268,7 @@ namespace Incite.Discord.Commands
                                 await converter.GetOrCreateWowItemAsync(dbContext, wowHeadItem);
                             }
 
-                            await Task.Delay(50);
+                            await Task.Delay(10);
                         }
                     }
                     catch (Exception ex)

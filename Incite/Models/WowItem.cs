@@ -31,7 +31,6 @@ namespace Incite.Models
         public int WowItemSubclassId { get; set; }
         public virtual WowItemSubclass WowItemSubclass { get; set; }
 
-        public int? CreatedById { get; set; }
-        public virtual WowSpell? CreatedBy { get; set; }
+        public virtual ICollection<WowSpell> CreatedBy { get; set; } = new List<WowSpell>();
     }
 }
