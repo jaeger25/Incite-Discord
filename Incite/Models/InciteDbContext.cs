@@ -24,6 +24,7 @@ namespace Incite.Models
         public DbSet<User> Users { get; set; }
         public DbSet<WowCharacter> WowCharacters { get; set; }
         public DbSet<WowCharacterProfession> WowCharacterProfessions { get; set; }
+        public DbSet<WowCharacterRecipe> WowCharacterRecipes { get; set; }
         public DbSet<WowClass> WowClasses { get; set; }
         public DbSet<WowItem> WowItems { get; set; }
         public DbSet<WowItemClass> WowItemClasses { get; set; }
@@ -102,8 +103,12 @@ namespace Incite.Models
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<WowCharacter>()
-                .OwnsMany(x => x.WowCharacterProfessions)
-                    .WithOwner(x => x.WowCharacter);
+                .HasMany(x => x.WowCharacterProfessions)
+                    .WithOne(x => x.WowCharacter);
+
+            modelBuilder.Entity<WowCharacterProfession>()
+                .OwnsMany(x => x.WowCharacterRecipes)
+                    .WithOwner(x => x.WowCharacterProfession);
 
             modelBuilder.Entity<WowItem>()
                 .HasOne(x => x.WowItemClass)

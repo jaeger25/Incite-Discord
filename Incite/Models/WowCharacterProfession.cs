@@ -11,5 +11,7 @@ namespace Incite.Models
 
         public int WowProfessionId { get; set; }
         public virtual WowProfession WowProfession { get; set; }
+
+        public virtual ICollection<WowCharacterRecipe> WowCharacterRecipes { get; set; } = new List<WowCharacterRecipe>();
     }
 }

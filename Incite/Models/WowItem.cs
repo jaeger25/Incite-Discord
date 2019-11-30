@@ -32,5 +32,10 @@ namespace Incite.Models
         public virtual WowItemSubclass WowItemSubclass { get; set; }
 
         public virtual ICollection<WowSpell> CreatedBy { get; set; } = new List<WowSpell>();
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

@@ -151,6 +151,10 @@ namespace Incite.Discord.Commands
                     foreach (var profession in character.WowCharacterProfessions)
                     {
                         message.Append($"\t{profession.WowProfession}\n");
+                        foreach (var recipe in profession.WowCharacterRecipes)
+                        {
+                            message.Append($"\t\t{recipe}\n");
+                        }
                     }
                 }
 
@@ -171,6 +175,10 @@ namespace Incite.Discord.Commands
                 foreach (var profession in character.Character.WowCharacterProfessions)
                 {
                     message.Append($"\t{profession.WowProfession}\n");
+                    foreach(var recipe in profession.WowCharacterRecipes)
+                    {
+                        message.Append($"\t\t{recipe}\n");
+                    }
                 }
 
                 var dmChannel = await context.Member.CreateDmChannelAsync();
@@ -200,19 +208,81 @@ namespace Incite.Discord.Commands
                 await m_dbContext.SaveChangesAsync();
             }
 
+            [Command("add")]
+            [Description("Adds a recipe to the specified character's profession")]
+            public async Task Add(CommandContext context,
+                [Description(Descriptions.WowCharacter)] UserWowCharacter character,
+                [Description(Descriptions.WowProfession)] WowProfession profession,
+                [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)
+            {
+                var characterProfession = character.Character.WowCharacterProfessions
+                    .FirstOrDefault(x => x.WowProfessionId == profession.Id);
+
+                if (characterProfession == null)
+                {
+                    ResponseString = $"{character.Character} does not know {profession}";
+                    return;
+                }
+
+                var charRecipe = new WowCharacterRecipe()
+                {
+                    WowCharacterProfession = characterProfession,
+                    Recipe = recipe.Recipe,
+                };
+
+                m_dbContext.WowCharacterRecipes.Add(charRecipe);
+                await m_dbContext.SaveChangesAsync();
+            }
+
             [Command("remove")]
             [Description("Removes a profession to the specified character")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
-                [Description(Descriptions.WowProfession)] WowProfession profession)
+                [Description(Descriptions.WowProfession)] WowProfession profession,
+                [Description("Confirm that you would like to remove this profession and all associated recipes.")] bool removeAllRecipes)
             {
+                if (!removeAllRecipes)
+                {
+                    ResponseString = "You must pass 'true' for removeAllRecipes to confirm.";
+                    return;
+                }
+
                 var charProfession = character.Character.WowCharacterProfessions
                     .FirstOrDefault(x => x.WowProfessionId == profession.Id);
 
                 if (charProfession != null)
                 {
+                    var recipes = character.Character.WowCharacterProfessions
+                        .Where(x => x.WowProfessionId == profession.Id)
+                        .SelectMany(x => x.WowCharacterRecipes);
+
+                    m_dbContext.WowCharacterRecipes.RemoveRange(recipes);
                     m_dbContext.WowCharacterProfessions.Remove(charProfession);
                     await m_dbContext.SaveChangesAsync();
+                }
+            }
+
+            [Command("remove")]
+            [Description("Removes a recipe from the specified character's profession")]
+            public async Task Remove(CommandContext context,
+                [Description(Descriptions.WowCharacter)] UserWowCharacter character,
+                [Description(Descriptions.WowProfession)] WowProfession profession,
+                [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)
+            {
+                var charRecipe = character.Character.WowCharacterProfessions
+                    .FirstOrDefault(x => x.WowProfessionId == profession.Id)
+                    ?.WowCharacterRecipes
+                    .FirstOrDefault(x => x.RecipeId == recipe.Recipe.Id);
+
+                if (charRecipe != null)
+                {
+                    m_dbContext.WowCharacterRecipes.Remove(charRecipe);
+                    await m_dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    ResponseString = "Recipe not found";
+                    return;
                 }
             }
         }
@@ -238,6 +308,8 @@ namespace Incite.Discord.Commands
                 {
                     await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
                 }
+
+                ResponseString = "";
             }
 
             [Command("seed")]
