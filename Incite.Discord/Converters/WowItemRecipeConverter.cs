@@ -25,8 +25,8 @@ namespace Incite.Discord.Converters
 
             if (recipes.Length != 1)
             {
-                StringBuilder results = new StringBuilder("__**Ambiguous Results**__\n");
-                foreach(var recipe in recipes)
+                StringBuilder results = new StringBuilder(recipes.Length > 1 ? "__**Ambiguous Results**__\n" : "__**No Results**__");
+                foreach (var recipe in recipes)
                 {
                     results.AppendLine(recipe.ToString());
                 }
