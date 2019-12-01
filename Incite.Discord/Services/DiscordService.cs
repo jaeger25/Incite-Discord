@@ -38,7 +38,6 @@ namespace Incite.Discord.Services
             });
 
             commands.RegisterConverter(new EnumConverter<RoleKind>());
-            commands.RegisterConverter(new EnumConverter<ChannelKind>());
             commands.RegisterConverter(new EnumConverter<WowFaction>());
             commands.RegisterCommands(GetType().Assembly);
 

@@ -33,7 +33,9 @@ namespace Incite.Discord.Commands
         {
             var characters = Guild.WowServer.WowCharacters
                 .Where(x => x.WowCharacterProfessions
-                    .Any(x => x.WowProfessionId == profession.Id));
+                    .Any(x => x.WowProfessionId == profession.Id))
+                .OrderBy(x => x.WowCharacterProfessions
+                    .Select(x => x.WowCharacterRecipes.Count));
 
             StringBuilder message = new StringBuilder($"__**{profession}**__\n");
             foreach (var character in characters)
