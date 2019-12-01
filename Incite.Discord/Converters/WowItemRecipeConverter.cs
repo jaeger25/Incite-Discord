@@ -25,6 +25,13 @@ namespace Incite.Discord.Converters
 
             if (recipes.Length != 1)
             {
+                StringBuilder results = new StringBuilder("__**Ambiguous Results**__\n");
+                foreach(var recipe in recipes)
+                {
+                    results.AppendLine(recipe.ToString());
+                }
+
+                await ctx.Message.RespondAsync(results.ToString());
                 return Optional.FromNoValue<WowItemRecipe>();
             }
 

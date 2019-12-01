@@ -315,12 +315,35 @@ namespace Incite.Discord.Commands
             public async Task Search(CommandContext context,
                 [Description(Descriptions.WowItem)] [RemainingText] IEnumerable<WowItem> items)
             {
-                foreach (var item in items.Take(4))
+                var wowItems = items.ToArray();
+                if (wowItems.Length <= 4)
                 {
-                    await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
-                }
+                    foreach (var item in wowItems)
+                    {
+                        await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
+                    }
 
-                ResponseString = "";
+                    ResponseString = "";
+                }
+                else
+                {
+                    var channel = await context.Member.CreateDmChannelAsync();
+
+                    StringBuilder results = new StringBuilder();
+                    foreach (var item in wowItems)
+                    {
+                        var itemResult = $"`{item} | {m_wowHead.GetWowHeadItemUrl(item.WowId)}`";
+                        if (results.Length + itemResult.Length >= 2000)
+                        {
+                            await channel.SendMessageAsync(results.ToString());
+                            results = new StringBuilder();
+                        }
+                        results.AppendLine(itemResult);
+                    }
+
+                    await channel.SendMessageAsync(results.ToString());
+                    ResponseString = "";
+                }
             }
 
             [Command("seed")]
