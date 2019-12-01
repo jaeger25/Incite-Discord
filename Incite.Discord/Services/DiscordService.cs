@@ -48,6 +48,7 @@ namespace Incite.Discord.Services
             commands.RegisterConverter(new WowClassConverter());
             commands.RegisterConverter(new WowItemConverter());
             commands.RegisterConverter(new WowItemsConverter());
+            commands.RegisterConverter(new WowItemRecipeConverter());
             commands.RegisterConverter(new WowProfessionConverter());
             commands.RegisterConverter(new WowServerConverter());
 

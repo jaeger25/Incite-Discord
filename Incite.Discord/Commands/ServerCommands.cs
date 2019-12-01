@@ -13,27 +13,17 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord.Commands
 {
-    [Group("guild")]
+    [Group("server")]
     [RequireGuildConfigured]
     [ModuleLifespan(ModuleLifespan.Transient)]
-    [Description("Commands for managing guild members and settings")]
-    public class GuildCommands : BaseInciteCommand
+    [Description("Commands for querying server information")]
+    public class ServerCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
 
-        public GuildCommands(InciteDbContext dbContext)
+        public ServerCommands(InciteDbContext dbContext)
         {
             m_dbContext = dbContext;
-        }
-
-        [Command("set-server")]
-        [RequireInciteRole(RoleKind.Leader)]
-        [Description("Sets the WoW server for the guild")]
-        public async Task SetRealm(CommandContext context,
-            [Description(Descriptions.WowServer)] WowServer server)
-        {
-            Guild.WowServerId = server.Id;
-            await m_dbContext.SaveChangesAsync();
         }
 
         [Command("list")]
@@ -41,7 +31,7 @@ namespace Incite.Discord.Commands
         public async Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
         {
-            var characters = Guild.WowCharacters
+            var characters = Guild.WowServer.WowCharacters
                 .Where(x => x.WowCharacterProfessions
                     .Any(x => x.WowProfessionId == profession.Id));
 
@@ -59,7 +49,7 @@ namespace Incite.Discord.Commands
         public async Task List(CommandContext context,
             [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)
         {
-            var characters = Guild.WowCharacters
+            var characters = Guild.WowServer.WowCharacters
                 .Where(x => x.WowCharacterProfessions
                     .Any(x => x.WowCharacterRecipes
                         .Any(x => x.RecipeId == recipe.Recipe.Id)));

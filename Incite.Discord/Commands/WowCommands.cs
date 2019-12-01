@@ -153,7 +153,7 @@ namespace Incite.Discord.Commands
                         message.Append($"\t{profession.WowProfession}\n");
                         foreach (var recipe in profession.WowCharacterRecipes)
                         {
-                            message.Append($"\t\t{recipe}\n");
+                            message.Append($"\t\t{recipe.Recipe}\n");
                         }
                     }
                 }
@@ -171,13 +171,13 @@ namespace Incite.Discord.Commands
             {
                 StringBuilder message = new StringBuilder();
 
-                message.Append($"{character}\n");
+                message.Append($"{character.Character}\n");
                 foreach (var profession in character.Character.WowCharacterProfessions)
                 {
                     message.Append($"\t{profession.WowProfession}\n");
                     foreach(var recipe in profession.WowCharacterRecipes)
                     {
-                        message.Append($"\t\t{recipe}\n");
+                        message.Append($"\t\t{recipe.Recipe}\n");
                     }
                 }
 
@@ -224,7 +224,18 @@ namespace Incite.Discord.Commands
                     return;
                 }
 
-                var charRecipe = new WowCharacterRecipe()
+                var charRecipe = character.Character.WowCharacterProfessions
+                    .FirstOrDefault(x => x.WowProfessionId == profession.Id)
+                    ?.WowCharacterRecipes
+                    .FirstOrDefault(x => x.RecipeId == recipe.Recipe.Id);
+
+                if (charRecipe != null)
+                {
+                    ResponseString = $"{character.Character} already knows {recipe.Recipe}";
+                    return;
+                }
+
+                charRecipe = new WowCharacterRecipe()
                 {
                     WowCharacterProfession = characterProfession,
                     Recipe = recipe.Recipe,
