@@ -72,6 +72,27 @@ namespace Incite.Discord.Commands
             ResponseString = message.ToString();
         }
 
+        [Command("request-join")]
+        [RequireGuildConfigured]
+        [RequireWowCharacter]
+        [Description("Requests to join the guild as the specified role")]
+        public async Task RequestJoin(CommandContext context)
+        {
+            if (Member.MemberRoles.Any(x => x.Role.Kind == RoleKind.Member))
+            {
+                ResponseString = $"{context.Member} is already a Member";
+                return;
+            }
+
+            Member.Status = MemberStatus.Pending;
+            await m_dbContext.SaveChangesAsync();
+
+            var officerRole = Guild.Roles.First(x => x.Kind == RoleKind.Officer);
+            var discordOfficerRole = context.Guild.GetRole(officerRole.DiscordId);
+
+            ResponseString = $"{discordOfficerRole}, {context.Member.DisplayName} ({Member.PrimaryWowCharacter.Name}) has requested to join guild. Use 'guild admin grant-role' to grant a role";
+        }
+
         [Command("list")]
         [RequireGuildConfigured]
         [Description("Lists the users which know the specified recipe")]
@@ -94,6 +115,7 @@ namespace Incite.Discord.Commands
 
         [Group("admin")]
         [RequireGuild]
+        [RequireInciteRole(RoleKind.Officer)]
         [ModuleLifespan(ModuleLifespan.Transient)]
         [Description("Commands for managing guild settings")]
         public class AdminCommands : BaseInciteCommand
@@ -119,9 +141,14 @@ namespace Incite.Discord.Commands
             [RequireInciteRole(RoleKind.Leader)]
             [Description("Sets the server role which corresponds with the RoleKind")]
             public async Task SetRole(CommandContext context,
-                [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind,
+                [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
                 [Description("Name of the corresponding discord role")] DiscordRole role)
             {
+                if (roleKind == RoleKind.Everyone)
+                {
+                    return;
+                }
+
                 var existingRole = Guild.Roles
                     .FirstOrDefault(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
 
@@ -148,19 +175,29 @@ namespace Incite.Discord.Commands
                 }
             }
 
+            [Command("list-pending-joins")]
+            [RequireGuildConfigured]
+            [RequireWowCharacter]
+            [Description("Requests to join the guild as the specified role")]
+            public async Task RequestJoin(CommandContext context)
+            {
+                StringBuilder stringBuilder = new StringBuilder("__**Pending joins**__\n");
+                foreach (var member in Guild.Members.Where(x => x.Status == MemberStatus.Pending))
+                {
+                    var discordMember = await context.Guild.GetMemberAsync(Member.User.DiscordId);
+                    stringBuilder.AppendLine($"{discordMember.DisplayName} ({member.PrimaryWowCharacter})");
+                }
+
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("Use '!guild admin grant-role' to assign a role");
+            }
+
             [Command("grant-role")]
-            [RequireInciteRole(RoleKind.Officer)]
             [Description("Grants the role for a user")]
             public async Task GrantRole(CommandContext context,
                 DiscordUser user,
-                [Description("Values: Member, Officer, Leader")] RoleKind roleKind)
+                [Description("Values: Everyone, Member, Officer, Leader")] RoleKind roleKind)
             {
-                if (roleKind == RoleKind.Everyone)
-                {
-                    ResponseString = "Assignment not needed for Everyone role";
-                    return;
-                }
-
                 bool allowedToChange = PermissionMethods.HasPermission(context.Member.PermissionsIn(context.Channel), Permissions.ManageGuild);
                 if (!allowedToChange)
                 {
@@ -197,6 +234,7 @@ namespace Incite.Discord.Commands
                     });
                 }
 
+                member.Status = MemberStatus.Confirmed;
                 await m_dbContext.SaveChangesAsync();
 
                 StringBuilder rolesString = new StringBuilder();

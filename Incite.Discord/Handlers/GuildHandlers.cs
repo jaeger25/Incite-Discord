@@ -37,10 +37,20 @@ namespace Incite.Discord.Handlers
         {
             if (! await m_dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
             {
-                m_dbContext.Guilds.Add(new Guild()
+                var guild = new Guild()
                 {
                     DiscordId = e.Guild.Id
-                });
+                };
+
+                var everyoneRole = new Role()
+                {
+                    DiscordId = e.Guild.EveryoneRole.Id,
+                    Guild = guild,
+                    Kind = RoleKind.Everyone
+                };
+
+                m_dbContext.Guilds.Add(guild);
+                m_dbContext.Roles.Add(everyoneRole);
 
                 await m_dbContext.SaveChangesAsync();
             }

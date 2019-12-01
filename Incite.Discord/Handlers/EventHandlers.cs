@@ -38,6 +38,9 @@ namespace Incite.Discord.Handlers
             }
 
             var guildEvent = await m_dbContext.Events
+                .Include(x => x.EventMembers)
+                    .ThenInclude(x => x.Member)
+                        .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.EventMessage.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
@@ -46,14 +49,14 @@ namespace Incite.Discord.Handlers
             }
 
             var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
-            if (member == null)
+            if (member == null || member.PrimaryWowCharacterId == 0)
             {
                 await message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
 
                 var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
                 var dmChannel = await discordMember.CreateDmChannelAsync();
 
-                await dmChannel.SendMessageAsync("You must first register with the '!member register' command");
+                await dmChannel.SendMessageAsync("You must first add a wow character. See '!help wow char add' for details");
                 return;
             }
 
@@ -95,6 +98,9 @@ namespace Incite.Discord.Handlers
             }
 
             var guildEvent = await m_dbContext.Events
+                .Include(x => x.EventMembers)
+                    .ThenInclude(x => x.Member)
+                        .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.EventMessage.Message.DiscordId == message.Id);
 
             if (guildEvent == null)
