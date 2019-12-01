@@ -9,25 +9,25 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Incite.Discord.Attributes
 {
-    public class RequireMemberRegisteredAttribute : CheckBaseAttribute
+    public class RequireWowCharacterAttribute : CheckBaseAttribute
     {
         public override async Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
             var dbContext = context.Services.GetService<InciteDbContext>();
-            bool isRegistered = await dbContext.Members.IsCurrentMemberRegisteredAsync(context);
 
-            if (!isRegistered)
+            bool hasCharacter = await dbContext.WowCharacters
+                .AnyAsync(x => x.User.DiscordId == context.User.Id);
+
+            if (!hasCharacter)
             {
-                var discordMember = await context.Guild.GetMemberAsync(context.User.Id);
-                var dmChannel = await discordMember.CreateDmChannelAsync();
-
-                await dmChannel.SendMessageAsync("You must first register with the '!member register' command");
+                await context.Message.RespondAsync("You must add a character using '!wow character add charName-ServerName' first");
             }
 
-            return isRegistered;
+            return hasCharacter;
         }
     }
 }

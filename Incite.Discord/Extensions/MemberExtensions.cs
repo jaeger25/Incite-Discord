@@ -12,17 +12,6 @@ namespace Incite.Discord.Extensions
 {
     public static class MemberExtensions
     {
-        public static Task<bool> IsMemberRegisteredAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
-        {
-            return members
-                .AnyAsync(x => x.Guild.DiscordId == discordGuildId && x.User.DiscordId == discordMemberId);
-        }
-
-        public static Task<bool> IsCurrentMemberRegisteredAsync(this DbSet<Member> members, CommandContext context)
-        {
-            return members.IsMemberRegisteredAsync(context.Guild.Id, context.User.Id);
-        }
-
         public static Task<Member> GetMemberAsync(this DbSet<Member> members, UInt64 discordGuildId, UInt64 discordMemberId)
         {
             return members

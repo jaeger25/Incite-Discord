@@ -30,7 +30,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
-        [RequireMemberRegistered]
+        [RequireInciteRole(RoleKind.Member)]
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
         {

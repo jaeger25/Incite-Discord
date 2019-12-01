@@ -43,11 +43,16 @@ namespace Incite.Discord.Attributes
                     (x.Kind == RoleKind.Member || x.Kind == RoleKind.Officer || x.Kind == RoleKind.Leader))
                 .CountAsync();
 
-            bool configured = roleCount == 3;
+            bool configured = roleCount == 3 &&
+                guild.WowServerId != 0;
 
             if (configured)
             {
                 ConfiguredGuildsCache.Add(context.Guild.Id);
+            }
+            else
+            {
+                await context.Message.RespondAsync("Guild is not configured. Ask a user with ManageGuild permissions to type '!help guild admin'");
             }
 
             return configured;
