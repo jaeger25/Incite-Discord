@@ -399,11 +399,22 @@ namespace Incite.Discord.Commands
 
             DiscordEmbed CreateEmbedForWowItem(WowItem item)
             {
+                StringBuilder createdBy = new StringBuilder("__**Created By**__\n");
+                foreach (var spell in item.CreatedBy)
+                {
+                    createdBy.AppendLine(spell.Name);
+                    foreach (var reagent in spell.WowReagents)
+                    {
+                        createdBy.AppendLine($"\t{reagent.WowItem.Name} x {reagent.Count}");
+                    }
+                }
+
                 return new DiscordEmbedBuilder()
                     .WithTitle(item.Name)
                     .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Medium))
                     .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
                     .WithColor(WowItemQualityToColor(item.ItemQuality))
+                    .WithDescription(createdBy.Length > 0 ? createdBy.ToString() : "")
                     .Build();
             }
 
