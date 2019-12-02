@@ -246,6 +246,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("remove")]
+            [Priority(90)]
             [Description("Removes a profession to the specified character")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -274,6 +275,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("remove")]
+            [Priority(100)]
             [Description("Removes a recipe from the specified character's profession")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
