@@ -18,6 +18,11 @@ namespace Incite.Discord.Converters
     {
         public async Task<Optional<WowItemRecipe>> ConvertAsync(string value, CommandContext ctx)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return Optional.FromNoValue<WowItemRecipe>();
+            }
+
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var recipes = await dbContext.WowItems
                 .Where(x => x.WowItemClass.Name == "Recipes" && EF.Functions.Like(x.Name, $"%{value}%"))

@@ -17,6 +17,11 @@ namespace Incite.Discord.Converters
     {
         public async Task<Optional<WowClass>> ConvertAsync(string value, CommandContext ctx)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return Optional.FromNoValue<WowClass>();
+            }
+
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var wowClass = await dbContext.WowClasses
                 .FirstOrDefaultAsync(x => x.Name == value);

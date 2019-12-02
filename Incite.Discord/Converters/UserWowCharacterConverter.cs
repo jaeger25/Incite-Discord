@@ -18,6 +18,11 @@ namespace Incite.Discord.Converters
     {
         public async Task<Optional<UserWowCharacter>> ConvertAsync(string value, CommandContext ctx)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return Optional.FromNoValue<UserWowCharacter>();
+            }
+
             var command = (BaseInciteCommand)ctx.Command.Module.GetInstance(ctx.Services);
             await command.BeforeExecutionAsync(ctx);
 

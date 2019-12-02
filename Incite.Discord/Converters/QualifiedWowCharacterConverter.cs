@@ -16,6 +16,11 @@ namespace Incite.Discord.Converters
     {
         public async Task<Optional<QualifiedWowCharacter>> ConvertAsync(string value, CommandContext ctx)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return Optional.FromNoValue<QualifiedWowCharacter>();
+            }
+
             var nameServerPair = value.Split('-');
             if (nameServerPair.Length != 2)
             {

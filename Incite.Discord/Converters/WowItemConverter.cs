@@ -20,6 +20,11 @@ namespace Incite.Discord.Converters
     {
         public async Task<Optional<IEnumerable<WowItem>>> ConvertAsync(string value, CommandContext ctx)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return Optional.FromNoValue<IEnumerable<WowItem>>();
+            }
+
             string sqlLikeSearchValue = value.Replace('*', '%');
             if (!sqlLikeSearchValue.Contains("%"))
             {
