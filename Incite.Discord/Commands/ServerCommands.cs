@@ -27,6 +27,21 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
+        [Description("Lists the guild's which are currently using this bot")]
+        public async Task List(CommandContext context)
+        {
+            StringBuilder message = new StringBuilder($"__**Guilds**__\n");
+            foreach (var guild in context.Client.Guilds)
+            {
+                message.AppendLine(guild.Value.Name);
+            }
+
+            var dmChannel = await context.Member.CreateDmChannelAsync();
+            await dmChannel.SendMessageAsync(message.ToString());
+            ResponseString = "";
+        }
+
+        [Command("list")]
         [Description("Lists the users which are the specified profession")]
         public async Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
