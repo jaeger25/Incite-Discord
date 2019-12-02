@@ -27,6 +27,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
+        [Priority(100)]
         [Description("Lists the guild's which are currently using this bot")]
         public async Task List(CommandContext context)
         {
@@ -42,7 +43,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
-        [Priority(100)]
+        [Priority(90)]
         [Description("Lists the users which are the specified profession")]
         public async Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
@@ -61,7 +62,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
-        [Priority(90)]
+        [Priority(80)]
         [Description("Lists the users which know the specified recipe")]
         public async Task List(CommandContext context,
             [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)

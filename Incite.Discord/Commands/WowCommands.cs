@@ -188,6 +188,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("add")]
+            [Priority(100)]
             [Description("Adds a profession to the specified character")]
             public async Task Add(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -209,6 +210,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("add")]
+            [Priority(90)]
             [Description("Adds a recipe to the specified character's profession")]
             public async Task Add(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -246,7 +248,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("remove")]
-            [Priority(90)]
+            [Priority(100)]
             [Description("Removes a profession to the specified character")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -275,7 +277,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("remove")]
-            [Priority(100)]
+            [Priority(90)]
             [Description("Removes a recipe from the specified character's profession")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,

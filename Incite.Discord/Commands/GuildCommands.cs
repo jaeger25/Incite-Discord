@@ -29,7 +29,29 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
+        [Command("request-join")]
+        [RequireGuildConfigured]
+        [RequireWowCharacter]
+        [Description("Requests to join the guild as the specified role")]
+        public async Task RequestJoin(CommandContext context)
+        {
+            if (Member.MemberRoles.Any(x => x.Role.Kind == RoleKind.Member))
+            {
+                ResponseString = $"{context.Member} is already a Member";
+                return;
+            }
+
+            Member.Status = MemberStatus.Pending;
+            await m_dbContext.SaveChangesAsync();
+
+            var officerRole = Guild.Roles.First(x => x.Kind == RoleKind.Officer);
+            var discordOfficerRole = context.Guild.GetRole(officerRole.DiscordId);
+
+            ResponseString = $"{discordOfficerRole}, {context.Member.DisplayName} ({Member.PrimaryWowCharacter.Name}) has requested to join guild. Use 'guild admin grant-role' to grant a role";
+        }
+
         [Command("list")]
+        [Priority(100)]
         [RequireInciteRole(RoleKind.Member)]
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
@@ -54,6 +76,7 @@ namespace Incite.Discord.Commands
         }
 
         [Command("list")]
+        [Priority(90)]
         [RequireGuildConfigured]
         [Description("Lists the users which are the specified profession")]
         public async Task List(CommandContext context,
@@ -72,28 +95,8 @@ namespace Incite.Discord.Commands
             ResponseString = message.ToString();
         }
 
-        [Command("request-join")]
-        [RequireGuildConfigured]
-        [RequireWowCharacter]
-        [Description("Requests to join the guild as the specified role")]
-        public async Task RequestJoin(CommandContext context)
-        {
-            if (Member.MemberRoles.Any(x => x.Role.Kind == RoleKind.Member))
-            {
-                ResponseString = $"{context.Member} is already a Member";
-                return;
-            }
-
-            Member.Status = MemberStatus.Pending;
-            await m_dbContext.SaveChangesAsync();
-
-            var officerRole = Guild.Roles.First(x => x.Kind == RoleKind.Officer);
-            var discordOfficerRole = context.Guild.GetRole(officerRole.DiscordId);
-
-            ResponseString = $"{discordOfficerRole}, {context.Member.DisplayName} ({Member.PrimaryWowCharacter.Name}) has requested to join guild. Use 'guild admin grant-role' to grant a role";
-        }
-
         [Command("list")]
+        [Priority(80)]
         [RequireGuildConfigured]
         [Description("Lists the users which know the specified recipe")]
         public async Task List(CommandContext context,
