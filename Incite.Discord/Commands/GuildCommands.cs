@@ -174,7 +174,14 @@ namespace Incite.Discord.Commands
 
                 if (!role.IsMentionable)
                 {
-                    await role.ModifyAsync(mentionable: true);
+                    try
+                    {
+                        await role.ModifyAsync(mentionable: true);
+                    }
+                    catch(UnauthorizedException)
+                    {
+                        ResponseString = "Commands completed, but you need to manually re-order the roles in your serve so that 'Incite Bot' is above any roles you are trying to set here.";
+                    }
                 }
             }
 
