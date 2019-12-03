@@ -132,7 +132,7 @@ namespace Incite.Discord.Commands
                 }
 
                 var existingRole = Guild.Roles
-                    .FirstOrDefault(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == roleKind);
+                    .FirstOrDefault(x => x.Kind == roleKind);
 
                 if (existingRole == null)
                 {
