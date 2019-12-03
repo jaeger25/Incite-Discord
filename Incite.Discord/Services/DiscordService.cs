@@ -37,7 +37,6 @@ namespace Incite.Discord.Services
                 Services = serviceProvider,
             });
 
-            commands.RegisterConverter(new EnumConverter<MemberStatus>());
             commands.RegisterConverter(new EnumConverter<RoleKind>());
             commands.RegisterConverter(new EnumConverter<WowFaction>());
             commands.RegisterCommands(GetType().Assembly);

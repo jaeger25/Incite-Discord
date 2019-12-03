@@ -5,17 +5,8 @@ using System.Text;
 
 namespace Incite.Models
 {
-    public enum MemberStatus
-    {
-        Unconfirmed,
-        Pending,
-        Confirmed
-    }
-
     public class Member : BaseModel
     {
-        public MemberStatus Status { get; set; }
-
         public int? PrimaryWowCharacterId { get; set; }
         public virtual WowCharacter? PrimaryWowCharacter { get; set; }
 

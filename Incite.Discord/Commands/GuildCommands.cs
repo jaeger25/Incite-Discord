@@ -29,27 +29,6 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("request-join")]
-        [RequireGuildConfigured]
-        [RequireWowCharacter]
-        [Description("Requests to join the guild as the specified role")]
-        public async Task RequestJoin(CommandContext context)
-        {
-            if (Member.MemberRoles.Any(x => x.Role.Kind == RoleKind.Member))
-            {
-                ResponseString = $"{context.Member} is already a Member";
-                return;
-            }
-
-            Member.Status = MemberStatus.Pending;
-            await m_dbContext.SaveChangesAsync();
-
-            var officerRole = Guild.Roles.First(x => x.Kind == RoleKind.Officer);
-            var discordOfficerRole = context.Guild.GetRole(officerRole.DiscordId);
-
-            ResponseString = $"{discordOfficerRole}, {context.Member.DisplayName} ({Member.PrimaryWowCharacter.Name}) has requested to join guild. Use 'guild admin grant-role' to grant a role";
-        }
-
         [Command("list")]
         [Priority(100)]
         [RequireInciteRole(RoleKind.Member)]
@@ -145,7 +124,7 @@ namespace Incite.Discord.Commands
             [Description("Sets the server role which corresponds with the RoleKind")]
             public async Task SetRole(CommandContext context,
                 [Description("Values: Member, Officer, Leader")] RoleKind roleKind,
-                [Description("Name of the corresponding discord role")] DiscordRole role)
+                [Description("Name of the corresponding discord role")] DiscordRole discordRole)
             {
                 if (roleKind == RoleKind.Everyone)
                 {
@@ -159,7 +138,7 @@ namespace Incite.Discord.Commands
                 {
                     existingRole = new Role()
                     {
-                        DiscordId = role.Id,
+                        DiscordId = discordRole.Id,
                         GuildId = Guild.Id,
                         Kind = roleKind
                     };
@@ -168,7 +147,7 @@ namespace Incite.Discord.Commands
                 }
                 else
                 {
-                    existingRole.DiscordId = role.Id;
+                    existingRole.DiscordId = discordRole.Id;
                     m_dbContext.Roles.Update(existingRole);
                 }
 
@@ -176,8 +155,60 @@ namespace Incite.Discord.Commands
 
                 var discordMemberIdsWithRole = context.Guild.Members
                     .Where(x => x.Value.Roles
-                        .Any(x => x.Id == role.Id))
+                        .Any(x => x.Id == discordRole.Id))
                     .Select(x => x.Key);
+
+                var existingUsers = await m_dbContext.Users
+                    .Where(x => discordMemberIdsWithRole.Contains(x.DiscordId))
+                    .ToArrayAsync();
+
+                var newUserIds = discordMemberIdsWithRole
+                    .Where(x => !existingUsers
+                        .Select(x => x.DiscordId)
+                        .Contains(x));
+
+                foreach(var newUserId in newUserIds)
+                {
+                    var member = new Member()
+                    {
+                        GuildId = Guild.Id,
+                        User = new User()
+                        {
+                            DiscordId = newUserId
+                        }
+                    };
+
+                    m_dbContext.Members.Add(member);
+                }
+
+                await m_dbContext.SaveChangesAsync();
+
+                var existingMembers = await m_dbContext.Members
+                    .Include(x => x.User)
+                    .Where(x => discordMemberIdsWithRole.Contains(x.User.DiscordId))
+                    .ToArrayAsync();
+
+                var newMemberIds = discordMemberIdsWithRole
+                    .Where(x => !existingMembers
+                        .Select(x => x.User.DiscordId)
+                        .Contains(x));
+
+                existingUsers = await m_dbContext.Users
+                    .Where(x => discordMemberIdsWithRole.Contains(x.DiscordId))
+                    .ToArrayAsync();
+
+                foreach (var newMemberId in newMemberIds)
+                {
+                    var member = new Member()
+                    {
+                        GuildId = Guild.Id,
+                        UserId = existingUsers.First(x => x.DiscordId == newMemberId).Id
+                    };
+
+                    m_dbContext.Members.Add(member);
+                }
+
+                await m_dbContext.SaveChangesAsync();
 
                 var existingMembersToAddRole = await m_dbContext.Members
                     .Include(x => x.MemberRoles)
@@ -194,39 +225,21 @@ namespace Incite.Discord.Commands
                     });
                 }
 
-                var newDiscordMemberIds = existingMembersToAddRole.
-                    Where(x => !discordMemberIdsWithRole.Contains(x.User.DiscordId));
+                await m_dbContext.SaveChangesAsync();
 
                 // create members and users
 
-                if (!role.IsMentionable)
+                if (!discordRole.IsMentionable)
                 {
                     try
                     {
-                        await role.ModifyAsync(mentionable: true);
+                        await discordRole.ModifyAsync(mentionable: true);
                     }
                     catch(UnauthorizedException)
                     {
                         ResponseString = "Commands completed, but you need to manually re-order the roles in your serve so that 'Incite Bot' is above any roles you are trying to set here.";
                     }
                 }
-            }
-
-            [Command("list-pending-joins")]
-            [RequireGuildConfigured]
-            [RequireWowCharacter]
-            [Description("Requests to join the guild as the specified role")]
-            public async Task RequestJoin(CommandContext context)
-            {
-                StringBuilder stringBuilder = new StringBuilder("__**Pending joins**__\n");
-                foreach (var member in Guild.Members.Where(x => x.Status == MemberStatus.Pending))
-                {
-                    var discordMember = await context.Guild.GetMemberAsync(Member.User.DiscordId);
-                    stringBuilder.AppendLine($"{discordMember.DisplayName} ({member.PrimaryWowCharacter})");
-                }
-
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("Use '!guild admin grant-role' to assign a role");
             }
 
             [Command("grant-role")]
@@ -271,7 +284,6 @@ namespace Incite.Discord.Commands
                     });
                 }
 
-                member.Status = MemberStatus.Confirmed;
                 await m_dbContext.SaveChangesAsync();
 
                 StringBuilder rolesString = new StringBuilder();
