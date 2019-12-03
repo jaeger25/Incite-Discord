@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Incite.Discord.Attributes
 {
@@ -23,17 +24,23 @@ namespace Incite.Discord.Attributes
 
         public override async Task<bool> ExecuteCheckAsync(CommandContext context, bool help)
         {
-            var discordMember = await context.Guild.GetMemberAsync(context.User.Id);
+            var discordMember = context.Member;
             if (PermissionMethods.HasPermission(discordMember.PermissionsIn(context.Channel), Permissions.ManageGuild))
             {
                 return true;
             }
 
             var dbContext = context.Services.GetService<InciteDbContext>();
-            var member = await dbContext.Members.TryGetCurrentMemberAsync(context);
+            var role = await dbContext.Roles
+                .FirstOrDefaultAsync(x => x.Guild.DiscordId == context.Guild.Id && x.Kind == RoleKind);
 
-            return member?.MemberRoles
-                .Any(x => x.Role.Kind >= RoleKind) ?? false;
+            if (role == null)
+            {
+                return false;
+            }
+
+            return discordMember.Roles
+                .Any(x => x.Id == role.DiscordId);
         }
     }
 }

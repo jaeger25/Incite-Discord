@@ -30,45 +30,13 @@ namespace Incite.Discord.Commands
                 Member = await dbContext.Members
                     .Include(x => x.Guild)
                         .ThenInclude(x => x.Roles)
-                    .Include(x => x.MemberRoles)
-                        .ThenInclude(x => x.Role)
                     .Include(x => x.PrimaryWowCharacter)
                     .Include(x => x.User)
                         .ThenInclude(x => x.WowCharacters)
-                    .FirstOrDefaultAsync(x => x.User.DiscordId == ctx.User.Id);
+                    .FirstAsync(x => x.User.DiscordId == ctx.User.Id);
 
-                if (Member == null)
-                {
-                    User = await dbContext.Users
-                        .FirstOrDefaultAsync(x => x.DiscordId == ctx.User.Id);
-
-                    if (User == null)
-                    {
-                        User = new User()
-                        {
-                            DiscordId = ctx.User.Id
-                        };
-
-                        dbContext.Users.Add(User);
-                    }
-
-                    Guild = await dbContext.Guilds
-                        .FirstAsync(x => x.DiscordId == ctx.Guild.Id);
-
-                    Member = new Member()
-                    {
-                        Guild = Guild,
-                        User = User,
-                    };
-
-                    dbContext.Members.Add(Member);
-                    await dbContext.SaveChangesAsync();
-                }
-                else
-                {
-                    User = Member.User;
-                    Guild = Member.Guild;
-                }
+                User = Member.User;
+                Guild = Member.Guild;
             }
         }
 

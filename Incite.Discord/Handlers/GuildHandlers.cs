@@ -25,19 +25,22 @@ namespace Incite.Discord.Handlers
 
         async Task Client_GuildAvailable(GuildCreateEventArgs e)
         {
-            await CreateGuildAsyc(e);
+            await UpdateGuildEntitiesAsync(e);
         }
 
         async Task Client_GuildCreated(GuildCreateEventArgs e)
         {
-            await CreateGuildAsyc(e);
+            await UpdateGuildEntitiesAsync(e);
         }
 
-        async Task CreateGuildAsyc(GuildCreateEventArgs e)
+        async Task UpdateGuildEntitiesAsync(GuildCreateEventArgs e)
         {
-            if (! await m_dbContext.Guilds.AnyAsync(x => x.DiscordId == e.Guild.Id))
+            var guild = await m_dbContext.Guilds
+                .FirstOrDefaultAsync(x => x.DiscordId == e.Guild.Id);
+
+            if (guild == null)
             {
-                var guild = new Guild()
+                guild = new Guild()
                 {
                     DiscordId = e.Guild.Id
                 };
@@ -51,9 +54,51 @@ namespace Incite.Discord.Handlers
 
                 m_dbContext.Guilds.Add(guild);
                 m_dbContext.Roles.Add(everyoneRole);
-
-                await m_dbContext.SaveChangesAsync();
             }
+
+            await CreateNewGuildMembersAsync(guild, e);
+
+            await m_dbContext.SaveChangesAsync();
+        }
+
+        async Task CreateNewGuildMembersAsync(Guild guild, GuildCreateEventArgs e)
+        {
+            var memberDiscordIds = e.Guild.Members
+                .Select(x => x.Key);
+
+            var existingUsers = await m_dbContext.Users
+                .Where(x => memberDiscordIds
+                    .Contains(x.DiscordId))
+                .ToArrayAsync();
+
+            var existingMembers = await m_dbContext.Members
+                .Include(x => x.User)
+                .Where(x => x.Guild.DiscordId == guild.DiscordId && memberDiscordIds
+                    .Contains(x.User.DiscordId))
+                .ToArrayAsync();
+
+            var newUsers = memberDiscordIds
+                .Where(x => !existingUsers
+                    .Select(x => x.DiscordId)
+                    .Contains(x))
+                .Select(x => new User()
+                {
+                    DiscordId = x
+                });
+
+            m_dbContext.Users.AddRange(newUsers);
+
+            var newMembers = memberDiscordIds
+                .Where(x => !existingMembers
+                    .Select(x => x.User.DiscordId)
+                    .Contains(x))
+                .Select(x => new Member()
+                {
+                    Guild = guild,
+                    User = m_dbContext.Users.Local.First(y => y.DiscordId == x)
+                });
+
+            m_dbContext.Members.AddRange(newMembers);
         }
     }
 }

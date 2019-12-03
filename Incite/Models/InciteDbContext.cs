@@ -18,7 +18,6 @@ namespace Incite.Models
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<MemberEvent> MemberEvents { get; set; }
-        public DbSet<MemberRole> MemberRoles { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
