@@ -157,12 +157,14 @@ namespace Incite.Discord.Commands
 
                 if (existingRole == null)
                 {
-                    m_dbContext.Roles.Add(new Role()
+                    existingRole = new Role()
                     {
                         DiscordId = role.Id,
                         GuildId = Guild.Id,
                         Kind = roleKind
-                    });
+                    };
+
+                    m_dbContext.Roles.Add(existingRole);
                 }
                 else
                 {
@@ -171,6 +173,31 @@ namespace Incite.Discord.Commands
                 }
 
                 await m_dbContext.SaveChangesAsync();
+
+                var discordMemberIdsWithRole = context.Guild.Members
+                    .Where(x => x.Value.Roles
+                        .Any(x => x.Id == role.Id))
+                    .Select(x => x.Key);
+
+                var existingMembersToAddRole = await m_dbContext.Members
+                    .Include(x => x.MemberRoles)
+                    .Include(x => x.User)
+                    .Where(x => x.GuildId == Guild.Id && discordMemberIdsWithRole.Contains(x.User.DiscordId))
+                    .ToArrayAsync();
+
+                foreach(var member in existingMembersToAddRole)
+                {
+                    member.MemberRoles.Add(new MemberRole()
+                    {
+                        MemberId = member.Id,
+                        RoleId = existingRole.Id
+                    });
+                }
+
+                var newDiscordMemberIds = existingMembersToAddRole.
+                    Where(x => !discordMemberIdsWithRole.Contains(x.User.DiscordId));
+
+                // create members and users
 
                 if (!role.IsMentionable)
                 {
