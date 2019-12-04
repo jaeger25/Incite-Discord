@@ -37,21 +37,20 @@ namespace Incite.Discord.Commands
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
         {
-            var channel = await context.Member.CreateDmChannelAsync();
-
-            StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name");
-            memberList.AppendLine();
+            StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name\n");
 
             foreach (var member in Guild.Members)
             {
                 string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
-                    (context.Guild.Members[member.User.DiscordId].Nickname ?? context.Guild.Members[member.User.DiscordId].DisplayName) :
+                    context.Guild.Members[member.User.DiscordId].DisplayName :
                     "(Unknown)";
 
                 memberList.AppendLine($"{member.UserId} | {member.Id} | {discordName} | {member.PrimaryWowCharacter}");
             }
 
-            await channel.SendMessageAsync(memberList.ToString());
+            var interactivity = context.Client.GetInteractivity();
+            var pages = interactivity.GeneratePagesInContent(memberList.ToString(), SplitType.Line);
+            await interactivity.SendPaginatedMessageAsync(context.Channel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(5));
         }
 
         [Command("list-profession")]
