@@ -179,6 +179,7 @@ namespace Incite.Discord.Commands
 
             [Command("import-members")]
             [RequireInciteRole(RoleKind.Leader)]
+            [RequireGuildConfigured]
             [Description("Attempts to import a list of guild characters from a 'Guild Roster Manager' export. Header must be included in export and character names must match Discord names exactly to be imported.")]
             public async Task ImportMembers(CommandContext context,
                 [Description("Optional. Defaults to ';'")] char delimeterCharacter = ';')
@@ -203,6 +204,9 @@ namespace Incite.Discord.Commands
                         .ThenInclude(x => x.WowCharacters)
                     .Where(x => x.GuildId == Guild.Id)
                     .ToArrayAsync();
+
+                var memberRole = context.Guild.GetRole(Guild.Roles
+                    .First(x => x.Kind == RoleKind.Member).DiscordId);
 
                 var discordMembers = context.Guild.Members;
                 int importCount = 0;
@@ -261,6 +265,17 @@ namespace Incite.Discord.Commands
                         else
                         {
                             existingCount++;
+                        }
+
+                        if (!discordMember.Roles.Contains(memberRole))
+                        {
+                            try
+                            {
+                                await discordMember.GrantRoleAsync(memberRole);
+                            }
+                            catch(UnauthorizedException)
+                            {
+                            }
                         }
                     }
                 }
