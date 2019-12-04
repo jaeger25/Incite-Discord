@@ -9,5 +9,6 @@ namespace Incite.Models
         public UInt64 DiscordId { get; set; }
 
         public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
+        public virtual ICollection<Member> Memberships { get; set; } = new List<Member>();
     }
 }

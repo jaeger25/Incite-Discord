@@ -25,6 +25,8 @@
     <Compile Remove="Migrations\20191128081228_WowItem6.Designer.cs" />
     <Compile Remove="Migrations\20191128081739_WowItem6.cs" />
     <Compile Remove="Migrations\20191128081739_WowItem6.Designer.cs" />
+    <Compile Remove="Migrations\20191204201444_Memberships.cs" />
+    <Compile Remove="Migrations\20191204201444_Memberships.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

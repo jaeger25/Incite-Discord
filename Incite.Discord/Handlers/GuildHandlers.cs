@@ -21,6 +21,33 @@ namespace Incite.Discord.Handlers
 
             client.GuildCreated += Client_GuildCreated;
             client.GuildAvailable += Client_GuildAvailable;
+            client.GuildMemberAdded += Client_GuildMemberAdded;
+        }
+
+        async Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
+        {
+            var user = m_dbContext.Users
+                .Include(x => x.Memberships)
+                    .ThenInclude(x => x.Guild)
+                .FirstOrDefault(x => x.DiscordId == e.Member.Id);
+
+            Member member = user?.Memberships
+                .FirstOrDefault(x => x.Guild.DiscordId == e.Guild.Id);
+
+            if (member == null)
+            {
+                member = new Member()
+                {
+                    Guild = await m_dbContext.Guilds.FirstAsync(x => x.DiscordId == e.Guild.Id),
+                    User = user ?? new User()
+                    {
+                        DiscordId = e.Member.Id
+                    }
+                };
+
+                m_dbContext.Members.Add(member);
+                await m_dbContext.SaveChangesAsync();
+            }
         }
 
         async Task Client_GuildAvailable(GuildCreateEventArgs e)
