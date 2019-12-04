@@ -206,6 +206,8 @@ namespace Incite.Discord.Commands
                     .ToArrayAsync();
 
                 var discordMembers = context.Guild.Members;
+                int importCount = 0;
+                int existingCount = 0;
 
                 try
                 {
@@ -254,6 +256,12 @@ namespace Incite.Discord.Commands
                                 WowServerId = Guild.WowServerId.Value,
                                 WowClassId = wowClasses.First(x => x.Name == charClass).Id,
                             });
+
+                            importCount++;
+                        }
+                        else
+                        {
+                            existingCount++;
                         }
                     }
                 }
@@ -264,6 +272,8 @@ namespace Incite.Discord.Commands
                 }
 
                 await m_dbContext.SaveChangesAsync();
+
+                ResponseString = $"Imported: {importCount} characters\nSkipped existing: {existingCount} characters\nTo view your member list, use the '!guild list-characters' command.";
             }
 
             async IAsyncEnumerable<string> ReadExportFile(string exportFileUrl)
