@@ -14,6 +14,8 @@ namespace Incite.Models
         public int? WowServerId { get; set; }
         public virtual WowServer? WowServer { get; set; }
 
+        public WowFaction? WowFaction { get; set; }
+
         public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 
         public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();

@@ -37,7 +37,8 @@ namespace Incite.Discord.Commands
                 m_dbContext = dbContext;
             }
 
-            [Command("list")]
+            [Command("list-characters")]
+            [Aliases("list")]
             [Description("Lists your characters")]
             public async Task List(CommandContext context)
             {
@@ -53,7 +54,8 @@ namespace Incite.Discord.Commands
                 ResponseString = "Command executed. Check your DMs.";
             }
 
-            [Command("add")]
+            [Command("add-character")]
+            [Aliases("add")]
             [Description("Adds a character to your character list")]
             public async Task AddCharacter(CommandContext context,
                 [Description(Descriptions.WowCharacter)] QualifiedWowCharacter character,
@@ -86,7 +88,8 @@ namespace Incite.Discord.Commands
                 await m_dbContext.SaveChangesAsync();
             }
 
-            [Command("remove")]
+            [Command("remove-character")]
+            [Aliases("remove")]
             [Description("Removes a character from your character list")]
             public async Task RemoveCharacter(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character)
@@ -139,7 +142,8 @@ namespace Incite.Discord.Commands
                 m_dbContext = dbContext;
             }
 
-            [Command("list")]
+            [Command("list-professions")]
+            [Aliases("list-profs")]
             [Description("Lists your characters' profressions")]
             public async Task List(CommandContext context)
             {
@@ -164,7 +168,7 @@ namespace Incite.Discord.Commands
                 ResponseString = "Command executed. Check your DMs.";
             }
 
-            [Command("list")]
+            [Command("list-recipes")]
             [Description("Lists your character's profressions")]
             public async Task List(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character)
@@ -187,8 +191,8 @@ namespace Incite.Discord.Commands
                 ResponseString = "Command executed. Check your DMs.";
             }
 
-            [Command("add")]
-            [Priority(100)]
+            [Command("add-profession")]
+            [Aliases("add-prof")]
             [Description("Adds a profession to the specified character")]
             public async Task Add(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -209,8 +213,7 @@ namespace Incite.Discord.Commands
                 await m_dbContext.SaveChangesAsync();
             }
 
-            [Command("add")]
-            [Priority(90)]
+            [Command("add-recipe")]
             [Description("Adds a recipe to the specified character's profession")]
             public async Task Add(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -247,8 +250,7 @@ namespace Incite.Discord.Commands
                 await m_dbContext.SaveChangesAsync();
             }
 
-            [Command("remove")]
-            [Priority(100)]
+            [Command("remove-profession")]
             [Description("Removes a profession to the specified character")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,
@@ -276,8 +278,7 @@ namespace Incite.Discord.Commands
                 }
             }
 
-            [Command("remove")]
-            [Priority(90)]
+            [Command("remove-recipe")]
             [Description("Removes a recipe from the specified character's profession")]
             public async Task Remove(CommandContext context,
                 [Description(Descriptions.WowCharacter)] UserWowCharacter character,

@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+using DSharpPlus.Interactivity;
 using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.Extensions;
@@ -10,7 +11,9 @@ using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,14 +32,11 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("list")]
-        [Priority(100)]
+        [Command("list-members")]
         [RequireInciteRole(RoleKind.Member)]
         [Description("Lists the registered guild members")]
         public async Task List(CommandContext context)
         {
-            await context.Message.DeleteAsync();
-
             var channel = await context.Member.CreateDmChannelAsync();
 
             StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name");
@@ -54,11 +54,11 @@ namespace Incite.Discord.Commands
             await channel.SendMessageAsync(memberList.ToString());
         }
 
-        [Command("list")]
-        [Priority(90)]
+        [Command("list-profession")]
+        [Aliases("list-prof")]
         [RequireGuildConfigured]
         [Description("Lists the users which are the specified profession")]
-        public async Task List(CommandContext context,
+        public Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
         {
             var characters = Guild.WowCharacters
@@ -72,13 +72,14 @@ namespace Incite.Discord.Commands
             }
 
             ResponseString = message.ToString();
+
+            return Task.CompletedTask;
         }
 
-        [Command("list")]
-        [Priority(80)]
+        [Command("list-recipe")]
         [RequireGuildConfigured]
         [Description("Lists the users which know the specified recipe")]
-        public async Task List(CommandContext context,
+        public Task List(CommandContext context,
             [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)
         {
             var characters = Guild.WowCharacters
@@ -93,6 +94,7 @@ namespace Incite.Discord.Commands
             }
 
             ResponseString = message.ToString();
+            return Task.CompletedTask;
         }
 
         [Group("admin")]
@@ -116,6 +118,16 @@ namespace Incite.Discord.Commands
                 [Description(Descriptions.WowServer)] WowServer server)
             {
                 Guild.WowServerId = server.Id;
+                await m_dbContext.SaveChangesAsync();
+            }
+
+            [Command("set-faction")]
+            [RequireInciteRole(RoleKind.Leader)]
+            [Description("Sets the WoW faction for the guild")]
+            public async Task SetFaction(CommandContext context,
+                [Description(Descriptions.WowFaction)] WowFaction faction)
+            {
+                Guild.WowFaction = faction;
                 await m_dbContext.SaveChangesAsync();
             }
 
@@ -159,10 +171,110 @@ namespace Incite.Discord.Commands
                     {
                         await discordRole.ModifyAsync(mentionable: true);
                     }
-                    catch(UnauthorizedException)
+                    catch (UnauthorizedException)
                     {
                         ResponseString = "Commands completed, but you need to manually re-order the roles in your serve so that 'Incite Bot' is above any roles you are trying to set here.";
                     }
+                }
+            }
+
+            [Command("import-members")]
+            [RequireInciteRole(RoleKind.Leader)]
+            [Description("Attempts to import a list of guild characters from a 'Guild Roster Manager' export. Header must be included in export and character names must match Discord names exactly to be imported.")]
+            public async Task ImportMembers(CommandContext context,
+                [Description("Optional. Defaults to ';'")] char delimeterCharacter = ';')
+            {
+                var interactivity = context.Client.GetInteractivity();
+
+                await context.Message.RespondAsync("Please export your guild roster from the 'Guild Roster Manager' addon. Copy the export text into a file, and response to this message with the file.");
+                var exportFileMessage = await interactivity.WaitForMessageAsync(x => x.Author.Id == context.User.Id && x.Attachments.Count == 1, TimeSpan.FromMinutes(3));
+                if (exportFileMessage.TimedOut)
+                {
+                    ResponseString = "Abandoning wait";
+                    return;
+                }
+
+                var exportFileUrl = exportFileMessage.Result.Attachments[0].Url;
+
+                var wowClasses = await m_dbContext.WowClasses
+                    .ToArrayAsync();
+
+                var guildMembers = await m_dbContext.Members
+                    .Include(x => x.User)
+                        .ThenInclude(x => x.WowCharacters)
+                    .Where(x => x.GuildId == Guild.Id)
+                    .ToArrayAsync();
+
+                var discordMembers = context.Guild.Members;
+
+                try
+                {
+                    int iName = -1;
+                    int iClass = -1;
+                    await foreach(var line in ReadExportFile(exportFileUrl))
+                    {
+                        string[] parts = line.Split(delimeterCharacter);
+                        if (iName == -1)
+                        {
+                            iName = Array.FindIndex(parts, x => x == "Name");
+                            iClass = Array.FindIndex(parts, x => x == "Class");
+                            if (iName == -1 || iClass == -1)
+                            {
+                                throw new KeyNotFoundException();
+                            }
+
+                            continue;
+                        }
+
+                        var charName = parts[iName];
+                        var charClass = parts[iClass];
+                        var discordMember = discordMembers.Values
+                            .FirstOrDefault(x => x.DisplayName.Equals(charName, StringComparison.InvariantCultureIgnoreCase));
+                        if (discordMember == null)
+                        {
+                            continue;
+                        }
+
+                        var guildMember = guildMembers
+                            .FirstOrDefault(x => x.User.DiscordId == discordMember.Id);
+                        if (guildMember == null)
+                        {
+                            continue;
+                        }
+
+                        if (!guildMember.User.WowCharacters
+                            .Any(x => x.Name.Equals(charName, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            guildMember.User.WowCharacters.Add(new WowCharacter()
+                            {
+                                GuildId = Guild.Id,
+                                Name = charName,
+                                UserId = guildMember.UserId,
+                                WowFaction = Guild.WowFaction.Value,
+                                WowServerId = Guild.WowServerId.Value,
+                                WowClassId = wowClasses.First(x => x.Name == charClass).Id,
+                            });
+                        }
+                    }
+                }
+                catch(Exception)
+                {
+                    ResponseString = "Failed to read export file. Ensure that the header and both Name and Class are included.";
+                    return;
+                }
+
+                await m_dbContext.SaveChangesAsync();
+            }
+
+            async IAsyncEnumerable<string> ReadExportFile(string exportFileUrl)
+            {
+                using HttpClient test = new HttpClient();
+                using var response = await test.GetStreamAsync(exportFileUrl);
+                using TextReader reader = new StreamReader(response);
+
+                for (string line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync())
+                {
+                    yield return line;
                 }
             }
         }

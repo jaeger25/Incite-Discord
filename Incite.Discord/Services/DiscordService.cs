@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
 using Incite.Discord.Converters;
 using Incite.Discord.DiscordExtensions;
 using Incite.Models;
@@ -35,6 +36,10 @@ namespace Incite.Discord.Services
                 StringPrefixes = new[] { "!" },
                 EnableDms = false,
                 Services = serviceProvider,
+            });
+
+            m_discordClient.UseInteractivity(new InteractivityConfiguration()
+            {
             });
 
             commands.RegisterConverter(new EnumConverter<RoleKind>());

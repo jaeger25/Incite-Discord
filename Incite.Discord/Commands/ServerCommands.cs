@@ -26,8 +26,7 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("list")]
-        [Priority(100)]
+        [Command("list-guilds")]
         [Description("Lists the guild's which are currently using this bot")]
         public async Task List(CommandContext context)
         {
@@ -42,10 +41,10 @@ namespace Incite.Discord.Commands
             ResponseString = "";
         }
 
-        [Command("list")]
-        [Priority(90)]
+        [Command("list-professions")]
+        [Aliases("list-prof", "list-profs")]
         [Description("Lists the users which are the specified profession")]
-        public async Task List(CommandContext context,
+        public Task List(CommandContext context,
             [Description(Descriptions.WowProfession)] WowProfession profession)
         {
             var characters = Guild.WowServer.WowCharacters
@@ -59,12 +58,12 @@ namespace Incite.Discord.Commands
             }
 
             ResponseString = message.ToString();
+            return Task.CompletedTask;
         }
 
-        [Command("list")]
-        [Priority(80)]
+        [Command("list-recipe")]
         [Description("Lists the users which know the specified recipe")]
-        public async Task List(CommandContext context,
+        public Task List(CommandContext context,
             [Description(Descriptions.WowItemRecipe)] [RemainingText] WowItemRecipe recipe)
         {
             var characters = Guild.WowServer.WowCharacters
@@ -79,6 +78,7 @@ namespace Incite.Discord.Commands
             }
 
             ResponseString = message.ToString();
+            return Task.CompletedTask;
         }
     }
 }
