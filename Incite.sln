@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29411.138
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Incite.Discord", "Incite.Discord\Incite.Discord.csproj", "{C2DA9D94-DADF-4196-977B-808331EDF0DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incite", "Incite\Incite.csproj", "{92097E0E-C75C-4C69-BAB4-A3CCFA298C94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Incite", "Incite\Incite.csproj", "{92097E0E-C75C-4C69-BAB4-A3CCFA298C94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incite.DbProviderMigrator", "Incite.DbProviderMigrator\Incite.DbProviderMigrator.csproj", "{1A0EA5A6-2B12-4DF6-820C-FF911E9E1ADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{92097E0E-C75C-4C69-BAB4-A3CCFA298C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92097E0E-C75C-4C69-BAB4-A3CCFA298C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92097E0E-C75C-4C69-BAB4-A3CCFA298C94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A0EA5A6-2B12-4DF6-820C-FF911E9E1ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A0EA5A6-2B12-4DF6-820C-FF911E9E1ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A0EA5A6-2B12-4DF6-820C-FF911E9E1ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A0EA5A6-2B12-4DF6-820C-FF911E9E1ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
