@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    [Migration("20191123222138_WowServer_Nullable")]
-    partial class WowServer_Nullable
+    [Migration("20191206023922_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0-preview3.19554.8")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,9 +32,6 @@ namespace Incite.Migrations
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<int>("GuildId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Kind")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -83,6 +80,9 @@ namespace Incite.Migrations
                     b.Property<decimal>("DiscordId")
                         .HasColumnType("decimal(20,0)");
 
+                    b.Property<int?>("WowFaction")
+                        .HasColumnType("int");
+
                     b.Property<int?>("WowServerId")
                         .HasColumnType("int");
 
@@ -105,8 +105,8 @@ namespace Incite.Migrations
                     b.Property<int>("GuildId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PrimaryCharacterName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PrimaryWowCharacterId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -115,31 +115,11 @@ namespace Incite.Migrations
 
                     b.HasIndex("GuildId");
 
+                    b.HasIndex("PrimaryWowCharacterId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Members");
-                });
-
-            modelBuilder.Entity("Incite.Models.MemberRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("MemberId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MemberId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("MemberRoles");
                 });
 
             modelBuilder.Entity("Incite.Models.Message", b =>
@@ -200,6 +180,66 @@ namespace Incite.Migrations
                     b.HasAlternateKey("DiscordId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Incite.Models.WowCharacter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowFaction")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowServerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WowClassId");
+
+                    b.HasIndex("WowServerId");
+
+                    b.ToTable("WowCharacters");
+                });
+
+            modelBuilder.Entity("Incite.Models.WowCharacterProfession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("WowCharacterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowProfessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WowCharacterId");
+
+                    b.HasIndex("WowProfessionId");
+
+                    b.ToTable("WowCharacterProfessions");
                 });
 
             modelBuilder.Entity("Incite.Models.WowClass", b =>
@@ -264,6 +304,81 @@ namespace Incite.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Incite.Models.WowItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ItemQuality")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WowHeadIcon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WowId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowItemClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowItemSubclassId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WowItemClassId");
+
+                    b.HasIndex("WowItemSubclassId");
+
+                    b.ToTable("WowItems");
+                });
+
+            modelBuilder.Entity("Incite.Models.WowItemClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WowItemClasses");
+                });
+
+            modelBuilder.Entity("Incite.Models.WowItemSubclass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WowId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WowItemClassId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WowItemClassId");
+
+                    b.ToTable("WowItemSubclasses");
+                });
+
             modelBuilder.Entity("Incite.Models.WowProfession", b =>
                 {
                     b.Property<int>("Id")
@@ -282,7 +397,7 @@ namespace Incite.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "First Aid"
+                            Name = "FirstAid"
                         },
                         new
                         {
@@ -366,6 +481,29 @@ namespace Incite.Migrations
                             Id = 1,
                             Name = "Kirtonos"
                         });
+                });
+
+            modelBuilder.Entity("Incite.Models.WowSpell", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CreatedItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedItemId");
+
+                    b.ToTable("WowSpells");
                 });
 
             modelBuilder.Entity("Incite.Models.Channel", b =>
@@ -467,8 +605,12 @@ namespace Incite.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Incite.Models.User", "User")
+                    b.HasOne("Incite.Models.WowCharacter", "PrimaryWowCharacter")
                         .WithMany()
+                        .HasForeignKey("PrimaryWowCharacterId");
+
+                    b.HasOne("Incite.Models.User", "User")
+                        .WithMany("Memberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -505,21 +647,6 @@ namespace Incite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Incite.Models.MemberRole", b =>
-                {
-                    b.HasOne("Incite.Models.Member", "Member")
-                        .WithMany("MemberRoles")
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Incite.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Incite.Models.Message", b =>
                 {
                     b.HasOne("Incite.Models.Channel", "Channel")
@@ -536,6 +663,144 @@ namespace Incite.Migrations
                         .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.WowCharacter", b =>
+                {
+                    b.HasOne("Incite.Models.Guild", "Guild")
+                        .WithMany("WowCharacters")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Incite.Models.User", "User")
+                        .WithMany("WowCharacters")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Incite.Models.WowClass", "WowClass")
+                        .WithMany("WowCharacters")
+                        .HasForeignKey("WowClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Incite.Models.WowServer", "WowServer")
+                        .WithMany("WowCharacters")
+                        .HasForeignKey("WowServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.WowCharacterProfession", b =>
+                {
+                    b.HasOne("Incite.Models.WowCharacter", "WowCharacter")
+                        .WithMany("WowCharacterProfessions")
+                        .HasForeignKey("WowCharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Incite.Models.WowProfession", "WowProfession")
+                        .WithMany()
+                        .HasForeignKey("WowProfessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsMany("Incite.Models.WowCharacterRecipe", "WowCharacterRecipes", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("RecipeId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("WowCharacterProfessionId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("RecipeId");
+
+                            b1.HasIndex("WowCharacterProfessionId");
+
+                            b1.ToTable("WowCharacterRecipes");
+
+                            b1.HasOne("Incite.Models.WowItem", "Recipe")
+                                .WithMany()
+                                .HasForeignKey("RecipeId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b1.WithOwner("WowCharacterProfession")
+                                .HasForeignKey("WowCharacterProfessionId");
+                        });
+                });
+
+            modelBuilder.Entity("Incite.Models.WowItem", b =>
+                {
+                    b.HasOne("Incite.Models.WowItemClass", "WowItemClass")
+                        .WithMany("WowItems")
+                        .HasForeignKey("WowItemClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Incite.Models.WowItemSubclass", "WowItemSubclass")
+                        .WithMany("WowItems")
+                        .HasForeignKey("WowItemSubclassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.WowItemSubclass", b =>
+                {
+                    b.HasOne("Incite.Models.WowItemClass", "WowItemClass")
+                        .WithMany("WowItemSubclasses")
+                        .HasForeignKey("WowItemClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.WowSpell", b =>
+                {
+                    b.HasOne("Incite.Models.WowItem", "CreatedItem")
+                        .WithMany("CreatedBy")
+                        .HasForeignKey("CreatedItemId");
+
+                    b.OwnsMany("Incite.Models.WowReagent", "WowReagents", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("Count")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("WowItemId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("WowSpellId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("WowItemId");
+
+                            b1.HasIndex("WowSpellId");
+
+                            b1.ToTable("WowReagents");
+
+                            b1.HasOne("Incite.Models.WowItem", "WowItem")
+                                .WithMany()
+                                .HasForeignKey("WowItemId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b1.WithOwner("WowSpell")
+                                .HasForeignKey("WowSpellId");
+                        });
                 });
 #pragma warning restore 612, 618
         }

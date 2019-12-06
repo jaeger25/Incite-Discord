@@ -5,35 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20191123213141_WowServer.cs" />
-    <Compile Remove="Migrations\20191123213141_WowServer.Designer.cs" />
-    <Compile Remove="Migrations\20191123220855_WowServer_Nullable.cs" />
-    <Compile Remove="Migrations\20191123220855_WowServer_Nullable.Designer.cs" />
-    <Compile Remove="Migrations\20191123221230_WowServer.cs" />
-    <Compile Remove="Migrations\20191123221230_WowServer.Designer.cs" />
-    <Compile Remove="Migrations\20191123222416_WowServer_NonNullable.cs" />
-    <Compile Remove="Migrations\20191123222416_WowServer_NonNullable.Designer.cs" />
-    <Compile Remove="Migrations\20191128032235_WowItem3.cs" />
-    <Compile Remove="Migrations\20191128032235_WowItem3.Designer.cs" />
-    <Compile Remove="Migrations\20191128070139_WowItem4.cs" />
-    <Compile Remove="Migrations\20191128070139_WowItem4.Designer.cs" />
-    <Compile Remove="Migrations\20191128080556_WowItem5.cs" />
-    <Compile Remove="Migrations\20191128080556_WowItem5.Designer.cs" />
-    <Compile Remove="Migrations\20191128080629_WowItem5.cs" />
-    <Compile Remove="Migrations\20191128080629_WowItem5.Designer.cs" />
-    <Compile Remove="Migrations\20191128081228_WowItem6.cs" />
-    <Compile Remove="Migrations\20191128081228_WowItem6.Designer.cs" />
-    <Compile Remove="Migrations\20191128081739_WowItem6.cs" />
-    <Compile Remove="Migrations\20191128081739_WowItem6.Designer.cs" />
-    <Compile Remove="Migrations\20191204201444_Memberships.cs" />
-    <Compile Remove="Migrations\20191204201444_Memberships.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0-preview3.19554.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0-preview3.19554.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0-preview3.19554.8" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0-preview3.19551.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

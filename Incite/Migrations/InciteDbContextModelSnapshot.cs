@@ -608,7 +608,7 @@ namespace Incite.Migrations
                         .HasForeignKey("PrimaryWowCharacterId");
 
                     b.HasOne("Incite.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Memberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

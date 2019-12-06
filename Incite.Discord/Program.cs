@@ -54,7 +54,7 @@ namespace Incite.Discord
                         LogLevel = isProduction ?
                             DSharpPlus.LogLevel.Warning : DSharpPlus.LogLevel.Info,
                     });
-
+                    
                     services.AddEntityFrameworkSqlServer()
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
@@ -63,7 +63,7 @@ namespace Incite.Discord
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
-                                .UseSqlServer(config["ConnectionStrings:Default"], sqlOptions =>
+                                .UseSqlServer(config["ConnectionStrings:Postgres"], sqlOptions =>
                                 {
                                     sqlOptions.EnableRetryOnFailure();
                                 });
