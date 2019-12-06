@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Incite.Migrations
 {
@@ -12,7 +13,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DiscordId = table.Column<decimal>(nullable: false)
                 },
                 constraints: table =>
@@ -26,7 +27,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -39,7 +40,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     WowId = table.Column<int>(nullable: false)
                 },
@@ -53,7 +54,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -66,7 +67,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -79,7 +80,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     WowId = table.Column<int>(nullable: false),
                     WowItemClassId = table.Column<int>(nullable: false)
@@ -100,7 +101,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DiscordId = table.Column<decimal>(nullable: false),
                     WowServerId = table.Column<int>(nullable: true),
                     WowFaction = table.Column<int>(nullable: true)
@@ -122,7 +123,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     WowId = table.Column<int>(nullable: false),
                     ItemQuality = table.Column<int>(nullable: false),
@@ -152,7 +153,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DiscordId = table.Column<decimal>(nullable: false),
                     GuildId = table.Column<int>(nullable: false)
                 },
@@ -172,7 +173,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     DateTime = table.Column<DateTimeOffset>(nullable: false),
@@ -195,7 +196,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DiscordId = table.Column<decimal>(nullable: false),
                     GuildId = table.Column<int>(nullable: false),
                     Kind = table.Column<int>(nullable: false)
@@ -216,7 +217,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     WowFaction = table.Column<int>(nullable: false),
                     GuildId = table.Column<int>(nullable: false),
@@ -258,7 +259,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true),
                     WowId = table.Column<int>(nullable: false),
                     CreatedItemId = table.Column<int>(nullable: true)
@@ -279,7 +280,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DiscordId = table.Column<decimal>(nullable: false),
                     ChannelId = table.Column<int>(nullable: false)
                 },
@@ -299,7 +300,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PrimaryWowCharacterId = table.Column<int>(nullable: true),
                     GuildId = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
@@ -332,7 +333,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     WowCharacterId = table.Column<int>(nullable: false),
                     WowProfessionId = table.Column<int>(nullable: false)
                 },
@@ -358,7 +359,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Count = table.Column<int>(nullable: false),
                     WowItemId = table.Column<int>(nullable: false),
                     WowSpellId = table.Column<int>(nullable: false)
@@ -385,7 +386,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventId = table.Column<int>(nullable: false),
                     MessageId = table.Column<int>(nullable: false)
                 },
@@ -411,7 +412,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EmojiDiscordName = table.Column<string>(nullable: true),
                     EventId = table.Column<int>(nullable: false),
                     MemberId = table.Column<int>(nullable: false)
@@ -438,7 +439,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     MemberId = table.Column<int>(nullable: false),
                     EventId = table.Column<int>(nullable: false)
                 },
@@ -464,7 +465,7 @@ namespace Incite.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     WowCharacterProfessionId = table.Column<int>(nullable: false),
                     RecipeId = table.Column<int>(nullable: false)
                 },
@@ -478,7 +479,7 @@ namespace Incite.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WowCharacterRecipes_WowCharacterProfessions_WowCharacterProfessionId",
+                        name: "FK_WowCharacterRecipes_WowCharacterProfessions_WowCharacterPro~",
                         column: x => x.WowCharacterProfessionId,
                         principalTable: "WowCharacterProfessions",
                         principalColumn: "Id",

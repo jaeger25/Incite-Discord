@@ -63,7 +63,7 @@ namespace Incite.Discord
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
-                                .UseSqlServer(config["ConnectionStrings:Postgres"], sqlOptions =>
+                                .UseNpgsql(config["ConnectionStrings:Postgres"], sqlOptions =>
                                 {
                                     sqlOptions.EnableRetryOnFailure();
                                 });

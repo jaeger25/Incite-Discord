@@ -35,6 +35,8 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasSequence("Id")
+
             modelBuilder.Entity<Channel>()
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Channels)

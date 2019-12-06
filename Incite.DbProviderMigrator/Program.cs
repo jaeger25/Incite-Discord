@@ -28,16 +28,23 @@ namespace Incite.DbProviderMigrator
 
             postgresDbContext.Database.MigrateAsync().Wait();
 
+            postgresDbContext.WowItemClasses.AddRange(sqlServerDbContext.WowItemClasses);
+            postgresDbContext.WowItemSubclasses.AddRange(sqlServerDbContext.WowItemSubclasses);
+            postgresDbContext.WowItems.AddRange(sqlServerDbContext.WowItems);
+            postgresDbContext.WowSpells.AddRange(sqlServerDbContext.WowSpells);
+
             postgresDbContext.Users.AddRange(sqlServerDbContext.Users);
             postgresDbContext.Guilds.AddRange(sqlServerDbContext.Guilds);
             postgresDbContext.Roles.AddRange(sqlServerDbContext.Roles);
-            postgresDbContext.Channels.AddRange(sqlServerDbContext.Channels);
-            postgresDbContext.Messages.AddRange(sqlServerDbContext.Messages);
-            postgresDbContext.Members.AddRange(sqlServerDbContext.Members);
-            postgresDbContext.Events.AddRange(sqlServerDbContext.Events);
 
             postgresDbContext.WowCharacters.AddRange(sqlServerDbContext.WowCharacters);
             postgresDbContext.WowCharacterProfessions.AddRange(sqlServerDbContext.WowCharacterProfessions);
+
+            postgresDbContext.Channels.AddRange(sqlServerDbContext.Channels);
+            postgresDbContext.Messages.AddRange(sqlServerDbContext.Messages);
+
+            postgresDbContext.Members.AddRange(sqlServerDbContext.Members);
+            postgresDbContext.Events.AddRange(sqlServerDbContext.Events);
 
             postgresDbContext.SaveChanges();
         }
