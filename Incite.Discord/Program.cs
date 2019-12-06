@@ -63,6 +63,7 @@ namespace Incite.Discord
                         .AddDbContextPool<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
+                                .EnableSensitiveDataLogging()
                                 .UseNpgsql(config["ConnectionStrings:Postgres"], sqlOptions =>
                                 {
                                     sqlOptions.EnableRetryOnFailure();
@@ -72,6 +73,7 @@ namespace Incite.Discord
                         {
                             builder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
                                 .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
+                                .AddFilter("REST", Microsoft.Extensions.Logging.LogLevel.Error)
                                 .SetMinimumLevel(isProduction ? Microsoft.Extensions.Logging.LogLevel.Warning : Microsoft.Extensions.Logging.LogLevel.Information)
                                 .AddConsole();
                         });

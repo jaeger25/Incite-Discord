@@ -33,7 +33,7 @@ namespace Incite.Discord.Services
 
             var commands = m_discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefixes = new[] { "!" },
+                StringPrefixes = new[] { "!", "$" },
                 EnableDms = false,
                 Services = serviceProvider,
             });
