@@ -104,7 +104,7 @@ namespace Incite.Discord.Messages
             // Player count and date
             AddEventField(embed, $"{m_emojis.Events.Icon_Count}", $"{guildEvent.EventMembers.Count(x => x.EmojiDiscordName != m_emojis.Events.Icon_Late.Name && x.EmojiDiscordName != m_emojis.Events.Icon_Maybe.Name && x.EmojiDiscordName != m_emojis.Events.Icon_Absent.Name )}");
             AddEventField(embed, $"{m_emojis.Events.Icon_Date}", $"{guildEvent.DateTime.ToString("MM-dd")}");
-            AddEventField(embed, $"{m_emojis.Events.Icon_Time}", $"{guildEvent.DateTime.ToString("h:mm tt zzz")}");
+            AddEventField(embed, $"{m_emojis.Events.Icon_Time}", $"{guildEvent.DateTime.ToOffset(new TimeSpan(-5, 0, 0)).ToString("h:mm tt zzz")}");
 
             // Melee, Ranged, Healer counts
             AddEventField(embed, $"{m_emojis.Events.Role_Tank}", $"{guildEvent.EventMembers.Count(x => m_emojis.TankEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
