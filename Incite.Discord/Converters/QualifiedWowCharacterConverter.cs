@@ -29,7 +29,7 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var server = await dbContext.WowServers
-                .FirstOrDefaultAsync(x => x.Name == nameServerPair[1]);
+                .FirstOrDefaultAsync(x => x.Name.ToLower() == nameServerPair[1].ToLower());
 
             if (server == null)
             {

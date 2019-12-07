@@ -24,7 +24,7 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var profession = await dbContext.WowProfessions
-                .FirstOrDefaultAsync(x => x.Name == value);
+                .FirstOrDefaultAsync(x => x.Name.ToLower() == value.ToLower());
 
             if (profession == null)
             {

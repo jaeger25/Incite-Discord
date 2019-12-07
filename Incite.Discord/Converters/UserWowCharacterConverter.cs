@@ -28,13 +28,13 @@ namespace Incite.Discord.Converters
 
             var nameServerPair = value.Split('-');
             var characters = command.User.WowCharacters
-                .Where(x => x.Name.Equals(nameServerPair[0], StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Name.ToLower() == nameServerPair[0].ToLower())
                 .ToArray();
 
             if (characters.Length != 1 && nameServerPair.Length == 2)
             {
                 characters = characters
-                    .Where(x => x.WowServer.Name.Equals(nameServerPair[1], StringComparison.OrdinalIgnoreCase))
+                    .Where(x => x.WowServer.Name.ToLower() == nameServerPair[1].ToLower())
                     .ToArray();
             }
 

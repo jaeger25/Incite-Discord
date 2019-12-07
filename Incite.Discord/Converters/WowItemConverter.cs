@@ -39,7 +39,7 @@ namespace Incite.Discord.Converters
                 .Include(x => x.CreatedBy)
                     .ThenInclude(x => x.WowReagents)
                         .ThenInclude(x => x.WowItem)
-                .Where(x => EF.Functions.Like(x.Name, sqlLikeSearchValue))
+                .Where(x => EF.Functions.ILike(x.Name, sqlLikeSearchValue))
                 .ToArrayAsync();
 
             if (wowItems.Length == 0)
@@ -48,7 +48,7 @@ namespace Incite.Discord.Converters
             }
 
             return Optional.FromValue(wowItems
-                .OrderBy(x => CalculateDamerauLevenshteinDistance(sqlLikeSearchValue, x.Name))
+                .OrderBy(x => CalculateDamerauLevenshteinDistance(sqlLikeSearchValue.Replace("%", "").ToLowerInvariant(), x.Name.ToLowerInvariant()))
                 .AsEnumerable());
         }
 

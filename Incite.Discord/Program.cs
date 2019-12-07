@@ -48,7 +48,7 @@ namespace Incite.Discord
                     var discordClient = new DiscordClient(new DiscordConfiguration
                     {
                         AutoReconnect = true,
-                        Token = config["Discord:BotToken"],
+                        Token = "NjM3MDc3MDY2MDgwMTkwNDk4.XessbQ.7lIBZsBwVF5Gj9bjE2eM3aG_v38",//config["Discord:BotToken"],
                         TokenType = TokenType.Bot,
                         UseInternalLogHandler = true,
                         LogLevel = isProduction ?
@@ -85,7 +85,7 @@ namespace Incite.Discord
         {
             var host = CreateHostBuilder(args).Build();
 
-            host.Services.GetService<InciteDbContext>().Database.Migrate();
+            host.Services.GetService<InciteDbContext>().Database.MigrateAsync().Wait();
             host.Run();
         }
     }

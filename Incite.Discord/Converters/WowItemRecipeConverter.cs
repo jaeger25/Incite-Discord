@@ -25,7 +25,7 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var recipes = await dbContext.WowItems
-                .Where(x => x.WowItemClass.Name == "Recipes" && EF.Functions.Like(x.Name, $"%{value}%"))
+                .Where(x => x.WowItemClass.Name == "Recipes" && EF.Functions.ILike(x.Name, $"%{value}%"))
                 .ToArrayAsync();
 
             if (recipes.Length != 1)
