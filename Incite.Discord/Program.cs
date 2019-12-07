@@ -48,7 +48,7 @@ namespace Incite.Discord
                     var discordClient = new DiscordClient(new DiscordConfiguration
                     {
                         AutoReconnect = true,
-                        Token = "NjM3MDc3MDY2MDgwMTkwNDk4.XessbQ.7lIBZsBwVF5Gj9bjE2eM3aG_v38",//config["Discord:BotToken"],
+                        Token = config["Discord:BotToken"],
                         TokenType = TokenType.Bot,
                         UseInternalLogHandler = true,
                         LogLevel = isProduction ?

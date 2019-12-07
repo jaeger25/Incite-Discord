@@ -43,7 +43,7 @@ namespace Incite.Discord.Commands
 
         public override async Task AfterExecutionAsync(CommandContext ctx)
         {
-            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":+1"));
+            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":+1:"));
 
             if (!string.IsNullOrEmpty(ResponseString))
             {
