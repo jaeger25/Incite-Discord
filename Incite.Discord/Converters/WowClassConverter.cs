@@ -24,10 +24,11 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var wowClass = await dbContext.WowClasses
-                .FirstOrDefaultAsync(x => x.Name.ToLower() == value.ToLower());
+                .FirstOrDefaultAsync(x => EF.Functions.ILike(x.Name, value));
 
             if (wowClass == null)
             {
+                await ctx.Message.RespondAsync($"WowClass not found.");
                 return Optional.FromNoValue<WowClass>();
             }
 

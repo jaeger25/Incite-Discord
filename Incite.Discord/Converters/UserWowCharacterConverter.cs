@@ -45,6 +45,10 @@ namespace Incite.Discord.Converters
                     Character = characters[0]
                 });
             }
+            else
+            {
+                await ctx.Message.RespondAsync($"Character not found for {ctx.Member.DisplayName}. Must be in the form CharName-ServerName");
+            }
 
             return Optional.FromNoValue<UserWowCharacter>();
         }

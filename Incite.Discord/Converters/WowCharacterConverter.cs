@@ -26,7 +26,7 @@ namespace Incite.Discord.Converters
 
             var nameServer = value.Split('-');
             var characters = await dbContext.WowCharacters
-                .Where(x => x.Name.ToLower() == nameServer[0].ToLower())
+                .Where(x => EF.Functions.ILike(x.Name, nameServer[0]))
                 .ToArrayAsync();
 
             if (characters.Length != 1 && nameServer.Length == 2)
@@ -38,6 +38,7 @@ namespace Incite.Discord.Converters
 
             if (characters.Length != 1)
             {
+                await ctx.Message.RespondAsync($"No character named {value} found for {ctx.Member.DisplayName}. Must be in the form CharName-ServerName.");
                 return Optional.FromNoValue<WowCharacter>();
             }
 

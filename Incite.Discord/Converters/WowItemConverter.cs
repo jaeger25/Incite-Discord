@@ -40,7 +40,7 @@ namespace Incite.Discord.Converters
 
             if (wowItems.Length == 0)
             {
-                return Optional.FromNoValue<IEnumerable<WowItem>>();
+                await ctx.Message.RespondAsync($"No items found.");
             }
 
             return Optional.FromValue(wowItems
