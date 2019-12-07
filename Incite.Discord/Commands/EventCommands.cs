@@ -95,7 +95,6 @@ namespace Incite.Discord.Commands
             await eventMessage.UpdateAsync();
 
             await eventMessage.AddReactionsToEventMessageAsync();
-            ResponseString = "";
         }
 
         [Command("update")]
@@ -134,7 +133,6 @@ namespace Incite.Discord.Commands
 
             var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
-            ResponseString = "";
         }
     }
 }

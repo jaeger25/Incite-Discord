@@ -38,7 +38,6 @@ namespace Incite.Discord.Commands
 
             var dmChannel = await context.Member.CreateDmChannelAsync();
             await dmChannel.SendMessageAsync(message.ToString());
-            ResponseString = "";
         }
 
         [Command("list-professions")]

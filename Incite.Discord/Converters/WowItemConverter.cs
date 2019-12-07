@@ -25,11 +25,7 @@ namespace Incite.Discord.Converters
                 return Optional.FromNoValue<IEnumerable<WowItem>>();
             }
 
-            string sqlLikeSearchValue = value.Replace('*', '%');
-            if (!sqlLikeSearchValue.Contains("%"))
-            {
-                sqlLikeSearchValue = $"{sqlLikeSearchValue}%";
-            }
+            var sqlLikeSearchValue = $"%{value}%";
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
 
@@ -48,7 +44,7 @@ namespace Incite.Discord.Converters
             }
 
             return Optional.FromValue(wowItems
-                .OrderBy(x => CalculateDamerauLevenshteinDistance(sqlLikeSearchValue.Replace("%", "").ToLowerInvariant(), x.Name.ToLowerInvariant()))
+                .OrderBy(x => CalculateDamerauLevenshteinDistance(value.ToLower(), x.Name.ToLower()))
                 .AsEnumerable());
         }
 
