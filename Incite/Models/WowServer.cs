@@ -9,6 +9,8 @@ namespace Incite.Models
     {
         public string Name { get; set; }
 
+        public TimeSpan UtcOffset { get; set; }
+
         public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
 
         public override string ToString()
@@ -24,6 +26,7 @@ namespace Incite.Models
                     {
                         Id = 1,
                         Name = "Kirtonos",
+                        UtcOffset = TimeSpan.FromHours(-5)
                     });
         }
     }
