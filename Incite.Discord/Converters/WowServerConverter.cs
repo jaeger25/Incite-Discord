@@ -22,10 +22,11 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var server = await dbContext.WowServers
-                .FirstOrDefaultAsync(x => x.Name == value);
+                .FirstOrDefaultAsync(x => EF.Functions.ILike(x.Name, value));
 
             if (server == null)
             {
+                await ctx.Message.RespondAsync($"Server not found");
                 return Optional.FromNoValue<WowServer>();
             }
 

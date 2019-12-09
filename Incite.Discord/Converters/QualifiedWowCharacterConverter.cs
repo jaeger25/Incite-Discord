@@ -24,15 +24,17 @@ namespace Incite.Discord.Converters
             var nameServerPair = value.Split('-');
             if (nameServerPair.Length != 2)
             {
+                await ctx.Message.RespondAsync("QualifiedWowCharacter must be in the form CharName-ServerName");
                 return Optional.FromNoValue<QualifiedWowCharacter>();
             }
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var server = await dbContext.WowServers
-                .FirstOrDefaultAsync(x => x.Name == nameServerPair[1]);
+                .FirstOrDefaultAsync(x => EF.Functions.ILike(x.Name, nameServerPair[1]));
 
             if (server == null)
             {
+                await ctx.Message.RespondAsync("Server not found");
                 return Optional.FromNoValue<QualifiedWowCharacter>();
             }
 

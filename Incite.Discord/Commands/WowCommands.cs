@@ -50,8 +50,6 @@ namespace Incite.Discord.Commands
 
                 var dmChannel = await context.Member.CreateDmChannelAsync();
                 await dmChannel.SendMessageAsync(characterList.ToString());
-
-                ResponseString = "Command executed. Check your DMs.";
             }
 
             [Command("add-character")]
@@ -64,7 +62,6 @@ namespace Incite.Discord.Commands
             {
                 if (User.WowCharacters.Any(x => x.WowServerId == character.Server.Id && x.Name.Equals(character.Name, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    ResponseString = "You have already registered this character";
                     return;
                 }
 
@@ -164,8 +161,6 @@ namespace Incite.Discord.Commands
 
                 var dmChannel = await context.Member.CreateDmChannelAsync();
                 await dmChannel.SendMessageAsync(message.ToString());
-
-                ResponseString = "Command executed. Check your DMs.";
             }
 
             [Command("list-recipes")]
@@ -187,8 +182,6 @@ namespace Incite.Discord.Commands
 
                 var dmChannel = await context.Member.CreateDmChannelAsync();
                 await dmChannel.SendMessageAsync(message.ToString());
-
-                ResponseString = "Command executed. Check your DMs.";
             }
 
             [Command("add-profession")]
@@ -200,7 +193,6 @@ namespace Incite.Discord.Commands
             {
                 if (character.Character.WowCharacterProfessions.Any(x => x.WowProfessionId == profession.Id))
                 {
-                    ResponseString = $"{character.Character} already has this profession added.";
                     return;
                 }
 
@@ -236,7 +228,6 @@ namespace Incite.Discord.Commands
 
                 if (charRecipe != null)
                 {
-                    ResponseString = $"{character.Character} already knows {recipe.Recipe}";
                     return;
                 }
 
@@ -327,8 +318,6 @@ namespace Incite.Discord.Commands
                     {
                         await context.Message.RespondAsync(embed: CreateEmbedForWowItem(item));
                     }
-
-                    ResponseString = "";
                 }
                 else
                 {
@@ -347,7 +336,6 @@ namespace Incite.Discord.Commands
                     }
 
                     await channel.SendMessageAsync(results.ToString());
-                    ResponseString = "";
                 }
             }
 

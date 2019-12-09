@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using DSharpPlus.Entities;
 
 namespace Incite.Discord.Commands
 {
@@ -20,7 +21,7 @@ namespace Incite.Discord.Commands
         public Member Member { get; private set; }
         public User User { get; private set; }
 
-        protected string ResponseString = "Command executed";
+        protected string ResponseString = "";
 
         public override async Task BeforeExecutionAsync(CommandContext ctx)
         {
@@ -42,6 +43,8 @@ namespace Incite.Discord.Commands
 
         public override async Task AfterExecutionAsync(CommandContext ctx)
         {
+            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":+1:"));
+
             if (!string.IsNullOrEmpty(ResponseString))
             {
                 await ctx.Message.RespondAsync(ResponseString);

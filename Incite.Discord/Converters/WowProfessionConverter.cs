@@ -24,10 +24,11 @@ namespace Incite.Discord.Converters
 
             var dbContext = ctx.Services.GetService<InciteDbContext>();
             var profession = await dbContext.WowProfessions
-                .FirstOrDefaultAsync(x => x.Name == value);
+                .FirstOrDefaultAsync(x => EF.Functions.ILike(x.Name, value));
 
             if (profession == null)
             {
+                await ctx.Message.RespondAsync($"Profession not found");
                 return Optional.FromNoValue<WowProfession>();
             }
 

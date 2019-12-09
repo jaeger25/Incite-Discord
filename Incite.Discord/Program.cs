@@ -85,7 +85,7 @@ namespace Incite.Discord
         {
             var host = CreateHostBuilder(args).Build();
 
-            host.Services.GetService<InciteDbContext>().Database.Migrate();
+            host.Services.GetService<InciteDbContext>().Database.MigrateAsync().Wait();
             host.Run();
         }
     }
