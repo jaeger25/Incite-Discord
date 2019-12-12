@@ -340,6 +340,7 @@ namespace Incite.Discord.Commands
             }
 
             [Command("seed")]
+            [Hidden]
             [RequireOwner]
             public async Task Seed(CommandContext context)
             {

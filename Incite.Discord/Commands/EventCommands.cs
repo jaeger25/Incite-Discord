@@ -112,8 +112,6 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            await context.Message.DeleteAsync();
-
             var memberEvent = Guild.Events
                 .FirstOrDefault(x => x.Id == eventId);
 
