@@ -18,6 +18,9 @@ namespace Incite.Models
         public int GuildId { get; set; }
         public virtual Guild Guild { get; set; }
 
+        public int OwnerId { get; set; }
+        public virtual Member Owner { get; set; }
+
         public virtual ICollection<EventMember> EventMembers { get; set; } = new List<EventMember>();
     }
 }

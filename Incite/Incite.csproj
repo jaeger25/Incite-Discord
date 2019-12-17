@@ -5,6 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20191216034537_Events_SetOwnerId.cs" />
+    <Compile Remove="Migrations\20191216034537_Events_SetOwnerId.Designer.cs" />
+    <Compile Remove="Migrations\20191216035612_OwnerId_NonNullable.cs" />
+    <Compile Remove="Migrations\20191216035612_OwnerId_NonNullable.Designer.cs" />
+    <Compile Remove="Migrations\20191216043225_OwnerId_NonNullable.cs" />
+    <Compile Remove="Migrations\20191216043225_OwnerId_NonNullable.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />

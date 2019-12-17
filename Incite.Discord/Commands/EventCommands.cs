@@ -70,28 +70,19 @@ namespace Incite.Discord.Commands
                 message.ChannelId = channel.Id;
             }
 
-            var memberEvent = new MemberEvent()
+            var memberEvent = new Models.Event()
             {
-                MemberId = Member.Id,
-                Event = new Models.Event()
-                {
-                    Name = name,
-                    Description = description,
-                    DateTime = dateTime,
-                    GuildId = Guild.Id
-                }
+                Name = name,
+                Description = description,
+                DateTime = dateTime,
+                GuildId = Guild.Id,
+                OwnerId = Member.Id,
             };
 
-            memberEvent.Event.EventMessage = new Models.EventMessage()
-            {
-                Event = memberEvent.Event,
-                Message = message
-            };
-
-            Member.MemberEvents.Add(memberEvent);
+            Member.OwnedEvents.Add(memberEvent);
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent.Event);
+            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
 
             await eventMessage.AddReactionsToEventMessageAsync();
@@ -112,7 +103,7 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            var memberEvent = Guild.Events
+            var memberEvent = Member.OwnedEvents
                 .FirstOrDefault(x => x.Id == eventId);
 
             if (memberEvent == null)

@@ -17,7 +17,6 @@ namespace Incite.Models
         public DbSet<EventMember> EventMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
-        public DbSet<MemberEvent> MemberEvents { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
@@ -55,6 +54,10 @@ namespace Incite.Models
                 .OwnsMany(x => x.EventMembers)
                     .WithOwner(x => x.Event);
 
+            modelBuilder.Entity<Event>()
+                .HasOne(x => x.Owner)
+                    .WithMany(x => x.OwnedEvents);
+
             modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
 
@@ -63,10 +66,6 @@ namespace Incite.Models
                     .WithMany(x => x.Members)
                 .HasForeignKey(x => x.GuildId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Member>()
-                .OwnsMany(x => x.MemberEvents)
-                    .WithOwner(x => x.Member);
 
             modelBuilder.Entity<Message>()
                 .HasOne(x => x.Channel)
