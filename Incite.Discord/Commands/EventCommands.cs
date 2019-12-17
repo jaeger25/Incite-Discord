@@ -47,28 +47,10 @@ namespace Incite.Discord.Commands
 
             var discordMessage = await context.Message.RespondAsync("\u200b");
 
-            var channel = await m_dbContext.Channels
-                .FirstOrDefaultAsync(x => x.DiscordId == context.Channel.Id);
-
             var message = new Message()
             {
                 DiscordId = discordMessage.Id,
             };
-
-            if (channel == null)
-            {
-                message.Channel = new Channel()
-                {
-                    DiscordId = context.Channel.Id,
-                    GuildId = Guild.Id
-                };
-
-                m_dbContext.Channels.Add(message.Channel);
-            }
-            else
-            {
-                message.ChannelId = channel.Id;
-            }
 
             var memberEvent = new Models.Event()
             {
@@ -77,15 +59,16 @@ namespace Incite.Discord.Commands
                 DateTime = dateTime,
                 GuildId = Guild.Id,
                 OwnerId = Member.Id,
+                EventMessage = message
             };
 
             Member.OwnedEvents.Add(memberEvent);
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
-            await eventMessage.UpdateAsync();
+            var discordEventMessage = new Messages.DiscordEventMessage(context.Client, discordMessage, memberEvent);
+            await discordEventMessage.UpdateAsync();
 
-            await eventMessage.AddReactionsToEventMessageAsync();
+            await discordEventMessage.AddReactionsToEventMessageAsync();
         }
 
         [Command("update")]
@@ -112,7 +95,7 @@ namespace Incite.Discord.Commands
                 return;
             }
 
-            var discordMessage = await context.Channel.GetMessageAsync(memberEvent.EventMessage.Message.DiscordId);
+            var discordMessage = await context.Channel.GetMessageAsync(memberEvent.EventMessage.DiscordId);
 
             memberEvent.Name = name;
             memberEvent.Description = description;
@@ -120,7 +103,7 @@ namespace Incite.Discord.Commands
 
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new Messages.EventMessage(context.Client, discordMessage, memberEvent);
+            var eventMessage = new Messages.DiscordEventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
         }
     }

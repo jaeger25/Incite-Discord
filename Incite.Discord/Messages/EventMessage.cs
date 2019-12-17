@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace Incite.Discord.Messages
 {
-    public class EventMessage
+    public class DiscordEventMessage
     {
         readonly EmojiService m_emojis;
         readonly Models.Event m_guildEvent;
 
         DiscordMessage m_message;
 
-        public EventMessage(DiscordClient client, DiscordMessage message, Models.Event guildEvent)
+        public DiscordEventMessage(DiscordClient client, DiscordMessage message, Models.Event guildEvent)
         {
             m_message = message;
             m_guildEvent = guildEvent;

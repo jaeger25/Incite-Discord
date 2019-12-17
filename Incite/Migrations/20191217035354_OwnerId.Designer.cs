@@ -3,21 +3,43 @@ using System;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Incite.Migrations
 {
     [DbContext(typeof(InciteDbContext))]
-    partial class InciteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191217035354_OwnerId")]
+    partial class OwnerId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("Incite.Models.Channel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<decimal>("DiscordId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("Channels");
+                });
 
             modelBuilder.Entity("Incite.Models.Event", b =>
                 {
@@ -103,6 +125,26 @@ namespace Incite.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("Incite.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("DiscordId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Incite.Models.Role", b =>
@@ -473,6 +515,15 @@ namespace Incite.Migrations
                     b.ToTable("WowSpells");
                 });
 
+            modelBuilder.Entity("Incite.Models.Channel", b =>
+                {
+                    b.HasOne("Incite.Models.Guild", "Guild")
+                        .WithMany("Channels")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Incite.Models.Event", b =>
                 {
                     b.HasOne("Incite.Models.Guild", "Guild")
@@ -521,17 +572,17 @@ namespace Incite.Migrations
                                 .IsRequired();
                         });
 
-                    b.OwnsOne("Incite.Models.Message", "EventMessage", b1 =>
+                    b.OwnsOne("Incite.Models.EventMessage", "EventMessage", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                            b1.Property<decimal>("DiscordId")
-                                .HasColumnType("numeric(20,0)");
-
                             b1.Property<int>("EventId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("MessageId")
                                 .HasColumnType("integer");
 
                             b1.HasKey("Id");
@@ -539,10 +590,18 @@ namespace Incite.Migrations
                             b1.HasIndex("EventId")
                                 .IsUnique();
 
+                            b1.HasIndex("MessageId");
+
                             b1.ToTable("Events1");
 
-                            b1.WithOwner()
+                            b1.WithOwner("Event")
                                 .HasForeignKey("EventId");
+
+                            b1.HasOne("Incite.Models.Message", "Message")
+                                .WithMany()
+                                .HasForeignKey("MessageId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
                         });
                 });
 
@@ -569,6 +628,15 @@ namespace Incite.Migrations
                         .WithMany("Memberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Incite.Models.Message", b =>
+                {
+                    b.HasOne("Incite.Models.Channel", "Channel")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

@@ -40,9 +40,6 @@ namespace Incite.DbProviderMigrator
             postgresDbContext.WowCharacters.AddRange(sqlServerDbContext.WowCharacters);
             postgresDbContext.WowCharacterProfessions.AddRange(sqlServerDbContext.WowCharacterProfessions);
 
-            postgresDbContext.Channels.AddRange(sqlServerDbContext.Channels);
-            postgresDbContext.Messages.AddRange(sqlServerDbContext.Messages);
-
             postgresDbContext.Members.AddRange(sqlServerDbContext.Members);
             postgresDbContext.Events.AddRange(sqlServerDbContext.Events);
 

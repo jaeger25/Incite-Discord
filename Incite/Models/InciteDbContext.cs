@@ -12,12 +12,10 @@ namespace Incite.Models
         {
         }
 
-        public DbSet<Channel> Channels { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventMember> EventMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
         public DbSet<Member> Members { get; set; }
-        public DbSet<Message> Messages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WowCharacter> WowCharacters { get; set; }
@@ -34,12 +32,6 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Channel>()
-                .HasOne(x => x.Guild)
-                    .WithMany(x => x.Channels)
-                .HasForeignKey(x => x.GuildId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Event>()
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Events)
@@ -48,7 +40,7 @@ namespace Incite.Models
 
             modelBuilder.Entity<Event>()
                 .OwnsOne(x => x.EventMessage)
-                    .WithOwner(x => x.Event);
+                    .WithOwner();
 
             modelBuilder.Entity<Event>()
                 .OwnsMany(x => x.EventMembers)
@@ -65,12 +57,6 @@ namespace Incite.Models
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Members)
                 .HasForeignKey(x => x.GuildId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(x => x.Channel)
-                    .WithMany(x => x.Messages)
-                .HasForeignKey(x => x.ChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Role>()

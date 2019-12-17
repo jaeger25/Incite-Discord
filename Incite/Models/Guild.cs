@@ -18,8 +18,6 @@ namespace Incite.Models
 
         public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 
-        public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();
-
         public virtual ICollection<Member> Members { get; set; } = new List<Member>();
 
         public virtual ICollection<Event> Events { get; set; } = new List<Event>();
