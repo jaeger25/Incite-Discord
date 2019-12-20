@@ -7,6 +7,7 @@ using DSharpPlus.Interactivity;
 using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.Extensions;
+using Incite.Discord.Helpers;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -186,7 +187,7 @@ namespace Incite.Discord.Commands
             {
                 var interactivity = context.Client.GetInteractivity();
 
-                await context.Message.RespondAsync("Please export your guild roster from the 'Guild Roster Manager' addon. Copy the export text into a file, and response to this message with the file.");
+                await context.Message.RespondAsync("Please export your guild roster from the 'Guild Roster Manager' addon. Copy the export text into a file, and respond to this message with the file.");
                 var exportFileMessage = await interactivity.WaitForMessageAsync(x => x.Author.Id == context.User.Id && x.Attachments.Count == 1, TimeSpan.FromMinutes(3));
                 if (exportFileMessage.TimedOut)
                 {
@@ -216,7 +217,7 @@ namespace Incite.Discord.Commands
                 {
                     int iName = -1;
                     int iClass = -1;
-                    await foreach(var line in ReadExportFile(exportFileUrl))
+                    await foreach(var line in FileHelper.ReadExportFileAsync(exportFileUrl))
                     {
                         string[] parts = line.Split(delimeterCharacter);
                         if (iName == -1)
@@ -288,18 +289,6 @@ namespace Incite.Discord.Commands
                 await m_dbContext.SaveChangesAsync();
 
                 ResponseString = $"Imported: {importCount} characters\nSkipped existing: {existingCount} characters\nTo view your member list, use the '!guild list-characters' command.";
-            }
-
-            async IAsyncEnumerable<string> ReadExportFile(string exportFileUrl)
-            {
-                using HttpClient test = new HttpClient();
-                using var response = await test.GetStreamAsync(exportFileUrl);
-                using TextReader reader = new StreamReader(response);
-
-                for (string line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync())
-                {
-                    yield return line;
-                }
             }
         }
     }

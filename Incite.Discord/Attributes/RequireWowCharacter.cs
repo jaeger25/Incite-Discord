@@ -24,7 +24,7 @@ namespace Incite.Discord.Attributes
 
             if (!hasCharacter)
             {
-                await context.Message.RespondAsync("You must add a character using '!wow character add charName-ServerName' first");
+                await context.Message.RespondAsync("You must add a character using '!wow character add charName-ServerName Class Faction' first");
             }
 
             return hasCharacter;

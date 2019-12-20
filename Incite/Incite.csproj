@@ -11,6 +11,12 @@
     <Compile Remove="Migrations\20191216035612_OwnerId_NonNullable.Designer.cs" />
     <Compile Remove="Migrations\20191216043225_OwnerId_NonNullable.cs" />
     <Compile Remove="Migrations\20191216043225_OwnerId_NonNullable.Designer.cs" />
+    <Compile Remove="Migrations\20191220081716_Epgp.cs" />
+    <Compile Remove="Migrations\20191220081716_Epgp.Designer.cs" />
+    <Compile Remove="Migrations\20191220083654_Epgp.cs" />
+    <Compile Remove="Migrations\20191220083654_Epgp.Designer.cs" />
+    <Compile Remove="Migrations\20191220083722_Epgp.cs" />
+    <Compile Remove="Migrations\20191220083722_Epgp.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

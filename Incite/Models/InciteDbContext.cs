@@ -12,6 +12,8 @@ namespace Incite.Models
         {
         }
 
+        public DbSet<EpgpSnapshot> EpgpSnapshots { get; set; }
+        public DbSet<EpgpStanding> EpgpStandings { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventMember> EventMembers { get; set; }
         public DbSet<Guild> Guilds { get; set; }
@@ -32,6 +34,10 @@ namespace Incite.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<EpgpSnapshot>()
+                .OwnsMany(x => x.Standings)
+                    .WithOwner(x => x.Snapshot);
+
             modelBuilder.Entity<Event>()
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Events)
@@ -52,6 +58,10 @@ namespace Incite.Models
 
             modelBuilder.Entity<Guild>()
                 .HasAlternateKey(x => x.DiscordId);
+
+            modelBuilder.Entity<Guild>()
+                .HasMany(x => x.EpgpSnapshots)
+                    .WithOne(x => x.Guild);
 
             modelBuilder.Entity<Member>()
                 .HasOne(x => x.Guild)

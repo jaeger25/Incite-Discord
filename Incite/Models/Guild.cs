@@ -23,5 +23,7 @@ namespace Incite.Models
         public virtual ICollection<Event> Events { get; set; } = new List<Event>();
 
         public virtual ICollection<WowCharacter> WowCharacters { get; set; } = new List<WowCharacter>();
+
+        public virtual ICollection<EpgpSnapshot> EpgpSnapshots { get; set; } = new List<EpgpSnapshot>();
     }
 }
