@@ -54,11 +54,12 @@ namespace Incite.Discord
                         LogLevel = isProduction ?
                             DSharpPlus.LogLevel.Warning : DSharpPlus.LogLevel.Info,
                     });
-                    
+
                     services.AddEntityFrameworkSqlServer()
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
                         .AddSingleton<EmojiService>()
+                        .AddSingleton<GuildCommandPrefixCache>()
                         .AddScoped<WowHeadService>()
                         .AddDbContextPool<InciteDbContext>(options =>
                         {

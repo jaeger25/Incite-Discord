@@ -63,6 +63,10 @@ namespace Incite.Models
                 .HasMany(x => x.EpgpSnapshots)
                     .WithOne(x => x.Guild);
 
+            modelBuilder.Entity<Guild>()
+                .OwnsOne(x => x.Options)
+                    .WithOwner();
+
             modelBuilder.Entity<Member>()
                 .HasOne(x => x.Guild)
                     .WithMany(x => x.Members)

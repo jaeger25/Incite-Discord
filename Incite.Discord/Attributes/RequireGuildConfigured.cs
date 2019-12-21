@@ -64,7 +64,7 @@ namespace Incite.Discord.Attributes
                 }
                 if (!guild.WowFaction.HasValue)
                 {
-                    response.AppendLine("\tWowFaction not assigned. Please assign your guild's facting using '!guild admin set-faction WowFaction'");
+                    response.AppendLine("\tWowFaction not assigned. Please assign your guild's faction using '!guild admin set-faction WowFaction'");
                 }
 
                 await context.Message.RespondAsync(response.ToString());

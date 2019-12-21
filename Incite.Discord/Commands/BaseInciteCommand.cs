@@ -31,6 +31,8 @@ namespace Incite.Discord.Commands
                 Member = await dbContext.Members
                     .Include(x => x.Guild)
                         .ThenInclude(x => x.Roles)
+                    .Include(x => x.Guild)
+                        .ThenInclude(x => x.Options)
                     .Include(x => x.PrimaryWowCharacter)
                     .Include(x => x.User)
                         .ThenInclude(x => x.WowCharacters)

@@ -33,9 +33,9 @@ namespace Incite.Discord.Services
 
             var commands = m_discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefixes = new[] { "!", "$" },
                 EnableDms = false,
                 Services = serviceProvider,
+                UseDefaultCommandHandler = false,
             });
 
             m_discordClient.UseInteractivity(new InteractivityConfiguration()

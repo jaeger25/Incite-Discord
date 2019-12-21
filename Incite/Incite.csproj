@@ -17,6 +17,8 @@
     <Compile Remove="Migrations\20191220083654_Epgp.Designer.cs" />
     <Compile Remove="Migrations\20191220083722_Epgp.cs" />
     <Compile Remove="Migrations\20191220083722_Epgp.Designer.cs" />
+    <Compile Remove="Migrations\20191221090944_GuildPrefix.cs" />
+    <Compile Remove="Migrations\20191221090944_GuildPrefix.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

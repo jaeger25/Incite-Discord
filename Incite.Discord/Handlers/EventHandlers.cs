@@ -1,10 +1,12 @@
 ﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Incite.Discord.Extensions;
 using Incite.Discord.Messages;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
@@ -18,13 +20,10 @@ namespace Incite.Discord.Handlers
 {
     public class EventHandlers : BaseHandler
     {
-        readonly InciteDbContext m_dbContext;
-
         Dictionary<ulong, AsyncLock> m_eventMessageLocks = new Dictionary<ulong, AsyncLock>();
 
-        public EventHandlers(DiscordClient client, InciteDbContext dbContext)
+        public EventHandlers(DiscordClient client)
         {
-            m_dbContext = dbContext;
             client.MessageReactionAdded += Client_MessageReactionAdded;
             client.MessageReactionRemoved += Client_MessageReactionRemoved;
         }
@@ -37,7 +36,8 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var guildEvent = await m_dbContext.Events
+            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            var guildEvent = await dbContext.Events
                 .Include(x => x.EventMembers)
                     .ThenInclude(x => x.Member)
                         .ThenInclude(x => x.User)
@@ -48,7 +48,7 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var member = await m_dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
+            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
             if (member == null || !member.PrimaryWowCharacterId.HasValue)
             {
                 await message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
@@ -81,7 +81,7 @@ namespace Incite.Discord.Handlers
                 eventMember.EmojiDiscordName = e.Emoji.Name;
             }
 
-            await m_dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
 
             var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
@@ -97,7 +97,8 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var guildEvent = await m_dbContext.Events
+            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            var guildEvent = await dbContext.Events
                 .Include(x => x.EventMembers)
                     .ThenInclude(x => x.Member)
                         .ThenInclude(x => x.User)
@@ -113,8 +114,8 @@ namespace Incite.Discord.Handlers
 
             if (member.EmojiDiscordName == e.Emoji.Name)
             {
-                m_dbContext.EventMembers.Remove(member);
-                await m_dbContext.SaveChangesAsync();
+                dbContext.EventMembers.Remove(member);
+                await dbContext.SaveChangesAsync();
             }
 
             var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent);

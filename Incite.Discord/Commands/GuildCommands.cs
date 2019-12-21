@@ -8,6 +8,7 @@ using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.Extensions;
 using Incite.Discord.Helpers;
+using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -105,10 +106,12 @@ namespace Incite.Discord.Commands
         public class AdminCommands : BaseInciteCommand
         {
             readonly InciteDbContext m_dbContext;
+            readonly GuildCommandPrefixCache m_guildCommandPrefixCache;
 
-            public AdminCommands(InciteDbContext dbContext)
+            public AdminCommands(InciteDbContext dbContext, GuildCommandPrefixCache guildCommandPrefixCache)
             {
                 m_dbContext = dbContext;
+                m_guildCommandPrefixCache = guildCommandPrefixCache;
             }
 
             [Command("set-server")]
@@ -178,12 +181,23 @@ namespace Incite.Discord.Commands
                 }
             }
 
+            [Command("set-command-prefix")]
+            [RequireInciteRole(RoleKind.Leader)]
+            [Description("Sets the server role which corresponds with the RoleKind")]
+            public async Task SetCommandPrefix(CommandContext context, string prefix = "!")
+            {
+                Guild.Options.CommandPrefix = prefix[0];
+                await m_dbContext.SaveChangesAsync();
+
+                m_guildCommandPrefixCache.SetPrefix(Guild, prefix[0]);
+            }
+
             [Command("import-members")]
             [RequireInciteRole(RoleKind.Leader)]
             [RequireGuildConfigured]
             [Description("Attempts to import a list of guild characters from a 'Guild Roster Manager' export. Header must be included in export and character names must match Discord names exactly to be imported.")]
             public async Task ImportMembers(CommandContext context,
-                [Description("Optional. Defaults to ';'")] char delimeterCharacter = ';')
+                [Description("Optional. Defaults to ';'")] string delimeterCharacter = ";")
             {
                 var interactivity = context.Client.GetInteractivity();
 

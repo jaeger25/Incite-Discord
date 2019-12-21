@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.EventArgs;
 using Incite.Discord.DiscordExtensions;
+using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,10 +15,12 @@ namespace Incite.Discord.Handlers
     public class GuildHandlers : BaseHandler
     {
         readonly InciteDbContext m_dbContext;
+        readonly GuildCommandPrefixCache m_commandPrefixCache;
 
-        public GuildHandlers(DiscordClient client, InciteDbContext dbContext)
+        public GuildHandlers(DiscordClient client, InciteDbContext dbContext, GuildCommandPrefixCache commandPrefixCache)
         {
             m_dbContext = dbContext;
+            m_commandPrefixCache = commandPrefixCache;
 
             client.GuildCreated += Client_GuildCreated;
             client.GuildAvailable += Client_GuildAvailable;
@@ -83,6 +86,15 @@ namespace Incite.Discord.Handlers
                 m_dbContext.Roles.Add(everyoneRole);
             }
 
+            if (guild.Options == null)
+            {
+                guild.Options = new GuildOptions()
+                {
+                    CommandPrefix = '!'
+                };
+            }
+
+            m_commandPrefixCache.SetPrefix(guild, guild.Options.CommandPrefix);
             await CreateNewGuildMembersAsync(guild, e);
 
             await m_dbContext.SaveChangesAsync();
