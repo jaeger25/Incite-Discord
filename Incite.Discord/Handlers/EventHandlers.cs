@@ -22,7 +22,7 @@ namespace Incite.Discord.Handlers
     {
         Dictionary<ulong, AsyncLock> m_eventMessageLocks = new Dictionary<ulong, AsyncLock>();
 
-        public EventHandlers(DiscordClient client)
+        public EventHandlers(DiscordClient client, InciteDbContext dbContext)
         {
             client.MessageReactionAdded += Client_MessageReactionAdded;
             client.MessageReactionRemoved += Client_MessageReactionRemoved;

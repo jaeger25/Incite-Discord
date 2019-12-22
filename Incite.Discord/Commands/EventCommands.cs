@@ -62,7 +62,7 @@ namespace Incite.Discord.Commands
                 EventMessage = message
             };
 
-            Member.OwnedEvents.Add(memberEvent);
+            m_dbContext.Events.Add(memberEvent);
             await m_dbContext.SaveChangesAsync();
 
             var discordEventMessage = new Messages.DiscordEventMessage(context.Client, discordMessage, memberEvent);
@@ -103,7 +103,7 @@ namespace Incite.Discord.Commands
 
             await m_dbContext.SaveChangesAsync();
 
-            var eventMessage = new Messages.DiscordEventMessage(context.Client, discordMessage, memberEvent);
+            var eventMessage = new DiscordEventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
         }
     }

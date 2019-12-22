@@ -61,14 +61,14 @@ namespace Incite.Discord
                         .AddSingleton<EmojiService>()
                         .AddSingleton<GuildCommandPrefixCache>()
                         .AddScoped<WowHeadService>()
-                        .AddDbContextPool<InciteDbContext>(options =>
+                        .AddDbContext<InciteDbContext>(options =>
                         {
                             options.UseLazyLoadingProxies()
                                 .UseNpgsql(config["ConnectionStrings:Postgres"], sqlOptions =>
                                 {
                                     sqlOptions.EnableRetryOnFailure();
                                 });
-                        })
+                        }, ServiceLifetime.Transient)
                         .AddLogging(builder =>
                         {
                             builder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)

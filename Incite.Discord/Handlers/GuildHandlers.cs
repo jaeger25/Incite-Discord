@@ -1,9 +1,11 @@
 ﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using Incite.Discord.DiscordExtensions;
 using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,10 @@ namespace Incite.Discord.Handlers
 {
     public class GuildHandlers : BaseHandler
     {
-        readonly InciteDbContext m_dbContext;
         readonly GuildCommandPrefixCache m_commandPrefixCache;
 
-        public GuildHandlers(DiscordClient client, InciteDbContext dbContext, GuildCommandPrefixCache commandPrefixCache)
+        public GuildHandlers(DiscordClient client, GuildCommandPrefixCache commandPrefixCache)
         {
-            m_dbContext = dbContext;
             m_commandPrefixCache = commandPrefixCache;
 
             client.GuildCreated += Client_GuildCreated;
@@ -29,7 +29,8 @@ namespace Incite.Discord.Handlers
 
         async Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
-            var user = m_dbContext.Users
+            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            var user = dbContext.Users
                 .Include(x => x.Memberships)
                     .ThenInclude(x => x.Guild)
                 .FirstOrDefault(x => x.DiscordId == e.Member.Id);
@@ -41,15 +42,15 @@ namespace Incite.Discord.Handlers
             {
                 member = new Member()
                 {
-                    Guild = await m_dbContext.Guilds.FirstAsync(x => x.DiscordId == e.Guild.Id),
+                    Guild = await dbContext.Guilds.FirstAsync(x => x.DiscordId == e.Guild.Id),
                     User = user ?? new User()
                     {
                         DiscordId = e.Member.Id
                     }
                 };
 
-                m_dbContext.Members.Add(member);
-                await m_dbContext.SaveChangesAsync();
+                dbContext.Members.Add(member);
+                await dbContext.SaveChangesAsync();
             }
         }
 
@@ -65,7 +66,8 @@ namespace Incite.Discord.Handlers
 
         async Task UpdateGuildEntitiesAsync(GuildCreateEventArgs e)
         {
-            var guild = await m_dbContext.Guilds
+            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            var guild = await dbContext.Guilds
                 .FirstOrDefaultAsync(x => x.DiscordId == e.Guild.Id);
 
             if (guild == null)
@@ -82,8 +84,8 @@ namespace Incite.Discord.Handlers
                     Kind = RoleKind.Everyone
                 };
 
-                m_dbContext.Guilds.Add(guild);
-                m_dbContext.Roles.Add(everyoneRole);
+                dbContext.Guilds.Add(guild);
+                dbContext.Roles.Add(everyoneRole);
             }
 
             if (guild.Options == null)
@@ -95,22 +97,22 @@ namespace Incite.Discord.Handlers
             }
 
             m_commandPrefixCache.SetPrefix(guild, guild.Options.CommandPrefix);
-            await CreateNewGuildMembersAsync(guild, e);
+            await CreateNewGuildMembersAsync(guild, e, dbContext);
 
-            await m_dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
 
-        async Task CreateNewGuildMembersAsync(Guild guild, GuildCreateEventArgs e)
+        async Task CreateNewGuildMembersAsync(Guild guild, GuildCreateEventArgs e, InciteDbContext dbContext)
         {
             var memberDiscordIds = e.Guild.Members
                 .Select(x => x.Key);
 
-            var existingUsers = await m_dbContext.Users
+            var existingUsers = await dbContext.Users
                 .Where(x => memberDiscordIds
                     .Contains(x.DiscordId))
                 .ToArrayAsync();
 
-            var existingMembers = await m_dbContext.Members
+            var existingMembers = await dbContext.Members
                 .Include(x => x.User)
                 .Where(x => x.Guild.DiscordId == guild.DiscordId && memberDiscordIds
                     .Contains(x.User.DiscordId))
@@ -125,7 +127,7 @@ namespace Incite.Discord.Handlers
                     DiscordId = x
                 });
 
-            m_dbContext.Users.AddRange(newUsers);
+            dbContext.Users.AddRange(newUsers);
 
             var newMembers = memberDiscordIds
                 .Where(x => !existingMembers
@@ -134,10 +136,10 @@ namespace Incite.Discord.Handlers
                 .Select(x => new Member()
                 {
                     Guild = guild,
-                    User = m_dbContext.Users.Local.First(y => y.DiscordId == x)
+                    User = dbContext.Users.Local.First(y => y.DiscordId == x)
                 });
 
-            m_dbContext.Members.AddRange(newMembers);
+            dbContext.Members.AddRange(newMembers);
         }
     }
 }

@@ -14,12 +14,10 @@ namespace Incite.Discord.Handlers
 {
     public class CommandHandlers : BaseHandler
     {
-        readonly InciteDbContext m_dbContext;
         readonly GuildCommandPrefixCache m_guildCommandPrefixCache;
 
-        public CommandHandlers(DiscordClient client, InciteDbContext dbContext, GuildCommandPrefixCache guildCommandPrefixCache)
+        public CommandHandlers(DiscordClient client, GuildCommandPrefixCache guildCommandPrefixCache)
         {
-            m_dbContext = dbContext;
             m_guildCommandPrefixCache = guildCommandPrefixCache;
             client.MessageCreated += Client_MessageCreated;
         }
