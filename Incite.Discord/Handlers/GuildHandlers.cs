@@ -27,41 +27,48 @@ namespace Incite.Discord.Handlers
             client.GuildMemberAdded += Client_GuildMemberAdded;
         }
 
-        async Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
+        Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
-            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
-            var user = dbContext.Users
-                .Include(x => x.Memberships)
-                    .ThenInclude(x => x.Guild)
-                .FirstOrDefault(x => x.DiscordId == e.Member.Id);
-
-            Member member = user?.Memberships
-                .FirstOrDefault(x => x.Guild.DiscordId == e.Guild.Id);
-
-            if (member == null)
+            _ = Task.Run(async () =>
             {
-                member = new Member()
+                var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+                var user = dbContext.Users
+                    .Include(x => x.Memberships)
+                        .ThenInclude(x => x.Guild)
+                    .FirstOrDefault(x => x.DiscordId == e.Member.Id);
+
+                Member member = user?.Memberships
+                    .FirstOrDefault(x => x.Guild.DiscordId == e.Guild.Id);
+
+                if (member == null)
                 {
-                    Guild = await dbContext.Guilds.FirstAsync(x => x.DiscordId == e.Guild.Id),
-                    User = user ?? new User()
+                    member = new Member()
                     {
-                        DiscordId = e.Member.Id
-                    }
-                };
+                        Guild = await dbContext.Guilds.FirstAsync(x => x.DiscordId == e.Guild.Id),
+                        User = user ?? new User()
+                        {
+                            DiscordId = e.Member.Id
+                        }
+                    };
 
-                dbContext.Members.Add(member);
-                await dbContext.SaveChangesAsync();
-            }
+                    dbContext.Members.Add(member);
+                    await dbContext.SaveChangesAsync();
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
-        async Task Client_GuildAvailable(GuildCreateEventArgs e)
+        Task Client_GuildAvailable(GuildCreateEventArgs e)
         {
-            await UpdateGuildEntitiesAsync(e);
+            _ = UpdateGuildEntitiesAsync(e);
+            return Task.CompletedTask;
         }
 
-        async Task Client_GuildCreated(GuildCreateEventArgs e)
+        Task Client_GuildCreated(GuildCreateEventArgs e)
         {
-            await UpdateGuildEntitiesAsync(e);
+            _ = UpdateGuildEntitiesAsync(e);
+            return Task.CompletedTask;
         }
 
         async Task UpdateGuildEntitiesAsync(GuildCreateEventArgs e)

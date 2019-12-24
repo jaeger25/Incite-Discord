@@ -71,8 +71,9 @@ namespace Incite.Discord.Commands
                 standings.AppendLine($"{standing.WowCharacter.Name}: {standing.EffortPoints} , {standing.GearPoints} , {standing.Priority}");
             }
 
+            var dmChannel = await context.Member.CreateDmChannelAsync();
             var pages = interactivity.GeneratePagesInContent(standings.ToString(), SplitType.Line);
-            await interactivity.SendPaginatedMessageAsync(context.Channel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(5));
+            await interactivity.SendPaginatedMessageAsync(dmChannel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(3));
         }
 
         [Command("import")]
