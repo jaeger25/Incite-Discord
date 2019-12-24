@@ -92,50 +92,60 @@ namespace Incite.Models
                     {
                         Id = nextId++,
                         Name = "Mirage Raceway",
-                        UtcOffset = TimeSpan.FromHours(-8)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Nethergarde Keep",
-                        UtcOffset = TimeSpan.FromHours(-8)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Pyrewood Village",
-                        UtcOffset = TimeSpan.FromHours(-5)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Auberdine",
-                        UtcOffset = TimeSpan.FromHours(-8)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Everlook",
-                        UtcOffset = TimeSpan.FromHours(-8)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Razorfen",
-                        UtcOffset = TimeSpan.FromHours(-5)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Lakeshire",
-                        UtcOffset = TimeSpan.FromHours(-5)
+                        UtcOffset = TimeSpan.FromHours(1)
                     },
                     new WowServer
                     {
                         Id = nextId++,
                         Name = "Chromie",
-                        UtcOffset = TimeSpan.FromHours(-5)
+                        UtcOffset = TimeSpan.FromHours(1)
+                    },
+
+                    // Australian PVE
+                    new WowServer
+                    {
+                        Id = nextId++,
+                        Name = "Remulos",
+                        UtcOffset = TimeSpan.FromHours(11)
                     }
+
+                    // America PVP
                     );
         }
     }
