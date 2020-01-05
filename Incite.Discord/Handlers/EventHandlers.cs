@@ -22,7 +22,7 @@ namespace Incite.Discord.Handlers
     {
         Dictionary<ulong, AsyncLock> m_eventMessageLocks = new Dictionary<ulong, AsyncLock>();
 
-        public EventHandlers(DiscordClient client, InciteDbContext dbContext)
+        public EventHandlers(IServiceScopeFactory scopeFactory, DiscordClient client) : base(scopeFactory)
         {
             client.MessageReactionAdded += Client_MessageReactionAdded;
             client.MessageReactionRemoved += Client_MessageReactionRemoved;
@@ -36,7 +36,9 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            using var scope = ServiceScopeFactory.CreateScope();
+
+            var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
             var guildEvent = await dbContext.Events
                 .Include(x => x.EventMembers)
                     .ThenInclude(x => x.Member)
@@ -97,7 +99,9 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            using var scope = ServiceScopeFactory.CreateScope();
+
+            var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
             var guildEvent = await dbContext.Events
                 .Include(x => x.EventMembers)
                     .ThenInclude(x => x.Member)

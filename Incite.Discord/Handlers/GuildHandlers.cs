@@ -18,7 +18,7 @@ namespace Incite.Discord.Handlers
     {
         readonly GuildCommandPrefixCache m_commandPrefixCache;
 
-        public GuildHandlers(DiscordClient client, GuildCommandPrefixCache commandPrefixCache)
+        public GuildHandlers(IServiceScopeFactory scopeFactory, DiscordClient client, GuildCommandPrefixCache commandPrefixCache) : base(scopeFactory)
         {
             m_commandPrefixCache = commandPrefixCache;
 
@@ -31,7 +31,9 @@ namespace Incite.Discord.Handlers
         {
             _ = Task.Run(async () =>
             {
-                var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+                using var scope = ServiceScopeFactory.CreateScope();
+
+                var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
                 var user = dbContext.Users
                     .Include(x => x.Memberships)
                         .ThenInclude(x => x.Guild)
@@ -73,7 +75,9 @@ namespace Incite.Discord.Handlers
 
         async Task UpdateGuildEntitiesAsync(GuildCreateEventArgs e)
         {
-            var dbContext = e.Client.GetCommandsNext().Services.GetService<InciteDbContext>();
+            using var scope = ServiceScopeFactory.CreateScope();
+
+            var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
             var guild = await dbContext.Guilds
                 .FirstOrDefaultAsync(x => x.DiscordId == e.Guild.Id);
 

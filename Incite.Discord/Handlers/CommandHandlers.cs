@@ -4,6 +4,7 @@ using DSharpPlus.EventArgs;
 using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Incite.Discord.Handlers
     {
         readonly GuildCommandPrefixCache m_guildCommandPrefixCache;
 
-        public CommandHandlers(DiscordClient client, GuildCommandPrefixCache guildCommandPrefixCache)
+        public CommandHandlers(IServiceScopeFactory scopeFactory, DiscordClient client, GuildCommandPrefixCache guildCommandPrefixCache) : base(scopeFactory)
         {
             m_guildCommandPrefixCache = guildCommandPrefixCache;
             client.MessageCreated += Client_MessageCreated;

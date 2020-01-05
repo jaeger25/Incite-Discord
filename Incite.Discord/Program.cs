@@ -68,7 +68,7 @@ namespace Incite.Discord
                                 {
                                     sqlOptions.EnableRetryOnFailure();
                                 });
-                        }, ServiceLifetime.Transient)
+                        })
                         .AddLogging(builder =>
                         {
                             builder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
