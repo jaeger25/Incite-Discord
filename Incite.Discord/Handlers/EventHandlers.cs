@@ -110,9 +110,9 @@ namespace Incite.Discord.Handlers
             }
 
             var member = guildEvent.EventMembers
-                .First(x => x.Member.User.DiscordId == e.User.Id);
+                .FirstOrDefault(x => x.Member.User.DiscordId == e.User.Id);
 
-            if (member.EmojiDiscordName == e.Emoji.Name)
+            if (member?.EmojiDiscordName == e.Emoji.Name)
             {
                 dbContext.EventMembers.Remove(member);
                 await dbContext.SaveChangesAsync();
