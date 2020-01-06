@@ -21,15 +21,26 @@ namespace Incite.Discord.Converters
                 return Optional.FromNoValue<QualifiedWowCharacter>();
             }
 
+            WowServer server = null;
+
+            var dbContext = ctx.Services.GetService<InciteDbContext>();
             var nameServerPair = value.Split('-');
             if (nameServerPair.Length != 2)
             {
-                await ctx.Message.RespondAsync("QualifiedWowCharacter must be in the form CharName-ServerName");
-                return Optional.FromNoValue<QualifiedWowCharacter>();
+                var guild = await dbContext.Guilds
+                    .Include(x => x.WowServer)
+                    .FirstOrDefaultAsync(x => x.DiscordId == ctx.Guild.Id);
+
+                if (guild?.WowServerId.HasValue == false)
+                {
+                    await ctx.Message.RespondAsync("QualifiedWowCharacter must be in the form CharName-ServerName");
+                    return Optional.FromNoValue<QualifiedWowCharacter>();
+                }
+
+                server = guild.WowServer;
             }
 
-            var dbContext = ctx.Services.GetService<InciteDbContext>();
-            var server = await dbContext.WowServers
+            server = await dbContext.WowServers
                 .FirstOrDefaultAsync(x => EF.Functions.ILike(x.Name, nameServerPair[1]));
 
             if (server == null)
