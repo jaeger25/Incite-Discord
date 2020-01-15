@@ -50,7 +50,7 @@ namespace Incite.Discord.Commands
             }
 
             StringBuilder characterList = new StringBuilder("__**Character**__ , __**Class**__");
-            foreach (var character in User.WowCharacters.OrderBy(x => x.WowServerId))
+            foreach (var character in user.WowCharacters.OrderBy(x => x.WowServerId))
             {
                 characterList.Append($"\n{character} , {character.WowClass}");
             }
