@@ -1,4 +1,5 @@
 ﻿using Incite.Models;
+using Incite.NtService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,14 +23,16 @@ namespace Incite.NtService
 
     class InciteService : ServiceControl
     {
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        IHost m_host = null;
+
+        static IHostBuilder CreateHostBuilder(string[] args) =>
             Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
                     var config = new ConfigurationBuilder()
                         .AddJsonFile("appsettings.json", false)
                         .AddJsonFile("appsettings.development.json", true)
-                        .AddUserSecrets("97f50552-3f23-43f2-af0f-ab150fb1bcdb")
+                        .AddUserSecrets("0021a7d4-5c77-450e-a852-71c077f1c81f")
                         .AddEnvironmentVariables()
                         .Build();
 
@@ -38,8 +41,9 @@ namespace Incite.NtService
                     bool isProduction =
                         config.Get<InciteNtServiceOptions>().Environment == InciteNtServiceOptions.Environment_Production;
 
-                    services.AddEntityFrameworkSqlServer()
+                    services.AddEntityFrameworkNpgsql()
                         .AddSingleton<IConfiguration>(config)
+                        .AddSingleton<WowAddOnService>()
                         .AddDbContext<InciteDbContext>(options =>
                         {
                             options.UseNpgsql(config["ConnectionStrings:Postgres"], sqlOptions =>
@@ -71,6 +75,7 @@ namespace Incite.NtService
 
         public bool Stop(HostControl hostControl)
         {
+            m_host?.StopAsync().Wait();
             return true;
         }
     }
