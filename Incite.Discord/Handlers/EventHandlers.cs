@@ -45,8 +45,12 @@ namespace Incite.Discord.Handlers
                         .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.EventMessage.DiscordId == message.Id);
 
-            if (guildEvent == null)
+            if (guildEvent == null || guildEvent.DateTime.UtcDateTime - DateTimeOffset.UtcNow < TimeSpan.FromMinutes(30))
             {
+                var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
+                var dmChannel = await discordMember.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("Signups are already closed for this event.");
                 return;
             }
 
@@ -108,8 +112,12 @@ namespace Incite.Discord.Handlers
                         .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.EventMessage.DiscordId == message.Id);
 
-            if (guildEvent == null)
+            if (guildEvent == null || guildEvent.DateTime.UtcDateTime - DateTimeOffset.UtcNow < TimeSpan.FromMinutes(30))
             {
+                var discordMember = await e.Guild.GetMemberAsync(e.User.Id);
+                var dmChannel = await discordMember.CreateDmChannelAsync();
+
+                await dmChannel.SendMessageAsync("Signups are already closed for this event.");
                 return;
             }
 
