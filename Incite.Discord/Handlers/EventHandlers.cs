@@ -93,7 +93,13 @@ namespace Incite.Discord.Handlers
 
             await dbContext.SaveChangesAsync();
 
-            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent);
+            var latestSnapshot = await dbContext.EpgpSnapshots
+                .Include(x => x.Standings)
+                    .ThenInclude(x => x.WowCharacter)
+                .OrderByDescending(x => x.DateTime)
+                .FirstOrDefaultAsync(x => x.GuildId == guildEvent.GuildId);
+
+            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent, latestSnapshot);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
 
             await eventMessage.UpdateAsync();
@@ -138,7 +144,13 @@ namespace Incite.Discord.Handlers
                 await dbContext.SaveChangesAsync();
             }
 
-            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent);
+            var latestSnapshot = await dbContext.EpgpSnapshots
+                .Include(x => x.Standings)
+                    .ThenInclude(x => x.WowCharacter)
+                .OrderByDescending(x => x.DateTime)
+                .FirstOrDefaultAsync(x => x.GuildId == guildEvent.GuildId);
+
+            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent, latestSnapshot);
             await eventMessage.UpdateAsync();
         }
 
