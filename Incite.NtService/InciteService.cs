@@ -41,7 +41,7 @@ namespace Incite.NtService
                     bool isProduction =
                         config.Get<InciteNtServiceOptions>().Environment == InciteNtServiceOptions.Environment_Production;
 
-                    services.AddEntityFrameworkNpgsql()
+                    services
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<WowAddOnService>()
                         .AddDbContext<InciteDbContext>(options =>

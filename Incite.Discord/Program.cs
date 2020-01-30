@@ -55,7 +55,7 @@ namespace Incite.Discord
                             DSharpPlus.LogLevel.Warning : DSharpPlus.LogLevel.Info,
                     });
 
-                    services.AddEntityFrameworkNpgsql()
+                    services
                         .AddSingleton<IConfiguration>(config)
                         .AddSingleton<DiscordClient>(discordClient)
                         .AddSingleton<EmojiService>()

@@ -20,12 +20,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00655" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00655" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00655" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-majaeger-00656" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-majaeger-00656" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-majaeger-00656" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
