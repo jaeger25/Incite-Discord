@@ -20,9 +20,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-majaeger-00656" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-majaeger-00656" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-majaeger-00656" />
+    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00657" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00657" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
@@ -35,7 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.1" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.1.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
