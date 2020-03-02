@@ -15,7 +15,7 @@ namespace Incite.DbProviderMigrator
                 .Build();
 
             using var sqlServerDbContext = new InciteDbContext(new DbContextOptionsBuilder<InciteDbContext>()
-                .UseSqlServer(config["ConnectionStrings:SqlServer"], sqlOptions =>
+                .UseNpgsql(config["ConnectionStrings:SqlServer"], sqlOptions =>
                 {
                     sqlOptions.EnableRetryOnFailure();
                 }).Options);

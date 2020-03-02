@@ -6,10 +6,14 @@ using Incite.Discord.ApiModels;
 using Incite.Discord.Attributes;
 using Incite.Discord.Extensions;
 using Incite.Discord.Messages;
+using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,10 +29,12 @@ namespace Incite.Discord.Commands
     public class EventCommands : BaseInciteCommand
     {
         readonly InciteDbContext m_dbContext;
+        readonly EmojiService m_emojiService;
 
-        public EventCommands(InciteDbContext dbContext)
+        public EventCommands(InciteDbContext dbContext, EmojiService emojiService)
         {
             m_dbContext = dbContext;
+            m_emojiService = emojiService;
         }
 
         [Command("create")]
@@ -106,5 +112,51 @@ namespace Incite.Discord.Commands
             var eventMessage = new DiscordEventMessage(context.Client, discordMessage, memberEvent);
             await eventMessage.UpdateAsync();
         }
+
+        //[Command("export")]
+        //[RequireUserPermissions(Permissions.SendMessages)]
+        //[Description("Exports an event")]
+        //public async Task Export(CommandContext context, int eventId)
+        //{
+        //    var memberEvent = await m_dbContext.Events
+        //        .Include(x => x.EventMembers)
+        //            .ThenInclude(x => x.Member.PrimaryWowCharacter)
+        //        .FirstOrDefaultAsync(x => x.Id == eventId && x.Guild.DiscordId == context.Guild.Id);
+
+        //    if (memberEvent == null)
+        //    {
+        //        ResponseString = "Failed to find event";
+        //        return;
+        //    }
+
+        //    var json = new JObject();
+        //    json.Add(new JProperty("Id", memberEvent.Id));
+        //    json.Add(new JProperty("Name", memberEvent.Name));
+        //    json.Add(new JProperty("Description", memberEvent.Description));
+        //    json.Add(new JProperty("DateTime", memberEvent.DateTime.ToString()));
+
+        //    var lateList = memberEvent.EventMembers
+        //        .Where(x => x.EmojiDiscordName == m_emojiService.Events.Icon_Late.GetDiscordName())
+        //        .Select(x => x.Member.PrimaryWowCharacter.Name);
+
+        //    var absentList = memberEvent.EventMembers
+        //        .Where(x => x.EmojiDiscordName == m_emojiService.Events.Icon_Absent.GetDiscordName())
+        //        .Select(x => x.Member.PrimaryWowCharacter.Name);
+
+        //    var maybeList = memberEvent.EventMembers
+        //        .Where(x => x.EmojiDiscordName == m_emojiService.Events.Icon_Maybe.GetDiscordName())
+        //        .Select(x => x.Member.PrimaryWowCharacter.Name);
+
+        //    var attendingList = memberEvent.EventMembers
+        //        .Select(x => x.Member.PrimaryWowCharacter.Name)
+        //        .Where(x => !lateList.Contains(x) && !absentList.Contains(x) && !maybeList.Contains(x));
+
+        //    json.Add(new JProperty("LateList", new JArray(lateList)));
+        //    json.Add(new JProperty("AbsentList", new JArray(absentList)));
+        //    json.Add(new JProperty("MaybeList", new JArray(maybeList)));
+        //    json.Add(new JProperty("AttendingList", new JArray(attendingList)));
+
+        //    context.Message.RespondWithFileAsync("")
+        //}
     }
 }
