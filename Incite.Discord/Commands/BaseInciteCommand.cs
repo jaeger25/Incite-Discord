@@ -33,7 +33,6 @@ namespace Incite.Discord.Commands
                         .ThenInclude(x => x.Roles)
                     .Include(x => x.Guild)
                         .ThenInclude(x => x.Options)
-                    .Include(x => x.PrimaryWowCharacter)
                     .Include(x => x.User)
                         .ThenInclude(x => x.WowCharacters)
                     .FirstAsync(x => x.Guild.DiscordId == ctx.Guild.Id && x.User.DiscordId == ctx.User.Id);

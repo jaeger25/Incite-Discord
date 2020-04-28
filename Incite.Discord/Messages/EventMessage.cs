@@ -68,11 +68,11 @@ namespace Incite.Discord.Messages
             await m_message.CreateReactionAsync(m_emojis.Events.Icon_Absent);
         }
 
-        void AddMemberListField(DiscordEmbedBuilder embed, string header, EpgpSnapshot? epgpSnapshot, IEnumerable<EventMember> members, bool inline = true, bool inclueEmoji = true)
+        void AddMemberListField(DiscordEmbedBuilder embed, string header, string? className, EpgpSnapshot? epgpSnapshot, IEnumerable<EventMember> members, bool inline = true, bool inclueEmoji = true)
         {
             var memberList = members
                 .Select(x => Tuple.Create(x, epgpSnapshot?.Standings
-                        .FirstOrDefault(y => y.WowCharacterId == x.Member.PrimaryWowCharacterId)
+                        .FirstOrDefault(y => x.Member.User.WowCharacters.Contains(y.WowCharacter))
                         ?.EffortPoints ?? 0))
                 .OrderByDescending(x => x.Item2)
                 .ToArray();
@@ -84,10 +84,15 @@ namespace Incite.Discord.Messages
                 var ep = memberEpPair.Item2;
                 string separator = inline ? "\n" : ", ";
 
-                var characterName = member.Member.PrimaryWowCharacter.Name;
+                // TODO: Get name by class
+                var characterName = member.Member.User.WowCharacters
+                    .Where(x => string.IsNullOrEmpty(className) ? true : x.WowClass.Name == className)
+                    .FirstOrDefault()
+                    ?.Name;
+
                 if (string.IsNullOrEmpty(characterName))
                 {
-                    throw new Exception($"MemberId: {member.MemberId}");
+                    characterName = "(Unknown) - ensure char added";
                 }
 
                 string epString = ep == 0 ? "" : $" - {ep}ep";
@@ -126,55 +131,55 @@ namespace Incite.Discord.Messages
             AddEventField(embed, $"{m_emojis.Events.Role_Healer}", $"{guildEvent.EventMembers.Count(x => m_emojis.HealerEmojis().Select(x => x.Name).Contains(x.EmojiDiscordName))}");
 
             // Class counts
-            AddMemberListField(embed, "Warrior", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Warrior", "Warrior", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.WarriorEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Rogue", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Rogue", "Rogue", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.RogueEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Hunter", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Hunter", "Hunter", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.HunterEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Mage", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Mage", "Mage", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.MageEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Warlock", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Warlock", "Warlock", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.WarlockEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Druid", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Druid", "Druid", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.DruidEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Shaman", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Shaman", "Shaman", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.ShamanEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
-            AddMemberListField(embed, "Priest", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Priest", "Priest", m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => m_emojis.PriestEmojis()
                     .Select(x => x.Name)
                     .Contains(x.EmojiDiscordName)));
 
             embed.AddBlankFields(true);
 
-            AddMemberListField(embed, "Late", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Late", null, m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Late.Name), false, false);
 
-            AddMemberListField(embed, "Maybe", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Maybe", null, m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Maybe.Name), false, false);
 
-            AddMemberListField(embed, "Absent", m_epgpSnapshot, guildEvent.EventMembers
+            AddMemberListField(embed, "Absent", null, m_epgpSnapshot, guildEvent.EventMembers
                 .Where(x => x.EmojiDiscordName == m_emojis.Events.Icon_Absent.Name), false, false);
 
             return embed.Build();

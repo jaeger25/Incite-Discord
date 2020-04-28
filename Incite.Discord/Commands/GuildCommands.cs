@@ -34,27 +34,6 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("list-members")]
-        [RequireInciteRole(RoleKind.Member)]
-        [Description("Lists the registered guild members")]
-        public async Task List(CommandContext context)
-        {
-            StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name\n");
-
-            foreach (var member in Guild.Members)
-            {
-                string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
-                    context.Guild.Members[member.User.DiscordId].DisplayName :
-                    "(Unknown)";
-
-                memberList.AppendLine($"{member.UserId} | {member.Id} | {discordName} | {member.PrimaryWowCharacter}");
-            }
-
-            var interactivity = context.Client.GetInteractivity();
-            var pages = interactivity.GeneratePagesInContent(memberList.ToString(), SplitType.Line);
-            await interactivity.SendPaginatedMessageAsync(context.Channel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(5));
-        }
-
         [Command("list-profession")]
         [Aliases("list-prof")]
         [RequireGuildConfigured]
