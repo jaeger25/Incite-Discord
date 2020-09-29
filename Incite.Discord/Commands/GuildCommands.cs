@@ -41,7 +41,7 @@ namespace Incite.Discord.Commands
         {
             StringBuilder memberList = new StringBuilder("UserId | MemberId | Discord Name | Character Name\n");
 
-            foreach (var member in Guild.Members)
+            foreach (var member in Guild.Members.Where(x => x.PrimaryWowCharacterId.HasValue))
             {
                 string discordName = context.Guild.Members.ContainsKey(member.User.DiscordId) ?
                     context.Guild.Members[member.User.DiscordId].DisplayName :

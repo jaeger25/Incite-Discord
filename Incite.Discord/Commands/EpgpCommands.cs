@@ -33,10 +33,11 @@ namespace Incite.Discord.Commands
             m_dbContext = dbContext;
         }
 
-        [Command("list")]
+        [Command("list-current")]
+        [Aliases("list")]
         [RequireInciteRole(RoleKind.Member)]
         [Description("Lists the guild members' EPGP")]
-        public async Task List(CommandContext context)
+        public async Task ListCurrent(CommandContext context)
         {
             var interactivity = context.Client.GetInteractivity();
 
@@ -72,6 +73,37 @@ namespace Incite.Discord.Commands
             }
 
             var pages = interactivity.GeneratePagesInContent(standings.ToString(), SplitType.Line);
+            await interactivity.SendPaginatedMessageAsync(context.Channel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(3));
+        }
+
+        [Command("list-snapshots")]
+        [RequireInciteRole(RoleKind.Member)]
+        [Description("Lists the guild EPGP snapshots")]
+        public async Task ListSnapshots(CommandContext context)
+        {
+            var interactivity = context.Client.GetInteractivity();
+
+            var epgpSnapshots = await m_dbContext.EpgpSnapshots
+                .Include(x => x.Standings)
+                    .ThenInclude(x => x.WowCharacter)
+                        .ThenInclude(x => x.WowClass)
+                .OrderByDescending(x => x.DateTime)
+                .ToListAsync();
+
+            if (epgpSnapshots.Count == 0)
+            {
+                ResponseString = "No EPGP standings imported yet.";
+                return;
+            }
+
+            StringBuilder snapshots = new StringBuilder($"ID | Date\n");
+
+            foreach (var epgpSnapshot in epgpSnapshots)
+            {
+                snapshots.AppendLine($"{epgpSnapshot.Id} | { epgpSnapshot.DateTime}");
+            }
+
+            var pages = interactivity.GeneratePagesInContent(snapshots.ToString(), SplitType.Line);
             await interactivity.SendPaginatedMessageAsync(context.Channel, context.User, pages, timeoutoverride: TimeSpan.FromMinutes(3));
         }
 
