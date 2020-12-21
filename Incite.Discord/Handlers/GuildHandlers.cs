@@ -6,6 +6,7 @@ using Incite.Discord.Services;
 using Incite.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,12 @@ namespace Incite.Discord.Handlers
     public class GuildHandlers : BaseHandler
     {
         readonly GuildCommandPrefixCache m_commandPrefixCache;
+        readonly ILogger<DiscordService> m_logger;
 
-        public GuildHandlers(IServiceScopeFactory scopeFactory, DiscordClient client, GuildCommandPrefixCache commandPrefixCache) : base(scopeFactory)
+        public GuildHandlers(ILogger<DiscordService> logger, IServiceScopeFactory scopeFactory, DiscordClient client, GuildCommandPrefixCache commandPrefixCache) : base(scopeFactory)
         {
             m_commandPrefixCache = commandPrefixCache;
+            m_logger = logger;
 
             client.GuildCreated += Client_GuildCreated;
             client.GuildAvailable += Client_GuildAvailable;
@@ -75,6 +78,7 @@ namespace Incite.Discord.Handlers
 
         async Task UpdateGuildEntitiesAsync(GuildCreateEventArgs e)
         {
+            m_logger.LogCritical($"UpdateGuildEntitiesAsync-Start: {e.Guild.Name}");
             using var scope = ServiceScopeFactory.CreateScope();
 
             var dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
@@ -111,12 +115,16 @@ namespace Incite.Discord.Handlers
             await CreateNewGuildMembersAsync(guild, e, dbContext);
 
             await dbContext.SaveChangesAsync();
+            m_logger.LogCritical($"UpdateGuildEntitiesAsync-Stop: {e.Guild.Name}");
         }
 
         async Task CreateNewGuildMembersAsync(Guild guild, GuildCreateEventArgs e, InciteDbContext dbContext)
         {
-            var memberDiscordIds = e.Guild.Members
-                .Select(x => x.Key);
+            var members = await e.Guild.GetAllMembersAsync();
+
+            var memberDiscordIds = members
+                .AsEnumerable()
+                .Select(x => x.Id);
 
             var existingUsers = await dbContext.Users
                 .Where(x => memberDiscordIds
