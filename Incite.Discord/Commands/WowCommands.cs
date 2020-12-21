@@ -76,11 +76,6 @@ namespace Incite.Discord.Commands
                     WowServerId = character.Server.Id,
                 };
 
-                if (Member.PrimaryWowCharacter == null)
-                {
-                    Member.PrimaryWowCharacter = wowCharacter;
-                }
-
                 m_dbContext.WowCharacters.Add(wowCharacter);
                 await m_dbContext.SaveChangesAsync();
             }

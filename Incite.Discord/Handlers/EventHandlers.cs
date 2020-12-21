@@ -1,4 +1,5 @@
-﻿using DSharpPlus;
+﻿using Castle.Core.Internal;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -58,8 +59,12 @@ namespace Incite.Discord.Handlers
                 return;
             }
 
-            var member = await dbContext.Members.TryGetMemberAsync(e.Guild.Id, e.User.Id);
-            if (member == null || !member.PrimaryWowCharacterId.HasValue)
+            var member = await dbContext.Members
+                .Where(x => x.User.DiscordId == e.User.Id)
+                .Include(x => x.User.WowCharacters)
+                .FirstOrDefaultAsync();
+
+            if (member?.User.WowCharacters.Count == 0)
             {
                 await message.DeleteReactionAsync(e.Emoji, e.User, "User not registered");
 
