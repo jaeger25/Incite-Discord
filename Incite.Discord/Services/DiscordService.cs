@@ -5,6 +5,7 @@ using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using Incite.Discord.Converters;
 using Incite.Discord.DiscordExtensions;
 using Incite.Models;
@@ -82,12 +83,12 @@ namespace Incite.Discord.Services
             m_discordClient.Ready -= DiscordClient_Ready;
         }
 
-        async Task DiscordClient_Ready(ReadyEventArgs e)
+        async Task DiscordClient_Ready(DiscordClient client, ReadyEventArgs e)
         {
-            await e.Client.UpdateStatusAsync(new DiscordActivity("for !help command", ActivityType.Watching));
+            await client.UpdateStatusAsync(new DiscordActivity("for !help command", ActivityType.Watching));
         }
 
-        async Task Commands_CommandErrored(CommandErrorEventArgs e)
+        async Task Commands_CommandErrored(CommandsNextExtension extension, CommandErrorEventArgs e)
         {
             m_logger.LogError($"CommandErrored: {e.Command?.QualifiedName}\nUser: {e.Context?.User}\n{e?.Exception}");
 
@@ -100,7 +101,7 @@ namespace Incite.Discord.Services
             }
         }
 
-        Task Commands_CommandExecuted(CommandExecutionEventArgs e)
+        Task Commands_CommandExecuted(CommandsNextExtension extension, CommandExecutionEventArgs e)
         {
             m_logger.LogInformation($"CommandExecuted: {e.Command?.QualifiedName}\nUser: {e.Context?.User}");
             return Task.CompletedTask;

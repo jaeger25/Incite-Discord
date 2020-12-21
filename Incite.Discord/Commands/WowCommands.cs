@@ -16,6 +16,7 @@ using Incite.Discord.Converters;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using DSharpPlus;
+using Microsoft.Extensions.Logging;
 
 namespace Incite.Discord.Commands
 {
@@ -368,7 +369,7 @@ namespace Incite.Discord.Commands
                     }
                     catch (Exception ex)
                     {
-                        context.Client.DebugLogger.LogMessage(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding error: {wowItemId}", DateTimeOffset.UtcNow.DateTime, ex);
+                        context.Client.Logger.Log(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding error: {wowItemId}", DateTimeOffset.UtcNow.DateTime, ex);
                     }
 
                     if (wowItemId % 500 == 0)
@@ -380,7 +381,7 @@ namespace Incite.Discord.Commands
                         dbContext = scope.ServiceProvider.GetService<InciteDbContext>();
 
 
-                        context.Client.DebugLogger.LogMessage(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding: {wowItemId} out of {23328}", DateTimeOffset.UtcNow.DateTime);
+                        context.Client.Logger.Log(LogLevel.Warning, "WowItemCommands-Seed", $"Seeding: {wowItemId} out of {23328}", DateTimeOffset.UtcNow.DateTime);
                     }
 
                     await Task.Delay(1);
@@ -408,7 +409,7 @@ namespace Incite.Discord.Commands
 
                 return new DiscordEmbedBuilder()
                     .WithTitle(item.Name)
-                    .WithThumbnailUrl(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Medium))
+                    .WithThumbnail(m_wowHead.GetWowHeadIconUrl(item.WowHeadIcon, WowHeadIconSize.Medium))
                     .WithUrl(m_wowHead.GetWowHeadItemUrl(item.WowId))
                     .WithColor(WowItemQualityToColor(item.ItemQuality))
                     .WithDescription(createdBy.ToString())

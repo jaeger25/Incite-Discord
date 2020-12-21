@@ -49,10 +49,7 @@ namespace Incite.Discord
                     {
                         AutoReconnect = true,
                         Token = config["Discord:BotToken"],
-                        TokenType = TokenType.Bot,
-                        UseInternalLogHandler = true,
-                        LogLevel = isProduction ?
-                            DSharpPlus.LogLevel.Warning : DSharpPlus.LogLevel.Info,
+                        TokenType = TokenType.Bot
                     });
 
                     services

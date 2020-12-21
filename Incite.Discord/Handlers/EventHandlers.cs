@@ -28,7 +28,7 @@ namespace Incite.Discord.Handlers
             client.MessageReactionRemoved += Client_MessageReactionRemoved;
         }
 
-        private async Task Client_MessageReactionAdded(MessageReactionAddEventArgs e)
+        private async Task Client_MessageReactionAdded(DiscordClient discordClient, MessageReactionAddEventArgs e)
         {
             var message = await e.Message.HydrateAsync();
             if (e.User.IsCurrent || !message.Author.IsCurrent)
@@ -99,13 +99,13 @@ namespace Incite.Discord.Handlers
                 .OrderByDescending(x => x.DateTime)
                 .FirstOrDefaultAsync(x => x.GuildId == guildEvent.GuildId);
 
-            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent, latestSnapshot);
+            var eventMessage = new Messages.DiscordEventMessage(discordClient, message, guildEvent, latestSnapshot);
             await eventMessage.RemovePreviousReactionsAsync(e.User, e.Emoji);
 
             await eventMessage.UpdateAsync();
         }
 
-        private async Task Client_MessageReactionRemoved(MessageReactionRemoveEventArgs e)
+        private async Task Client_MessageReactionRemoved(DiscordClient discordClient, MessageReactionRemoveEventArgs e)
         {
             var message = await e.Message.HydrateAsync();
             if (!message.Author.IsCurrent)
@@ -150,7 +150,7 @@ namespace Incite.Discord.Handlers
                 .OrderByDescending(x => x.DateTime)
                 .FirstOrDefaultAsync(x => x.GuildId == guildEvent.GuildId);
 
-            var eventMessage = new Messages.DiscordEventMessage(e.Client, message, guildEvent, latestSnapshot);
+            var eventMessage = new Messages.DiscordEventMessage(discordClient, message, guildEvent, latestSnapshot);
             await eventMessage.UpdateAsync();
         }
 

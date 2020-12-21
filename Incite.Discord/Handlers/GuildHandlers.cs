@@ -27,7 +27,7 @@ namespace Incite.Discord.Handlers
             client.GuildMemberAdded += Client_GuildMemberAdded;
         }
 
-        Task Client_GuildMemberAdded(GuildMemberAddEventArgs e)
+        Task Client_GuildMemberAdded(DiscordClient client, GuildMemberAddEventArgs e)
         {
             _ = Task.Run(async () =>
             {
@@ -61,13 +61,13 @@ namespace Incite.Discord.Handlers
             return Task.CompletedTask;
         }
 
-        Task Client_GuildAvailable(GuildCreateEventArgs e)
+        Task Client_GuildAvailable(DiscordClient client, GuildCreateEventArgs e)
         {
             _ = UpdateGuildEntitiesAsync(e);
             return Task.CompletedTask;
         }
 
-        Task Client_GuildCreated(GuildCreateEventArgs e)
+        Task Client_GuildCreated(DiscordClient client, GuildCreateEventArgs e)
         {
             _ = UpdateGuildEntitiesAsync(e);
             return Task.CompletedTask;

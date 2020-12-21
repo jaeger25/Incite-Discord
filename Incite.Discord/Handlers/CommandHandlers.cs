@@ -23,7 +23,7 @@ namespace Incite.Discord.Handlers
             client.MessageCreated += Client_MessageCreated;
         }
 
-        async Task Client_MessageCreated(MessageCreateEventArgs e)
+        async Task Client_MessageCreated(DiscordClient discordClient, MessageCreateEventArgs e)
         {
             if (e.Author.IsBot)
             {
@@ -38,7 +38,7 @@ namespace Incite.Discord.Handlers
             }
 
             var content = e.Message.Content.Substring(1);
-            var commands = e.Client.GetCommandsNext();
+            var commands = discordClient.GetCommandsNext();
             var cmd = commands.FindCommand(content, out var args);
             if (cmd == null)
             {
